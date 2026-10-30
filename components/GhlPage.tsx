@@ -1,0 +1,89 @@
+'use client';
+/* A client component on purpose: each route's generated client.tsx imports its markup and renders this, so the
+   markup is server-rendered into the HTML once and never serialized into the React hydration payload. */
+import { useEffect } from 'react';
+
+export type PageScript = { id: string; src?: string; type?: string; crossOrigin?: string; code?: string };
+
+/**
+ * Renders one converted GoHighLevel page: the original <head> stylesheet/style sequence followed by
+ * the original <body> markup (both untouched apart from URL rewriting), then every original script
+ * re-emitted through next/script in the original order. `display: contents` keeps the wrapper out of
+ * the layout so the markup behaves as if it were a direct child of <body>, exactly like the source.
+ */
+/**
+ * Vue's <Teleport to="body"> hydration expects the SSR anchors (<!--teleport start anchor--> … <!--teleport anchor-->)
+ * and the teleported markup to be direct children of <body>, starting at body.firstChild. React needs a host element,
+ * so the page markup is rendered inside a wrapper; this script (first afterInteractive script, i.e. after React
+ * hydration and before the Nuxt entry executes) moves every body-level node that preceded #__nuxt in the original
+ * document back to the start of <body>, and every body-level node that followed it to the end of <body>.
+ */
+const TELEPORT_FIX = `(function(){var w=document.querySelector('[data-ghl-page]');var n=document.getElementById('__nuxt');if(!w||!n||n.parentNode!==w||w.getAttribute('data-ghl-fixed'))return;
+var keep=function(x){return x.nodeType===1&&/^(STYLE|LINK|SCRIPT)$/.test(x.tagName)};var before=document.createDocumentFragment(),after=document.createDocumentFragment(),c=w.firstChild,past=false;
+while(c){var nx=c.nextSibling;if(c===n){past=true}else if(!keep(c)){(past?after:before).appendChild(c)}c=nx}
+document.body.insertBefore(before,document.body.firstChild);document.body.appendChild(after);w.setAttribute('data-ghl-fixed','1')})();`;
+
+export type PagePreload = { href: string; media?: string };
+
+/**
+ * The builder headline faces ("Poppins Headline" / "Poppins Headline Bold", 8 KB each, overrides/site.css), preloaded at
+ * the very start of the page markup: early enough that they arrive before the headlines render (preloaded only from the
+ * markup further down they arrived late on phones and the headlines re-wrapped when they swapped in: layout shift).
+ * Deliberately in <body>, not <head>: Chrome holds the first rendering while a font preloaded from <head> is still
+ * downloading, and when the font landed just after the first frame the page stayed blank for a further second (observed
+ * first paint ~1.35 s instead of ~0.35 s in most Lighthouse mobile runs, simulated LCP ~12 s). Performance pass, October 2026.
+ */
+const FONT_PRELOADS =
+  '<link rel="preload" as="font" type="font/woff2" crossorigin="" href="/assets/gfonts/s/poppins/v24/pxiByp8kv8JHgFVrLDD4Z1xlFQ.woff2">' +
+  '<link rel="preload" as="font" type="font/woff2" crossorigin="" href="/assets/gfonts/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFQ.woff2">';
+
+/**
+ * The page scripts (teleport fix, Nuxt payload, runtime entry, …) are appended in their original order once React
+ * has hydrated (an effect runs after hydration, like next/script's afterInteractive did). next/script is not used
+ * for them any more: for every external afterInteractive script it emits a <link rel="preload" as="script"> in
+ * <head>, which started the 256 KB runtime entry alongside the document and the hero image on phones.
+ */
+function runPageScripts(scripts: PageScript[]) {
+  // Appended back to back, like next/script did: classic inline scripts run synchronously in this order, classic
+  // external ones keep their order (async = false), and the runtime's module entry — first in the source, but
+  // deferred by the browser — executes after them, once the inline Nuxt config it needs has run.
+  for (const s of [{ id: 'ghl-teleport-fix', code: TELEPORT_FIX }, ...scripts]) {
+    if (document.getElementById(s.id)) continue;
+    const el = document.createElement('script');
+    el.id = s.id;
+    if (s.type) el.type = s.type;
+    if (s.crossOrigin) el.crossOrigin = s.crossOrigin;
+    if (s.src) { el.src = s.src; el.async = false; } else el.text = s.code || '';
+    document.body.appendChild(el);
+  }
+}
+
+export function GhlPage({ headHtml, bodyHtml, scripts, preload }: { headHtml: string; bodyHtml: string; scripts: PageScript[]; preload?: PagePreload[] }) {
+  useEffect(() => {
+    const w = document.querySelector('[data-ghl-page]');
+    if (!w) return;
+    // Defence in depth: the client never has the markup (__html is ''), so if React ever regenerates the tree after
+    // a hydration mismatch the wrapper comes back empty. Keep a copy of the server markup from the first mount and
+    // put it back, so the visitor sees the page (static) instead of a blank document.
+    const g = window as unknown as { __snzGhlNodes?: Node[] };
+    if (!w.childNodes.length && g.__snzGhlNodes) { for (const n of g.__snzGhlNodes) w.appendChild(n); console.warn('[snz] page markup put back after a React re-render'); }
+    if (w.getAttribute('data-ghl-scripts')) return;
+    w.setAttribute('data-ghl-scripts', '1');
+    runPageScripts(scripts);
+  }, [scripts]);
+  return (
+    <>
+      {/* hero background = LCP element; React hoists these into <head> */}
+      {(preload || []).map((p) => (
+        <link key={p.href + (p.media || '')} rel="preload" as="image" href={p.href} media={p.media} fetchPriority="high" />
+      ))}
+      {/* __html is '' on the client (client.tsx): React keeps the server-rendered markup as long as the value does not change;
+          the font preloads (FONT_PRELOADS) are added to the server markup only, so the client value stays '' */}
+      <div data-ghl-page="" style={{ display: 'contents' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: headHtml ? FONT_PRELOADS + headHtml + bodyHtml : '' }} />
+      {/* keeps a handle on the server-rendered nodes before React runs: third-party loaders (CallRail, tag managers)
+          can insert elements between the wrapper and its siblings while the HTML is still streaming, and a hydration
+          mismatch then makes React regenerate the tree with an empty wrapper; the effect above puts the nodes back */}
+      <script dangerouslySetInnerHTML={{ __html: "(function(){var w=document.querySelector('[data-ghl-page]');if(w&&!window.__snzGhlNodes)window.__snzGhlNodes=Array.prototype.slice.call(w.childNodes)})();" }} />
+    </>
+  );
+}

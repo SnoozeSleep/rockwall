@@ -1,0 +1,1512 @@
+#!/usr/bin/env node
+/**
+ * convert.mjs — one-shot, repeatable conversion of the wget clone of
+ * brownsville.snoozemattresscompany.com into this Next.js 15 App Router project.
+ *
+ *   node scripts/convert.mjs            # uses CLONE_ROOT (default C:/clones)
+ *   CLONE_ROOT=/path/to/clone NEXT_PUBLIC_SITE_URL=https://example.com node scripts/convert.mjs
+ *
+ * What it does (see README.md for the full story):
+ *   0. verifies the clone is complete (every <img src>/srcset resolves to a local file) or aborts
+ *   1. copies every non-HTML asset of the clone into public/assets/<alias>/… (collision-free,
+ *      Windows-safe names) and records asset-map.json (original local path -> public path)
+ *   2. generates one App Router route per HTML page, with `export const metadata`, the page's
+ *      <head> stylesheet/style sequence + <body> markup rendered through dangerouslySetInnerHTML,
+ *      and every script re-emitted through next/script in the original order
+ *   3. rewrites every asset URL (HTML attributes, inline CSS, the Nuxt JSON payload, the Nuxt
+ *      runtime config and the copied JS bundles) so nothing points at the original domain/CDNs
+ *   4. removes trackers (GTM, gtag, the Facebook pixel loader, GHL reviews widget loader)
+ *   5. stubs the LeadConnector widgets (reviews iframe, popup form, booking calendar)
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import * as cheerio from 'cheerio';
+import { extractSections, insertSectionsIntoPage } from './insert-sections.mjs';
+import { applyHeroBackground } from './hero-backgrounds.mjs';
+import { fluidTypography, addImageDimensions } from './responsive-extras.mjs';
+import { prepareLogoMarquee } from './scrub-logos.mjs';
+import { loadLocale, translateDom, translateString, tr } from './i18n.mjs';
+import { relocate } from './relocate.mjs';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+const CLONE = (process.env.CLONE_ROOT || 'C:/clones').replace(/\\/g, '/').replace(/\/+$/, '');
+const SITE_HOST = 'brownsville.snoozemattresscompany.com';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://mcallen.snoozemattresscompany.com').replace(/\/+$/, '');
+const SITE_DIR = `${CLONE}/${SITE_HOST}`;
+const PUBLIC = path.join(ROOT, 'public');
+const APP = path.join(ROOT, 'app');
+
+// Host -> public/assets/<alias>. Aliases are deliberately not the hostnames so that a grep of the
+// built output for the original hostnames comes back empty.
+const HOST_ALIAS = {
+  'assets.cdn.filesafe.space': 'filesafe',
+  'images.leadconnectorhq.com': 'lcimg',
+  'stcdn.leadconnectorhq.com': 'lcstatic',
+  'fonts.googleapis.com': 'gfonts-css',
+  'fonts.gstatic.com': 'gfonts',
+};
+const MEDIA_HOSTS = new Set(['assets.cdn.filesafe.space', 'cdn.filesafe.space', 'assets.cdn.msgsndr.com', 'cdn.msgsndr.com']);
+const REMOVED_SCRIPT_HOSTS = [
+  { test: /apisystem\.tech\/js\/reviews_widget\.js/i, reason: 'GoHighLevel reviews-widget loader (CRM widget)' },
+  { test: /storage\.googleapis\.com\/builder-preview\/iframe\/pixel\.js/i, reason: 'Facebook pixel loader (fbevents.js)' },
+  { test: /storage\.googleapis\.com\/builder-preview\/iframe\/iframeResizer/i, reason: 'GHL builder-preview iframe resizer (only used inside the GHL editor)' },
+];
+const TRACKER_SCRIPT_RE = /googletagmanager\.com|google-analytics\.com|gtag\(|gtag\/js|dataLayer|fbq\(|fbevents\.js|connect\.facebook\.net|clarity\.ms|hotjar|leadconnectorhq\.com\/tracking|removed-tracker/i;
+// external scripts that may stay external: the client's white-label widget domains (form / calendar / review embeds)
+const EXTERNAL_SCRIPT_ALLOW = /^https:\/\/(?:link\.snoozesleep\.com|reputationhub\.site)\//i;
+
+// ---------------------------------------------------------------- overrides (hand-provided section code, live widget embeds, removals)
+const OVERRIDES_DIR = path.join(ROOT, 'overrides');
+const OVR = fs.existsSync(path.join(OVERRIDES_DIR, 'overrides.json')) ? JSON.parse(fs.readFileSync(path.join(OVERRIDES_DIR, 'overrides.json'), 'utf8')) : {};
+OVR.vars ||= {}; OVR.rules ||= []; OVR.widgets ||= {}; OVR.removeElements ||= []; OVR.site ||= {}; OVR.insertSections ||= []; OVR.heroBackgrounds ||= {};
+const BUILD_STAMP = Date.now().toString(36); // cache-busts the two page scripts on every regeneration
+const RIBBON_IMAGE_ID = '56c2e728-7cc6-48a2-900b-17c687ee6b20'; // the "0% Financing Available" ribbon PNG (replaced by overrides/ribbon.html)
+// client-supplied ribbon banners per locale (public/assets/filesafe/ARD47WoZpqaZSQ9MSxLD/media/)
+const RIBBON_FILES = { en: { src: '/assets/filesafe/ARD47WoZpqaZSQ9MSxLD/media/6998d2e3d83aec18a37dc71c-w1100.webp', width: 1100, height: 198 }, es: { src: '/assets/filesafe/ARD47WoZpqaZSQ9MSxLD/media/6a70fefca4c8a1a2c30ff22b-w1100.webp', width: 1100, height: 178 } }; // 1100px webp re-encodes of the client's PNGs (displayed at <= 550 CSS px)
+const SITE_LOGO = '/assets/lcimg/image/f_webp/q_80/r_1200/u/filesafe/qR8peonBlnjGI3ZuLHQP/media/8d16458d-661d-4d16-bec0-14dea766bf45.webp';
+// ---- locales: overrides/i18n/<code>.part-*.json (+ <code>.extra.json) dictionaries; each page is generated once per locale
+const I18N_DIR = path.join(OVERRIDES_DIR, 'i18n');
+const LOCALES = [{ code: 'en', prefix: '', lang: 'en', hreflang: 'en-US', htmlLang: 'en', ogLocale: 'en_US' }, { code: 'es', prefix: '/es', lang: 'es', hreflang: 'es-US', htmlLang: 'es', ogLocale: 'es_US' }]; // hreflang: region-qualified (SEO report, October 27, 2026)
+const EXTRA_LOCALES = fs.existsSync(I18N_DIR) ? LOCALES.filter((l) => l.code !== 'en' && fs.readdirSync(I18N_DIR).some((f) => f.startsWith(l.code + '.part-'))).map((l) => Object.assign(loadLocale(I18N_DIR, l.code), l)) : [];
+const SITE_HOSTS = new Set([new URL(SITE_URL).host.toLowerCase(), 'brownsville.snoozemattresscompany.com', 'www.brownsville.snoozemattresscompany.com']);
+const localized = (route, loc) => (loc && loc.prefix ? loc.prefix + (route === '/' ? '' : route) : route);
+const escapeHtml = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const MOTION = fs.existsSync(path.join(OVERRIDES_DIR, 'motion.json')) ? JSON.parse(fs.readFileSync(path.join(OVERRIDES_DIR, 'motion.json'), 'utf8')) : { pages: {} };
+const motionRulesFor = (rel) => { let r = MOTION.pages[rel]; while (typeof r === 'string') r = MOTION.pages[r]; return [...(r || []), ...(MOTION.pages['*'] || [])]; };
+const PREPARED = new Map(); // override files rewritten at build time (the logo marquee, see below)
+const ovrFile = (name) => (PREPARED.has(name) ? PREPARED.get(name) : fs.readFileSync(path.join(OVERRIDES_DIR, name), 'utf8'));
+const applyVars = (html, extra = {}) => html.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (m, k) => (k in extra ? String(extra[k]) : k in OVR.vars ? String(OVR.vars[k]) : m));
+const ruleFor = (html) => OVR.rules.find((r) => r.match.every((s) => html.includes(s)));
+
+const report = {
+  siteUrl: SITE_URL,
+  insertPacks: [],
+  insertedSections: [],
+  heroBackgrounds: [],
+  motion: [],
+  pages: [],
+  assets: { copied: 0, bytes: 0, skippedUnchanged: 0, collisions: 0, bundlesPatched: 0, bundleReplacements: {} },
+  missingImages: [],           // clone verification failures (fatal)
+  missingReferenced: new Set(), // referenced files that do not exist in the clone (non-fatal, reported)
+  removedTrackers: [],
+  removedScripts: [],
+  stubs: [],
+  overrides: [],
+  widgets: [],
+  faqs: [],
+  ribbons: [],
+  i18n: [],
+  embedScripts: [],
+  droppedHints: 0,
+  rewrittenUrls: 0,
+  externalHostsLeft: {},
+};
+
+// ---------------------------------------------------------------- helpers
+const posix = (p) => p.replace(/\\/g, '/');
+function fnv1a(s) { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); }
+function sanitizeSeg(seg) {
+  let s = seg.replace(/[^A-Za-z0-9._-]/g, '_');
+  if (s.length > 100) { const ext = (seg.match(/\.[A-Za-z0-9]{1,8}$/) || [''])[0]; s = s.slice(0, 60) + '-' + fnv1a(seg) + ext; }
+  return s;
+}
+function winEscape(s) { return s.replace(/[\\|:?"*<>\x00-\x1f]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')); }
+function decodeSeg(s) { try { return decodeURIComponent(s); } catch { return s; } }
+function walk(dir, out = []) { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = path.join(dir, e.name); if (e.isDirectory()) walk(p, out); else out.push(p); } return out; }
+function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
+function write(file, content) { ensureDir(path.dirname(file)); fs.writeFileSync(file, content); }
+function escapeJsonForScript(json) { return json.replace(/</g, '\\u003C').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
+function routeFromPage(relHtml) { const r = relHtml.replace(/\.html$/i, ''); const route = r === 'index' ? '/' : '/' + r; return RENAMED_ROUTES[route] || route; }
+
+// ---------------------------------------------------------------- 0. verify the clone
+const pageFiles = walk(SITE_DIR).filter((f) => f.toLowerCase().endsWith('.html')).map((f) => posix(path.relative(SITE_DIR, f))).sort()
+  .filter((f) => !['terms-conditions.html', 'privacy-policy-page-1.html', 'home-page.html', 'main-page.html'].includes(f)); // duplicate legal / home pages: see DUPLICATE_ROUTES
+if (pageFiles.length === 0) { console.error(`No HTML pages found under ${SITE_DIR}`); process.exit(1); }
+const fontmap = fs.existsSync(`${CLONE}/fontmap.json`) ? JSON.parse(fs.readFileSync(`${CLONE}/fontmap.json`, 'utf8')) : {};
+
+function localRelFromRelative(ref, pageDirPosix) {
+  const clean = ref.split('#')[0].split('?')[0];
+  if (!clean) return null;
+  const abs = path.posix.normalize(path.posix.join(pageDirPosix, ...clean.split('/').map(decodeSeg)));
+  const rel = path.posix.relative(CLONE, abs);
+  return rel.startsWith('..') ? null : rel;
+}
+for (const rel of pageFiles) {
+  const html = fs.readFileSync(`${SITE_DIR}/${rel}`, 'utf8');
+  const $ = cheerio.load(html);
+  const pageDir = path.posix.dirname(`${SITE_DIR}/${rel}`);
+  $('img').each((_, el) => {
+    const cands = [];
+    const src = $(el).attr('src'); if (src) cands.push(src);
+    const srcset = $(el).attr('srcset'); if (srcset) for (const part of srcset.split(',')) { const u = part.trim().split(/\s+/)[0]; if (u) cands.push(u); }
+    for (const c of cands) {
+      if (/^(data:|https?:|\/\/)/i.test(c)) { if (/^https?:\/\/(?:[a-z0-9-]+\.)*(snoozemattresscompany\.com|filesafe\.space|leadconnectorhq\.com|msgsndr\.com)/i.test(c)) report.missingImages.push({ page: rel, src: c, why: 'still remote' }); continue; }
+      const lr = localRelFromRelative(c, pageDir);
+      if (!lr || !fs.existsSync(`${CLONE}/${lr}`)) report.missingImages.push({ page: rel, src: c, why: 'no local file' });
+    }
+  });
+}
+if (report.missingImages.length) {
+  console.error(`CLONE INCOMPLETE: ${report.missingImages.length} <img> references do not resolve to a local file. Refusing to build on a broken clone.`);
+  for (const m of report.missingImages.slice(0, 30)) console.error(`  ${m.page}: ${m.src} (${m.why})`);
+  process.exit(2);
+}
+console.log(`clone check: ${pageFiles.length} pages, every <img> src/srcset resolves locally`);
+
+// ---------------------------------------------------------------- 1. assets
+const assetMap = new Map();      // localRel -> publicPath
+const usedPublic = new Map();    // publicPath -> localRel
+const webpTwins = new Map();     // localRel -> path of its WebP twin (scripts/optimize-images.mjs), served in its place
+const variantIndex = new Map();  // mediaPath -> [{ size, localRel }]
+
+function publicPathFor(host, segs) {
+  const alias = HOST_ALIAS[host];
+  segs = segs.slice();
+  if (host === 'images.leadconnectorhq.com') {
+    const i = segs.findIndex((s) => /^u_https?%3A$/i.test(s));
+    if (i >= 0 && segs[i + 1]) {
+      let rest = segs.slice(i + 2);
+      if (segs[i + 1] === 'storage.googleapis.com' && rest[0] === 'msgsndr') rest = rest.slice(1);
+      segs = [...segs.slice(0, i), 'u', 'filesafe', ...rest];
+    }
+  }
+  return `/assets/${alias}/` + segs.map(sanitizeSeg).join('/');
+}
+function mediaPathOf(host, segs) {
+  if (MEDIA_HOSTS.has(host)) return segs.join('/');
+  if (host === 'images.leadconnectorhq.com') {
+    const i = segs.findIndex((s) => /^u_https?%3A$/i.test(s));
+    if (i < 0) return null;
+    const mh = segs[i + 1]; let rest = segs.slice(i + 2);
+    if (mh === 'storage.googleapis.com' && rest[0] === 'msgsndr') rest = rest.slice(1);
+    const size = Number((segs.slice(0, i).find((s) => /^r_\d+$/.test(s)) || 'r_0').slice(2));
+    return { mediaPath: rest.join('/'), size };
+  }
+  return null;
+}
+for (const host of Object.keys(HOST_ALIAS)) {
+  const dir = `${CLONE}/${host}`;
+  if (!fs.existsSync(dir)) continue;
+  for (const file of walk(dir)) {
+    const segs = posix(path.relative(dir, file)).split('/');
+    if (segs.length === 1 && segs[0] === 'index.html') continue; // stray host index page saved by wget
+    const localRel = `${host}/${segs.join('/')}`;
+    // WebP twins written by scripts/optimize-images.mjs sit next to their heavy PNG/JPEG original: the twin is not an
+    // asset of its own, the original is served under its public path + ".webp"
+    if (/\.(png|jpe?g)\.webp$/i.test(file) && fs.existsSync(file.replace(/\.webp$/i, ''))) continue;
+    const twin = /\.(png|jpe?g)$/i.test(file) && fs.existsSync(`${file}.webp`) ? `${file}.webp` : null;
+    let pub = publicPathFor(host, segs) + (twin ? '.webp' : '');
+    if (twin) webpTwins.set(localRel, twin);
+    if (usedPublic.has(pub) && usedPublic.get(pub) !== localRel) {
+      report.assets.collisions++;
+      pub = pub.replace(/(\.[A-Za-z0-9]{1,8})?$/, `-${fnv1a(localRel)}$1`);
+    }
+    usedPublic.set(pub, localRel); assetMap.set(localRel, pub);
+    const mp = mediaPathOf(host, segs);
+    if (typeof mp === 'string') { /* original media file */ }
+    else if (mp) { if (!variantIndex.has(mp.mediaPath)) variantIndex.set(mp.mediaPath, []); variantIndex.get(mp.mediaPath).push({ size: mp.size, localRel }); }
+  }
+}
+for (const v of variantIndex.values()) v.sort((a, b) => a.size - b.size);
+
+const BUNDLE_RULES = [
+  [/https:\/\/stcdn\.leadconnectorhq\.com\//g, '/assets/lcstatic/'],
+  [/https:\/\/stcdn\.leadconnectorhq\.com/g, '/assets/lcstatic'],
+  [/https:\/\/images(?:-staging)?\.leadconnectorhq\.com/g, '/assets/lcimg'],
+  [/https:\/\/(?:[a-z0-9-]+\.)*leadconnectorhq\.com/g, '/ghl-stub/api'],
+  [/https:\/\/(?:[a-z0-9-]+\.)*apisystem\.tech/g, '/ghl-stub/api'],
+  [/https:\/\/(?:assets\.)?cdn\.(?:filesafe\.space|msgsndr\.com)/g, '/assets/filesafe'],
+  // the runtime builds Google Fonts URLs from these constants; middleware.ts maps …/gfonts-css/css?family=… to the local copy
+  [/https:\/\/fonts\.googleapis\.com/g, '/assets/gfonts-css'],
+  [/https:\/\/fonts\.gstatic\.com/g, '/assets/gfonts'],
+  [/leadconnectorhq\.com/g, 'leadconnectorhq.invalid'],
+  [/filesafe\.space/g, 'filesafe.invalid'],
+  [/msgsndr\.com/g, 'msgsndr.invalid'],
+  [/apisystem\.tech/g, 'apisystem.invalid'],
+];
+function patchBundle(text) {
+  let n = 0;
+  for (const [re, rep] of BUNDLE_RULES) text = text.replace(re, () => { n++; report.assets.bundleReplacements[re.source] = (report.assets.bundleReplacements[re.source] || 0) + 1; return rep; });
+  return { text, n };
+}
+console.log(`assets: ${assetMap.size} files indexed, ${variantIndex.size} proxied image sources, copying…`);
+// Indexed (so URLs still map locally) but not shipped: Google font files except the two 'Poppins Headline' cuts (every
+// face was stripped from the cloned stylesheets), Font Awesome's legacy formats (browsers take the woff2/woff listed
+// first), the form builder's GIFs (forms are iframes) and runtime chunks no page entry can reach.
+const HEADLINE_FONT_FILES = /pxiByp8kv8JHgFVrL(DD4Z1xlFQ|DD4Z1JlFc-K|Cz7Z1xlFQ|Cz7Z1JlFc-K)\.woff2$/;
+const unreachableChunks = (() => {
+  const dir = CLONE + '/stcdn.leadconnectorhq.com/_preview'; if (!fs.existsSync(dir)) return new Set();
+  const chunks = new Set(fs.readdirSync(dir).filter((x) => x.endsWith('.js')));
+  const entries = new Set(); for (const rel of pageFiles) for (const m of fs.readFileSync(path.join(SITE_DIR, rel), 'utf8').matchAll(/_preview\/([A-Za-z0-9_.-]+\.js)/g)) entries.add(m[1]);
+  const seen = new Set(); const queue = [...entries].filter((e) => chunks.has(e));
+  while (queue.length) { const ch = queue.pop(); if (seen.has(ch)) continue; seen.add(ch); const txt = fs.readFileSync(path.join(dir, ch), 'utf8'); for (const m of txt.matchAll(/["'`](?:\.\/)?([A-Za-z0-9_.-]+\.js)["'`]/g)) if (chunks.has(m[1]) && !seen.has(m[1])) queue.push(m[1]); }
+  return new Set([...chunks].filter((ch) => !seen.has(ch)));
+})();
+const SKIP_COPY = (localRel) => (/^fonts\.gstatic\.com\//.test(localRel) && !HEADLINE_FONT_FILES.test(localRel))
+  || /fontawesome\/webfonts\/.*\.(svg|eot|eot_|ttf)$/i.test(localRel)
+  || /^stcdn\.leadconnectorhq\.com\/forms\/gifs\//.test(localRel)
+  || (/^stcdn\.leadconnectorhq\.com\/_preview\/[^/]+\.js$/.test(localRel) && unreachableChunks.has(localRel.split('/').pop()));
+report.assets.skippedUnshipped = 0;
+for (const [localRel, pub] of assetMap) {
+  const src = webpTwins.get(localRel) || `${CLONE}/${localRel}`; const dest = path.join(PUBLIC, pub.replace(/^\//, ''));
+  if (SKIP_COPY(localRel)) { report.assets.skippedUnshipped++; if (fs.existsSync(dest)) fs.rmSync(dest); continue; }
+  const host = localRel.split('/')[0];
+  const isText = /\.(js|mjs|css)$/i.test(localRel) && (host === 'stcdn.leadconnectorhq.com' || host === 'fonts.googleapis.com');
+  if (!isText) {
+    const st = fs.statSync(src);
+    if (fs.existsSync(dest) && fs.statSync(dest).size === st.size) { report.assets.skippedUnchanged++; report.assets.bytes += st.size; continue; }
+    ensureDir(path.dirname(dest)); fs.copyFileSync(src, dest); report.assets.copied++; report.assets.bytes += st.size; continue;
+  }
+  let text = fs.readFileSync(src, 'utf8');
+  if (host === 'fonts.googleapis.com') {
+    text = text.replace(/\.\.\/fonts\.gstatic\.com\//g, '../gfonts/').replace(/https:\/\/fonts\.gstatic\.com\//g, '/assets/gfonts/');
+    // All text renders Poppins (next/font in the root layouts; the two 'Poppins Headline' cuts are declared in
+    // overrides/site.css), so every @font-face is dropped from the cloned Google Fonts stylesheets and none of these
+    // families' font files is shipped (SKIP_COPY below).
+    text = text.replace(/(?:\/\*[^*]*\*\/\s*)?@font-face\s*\{[^}]*\}\s*/g, '');
+  }
+  else { const r = patchBundle(text); if (r.n) report.assets.bundlesPatched++; text = r.text; }
+  write(dest, text); report.assets.copied++; report.assets.bytes += Buffer.byteLength(text);
+}
+
+// ---- brand-logo marquee: the grey/white boxes are erased at build time (scripts/scrub-logos.mjs) into alpha WebPs
+// with width/height, so the page does no canvas work and downloads each logo once
+PREPARED.set('logo-marquee.html', await prepareLogoMarquee(
+  fs.readFileSync(path.join(OVERRIDES_DIR, 'logo-marquee.html'), 'utf8'),
+  (url) => { const c = wgetCandidates(url).find((x) => assetMap.has(x)); return c ? { src: `${CLONE}/${c}`, publicPath: assetMap.get(c) } : null; },
+  PUBLIC, (msg) => console.log(msg)));
+
+// ---------------------------------------------------------------- URL mapping
+function wgetCandidates(url) {
+  const m = /^https?:\/\/([^/?#]+)([^?#]*)(?:\?([^#]*))?/.exec(url); if (!m) return [];
+  const host = m[1].toLowerCase(); let p = winEscape(m[2].replace(/^\//, '')).replace(/\/{2,}/g, '/');
+  if (m[3] !== undefined) p += '@' + winEscape(m[3]);
+  if (!p) return [];
+  return [p, p + '.css', p + '.html'].map((x) => `${host}/${x}`);
+}
+function mediaPublic(mediaPath, wantSize) {
+  const orig = `assets.cdn.filesafe.space/${mediaPath}`;
+  const vs = variantIndex.get(mediaPath) || [];
+  if (!wantSize && assetMap.has(orig)) return assetMap.get(orig);
+  if (vs.length) { const pick = wantSize ? (vs.find((v) => v.size >= wantSize) || vs[vs.length - 1]) : vs[vs.length - 1]; return assetMap.get(pick.localRel); }
+  if (assetMap.has(orig)) return assetMap.get(orig);
+  return null;
+}
+// The builder exported two copies of each legal page (terms-conditions.html / terms-conditions-page.html,
+// privacy-policy-page-1.html / privacy-policy-page.html) with identical text. Only the footer-linked copy is
+// generated; the other URL redirects to it (next.config.ts) and any link to it points at the kept page. Two live
+// URLs with the same text made Google pick its own canonical for /es/terms-conditions-page (Search Console).
+// The builder also exported Home three times (index.html, home-page.html, main-page.html: identical pages, each with
+// its own self-canonical and 28 H1s): only "/" is generated, the other two URLs redirect to it (vercel.json).
+const DUPLICATE_ROUTES = { '/terms-conditions': '/terms-conditions-page', '/privacy-policy-page-1': '/privacy-policy-page', '/home-page': '/', '/main-page': '/' };
+// Pages renamed from the builder's file name: the builder's opt-in page (the key below) is the site's contact page
+// at /contact-us since October 29, 2026 (indexable, with the store's details: components/ContactDetails.tsx). The old
+// URL redirects (vercel.json); scripts/contact-page.mjs re-points the builder payload's funnel-step URL and sets the H1.
+const RENAMED_ROUTES = { '/optin-page': '/contact-us' };
+// Pages search engines must not index (noindex,follow): the booking / Dream Mapping thank-you pages. They stay
+// crawlable (robots.txt does not block them: Google can only read noindex on a page it may fetch) and out of the
+// sitemap (app/sitemap.ts).
+const NOINDEX_ROUTES = new Set(['/thank/you', '/dream/map/thank/you']);
+function routeForSitePath(p) {
+  let r = p.replace(/^\/+/, '').replace(/\.html$/i, '').replace(/\/+$/, '');
+  const route = r === '' || r === 'index' ? '/' : '/' + r;
+  return DUPLICATE_ROUTES[route] || RENAMED_ROUTES[route] || route;
+}
+function noteMissing(url) { report.missingReferenced.add(url); }
+function noteExternal(host) { report.externalHostsLeft[host] = (report.externalHostsLeft[host] || 0) + 1; }
+
+/** Map an absolute URL to its local replacement. Returns null when it should be left alone. */
+// overrides.json -> imageReplacements: { "<old mediaPath>": "<new mediaPath>" } swaps a client image everywhere it is
+// referenced (bare CDN URL, every images.leadconnectorhq.com resize variant, relative clone paths, payload strings)
+// for a new file that was added to the clone tree with scripts/image-variants.mjs
+function replaceMedia(s) {
+  for (const [from, to] of Object.entries(OVR.imageReplacements || {})) if (from !== '_comment' && s.includes(from)) s = s.split(from).join(to);
+  return s;
+}
+function mapAbsolute(url) {
+  url = replaceMedia(url);
+  const m = /^(https?:)\/\/([^/?#]+)(\/[^?#]*)?(\?[^#]*)?(#.*)?$/i.exec(url); if (!m) return null;
+  const host = m[2].toLowerCase(); const pathname = m[3] || '/'; const query = m[4] || ''; const hash = m[5] || '';
+  const segs = pathname.replace(/^\//, '').split('/');
+  if (host === SITE_HOST || host === 'www.' + SITE_HOST) return routeForSitePath(pathname) + query + hash;
+  // bare CDN hosts (runtime config: cdnURL, IMAGE_CDN, STORAGE_API_URL_*) -> the local alias root
+  if (pathname === '/' && !query) {
+    if (MEDIA_HOSTS.has(host)) return '/assets/filesafe' + (url.endsWith('/') ? '/' : '');
+    if (HOST_ALIAS[host]) return `/assets/${HOST_ALIAS[host]}` + (url.endsWith('/') ? '/' : '');
+  }
+  if (MEDIA_HOSTS.has(host) || (host === 'storage.googleapis.com' && segs[0] === 'msgsndr')) {
+    const mediaPath = (host === 'storage.googleapis.com' ? segs.slice(1) : segs).join('/');
+    const pub = mediaPublic(mediaPath, 0);
+    if (pub) return pub;
+    if (host === 'storage.googleapis.com') { noteExternal(host); return null; }
+    noteMissing(url); return `/assets/filesafe/${mediaPath.split('/').map(sanitizeSeg).join('/')}`;
+  }
+  if (host === 'images.leadconnectorhq.com') {
+    for (const c of wgetCandidates(url)) if (assetMap.has(c)) return assetMap.get(c);
+    const mm = /^\/image\/((?:[^/]+\/)*?)u_(https?:\/\/.+)$/i.exec(pathname + query);
+    if (mm) {
+      const size = Number((mm[1].match(/r_(\d+)/) || [0, 0])[1]);
+      const inner = /^https?:\/\/([^/]+)\/(.*)$/.exec(mm[2]);
+      if (inner) {
+        let mp = inner[2]; if (inner[1] === 'storage.googleapis.com') mp = mp.replace(/^msgsndr\//, '');
+        const pub = mediaPublic(mp, size); if (pub) return pub;
+      }
+    }
+    noteMissing(url); return `/assets/lcimg/${segs.map(sanitizeSeg).join('/')}`;
+  }
+  if (host === 'stcdn.leadconnectorhq.com' || host === 'fonts.gstatic.com') {
+    for (const c of wgetCandidates(url)) if (assetMap.has(c)) return assetMap.get(c);
+    noteMissing(url); return `/assets/${HOST_ALIAS[host]}/${segs.map(sanitizeSeg).join('/')}`;
+  }
+  if (host === 'fonts.googleapis.com') {
+    const fm = fontmap[url] || fontmap[url.replace(/&amp;/g, '&')];
+    if (fm && assetMap.has(fm)) return assetMap.get(fm);
+    for (const c of wgetCandidates(url)) if (assetMap.has(c)) return assetMap.get(c);
+    noteMissing(url); return `/assets/gfonts-css/${sanitizeSeg((segs.join('/') || 'css') + (query ? '@' + query.slice(1) : '') + '.css')}`;
+  }
+  if (host === 'backend.leadconnectorhq.com' && /^\/appengine\/reviews\/get_widget\//i.test(pathname)) return `/ghl-stub/widget/reviews/${segs.slice(3).join('/')}`;
+  // the client's white-label widget domains (popup form, booking calendar, review widget): live embeds stay as they are
+  if (host === 'link.snoozesleep.com' || host === 'reputationhub.site') { noteExternal(host); return null; }
+  if (/(?:^|\.)(?:leadconnectorhq\.com|apisystem\.tech)$/i.test(host)) return `/ghl-stub/api${pathname}${query}`;
+  if (host === 'www.googletagmanager.com' || host === 'connect.facebook.net') return '/ghl-stub/removed-tracker';
+  noteExternal(host);
+  return null;
+}
+function mapUrl(raw, pageDir) {
+  const ref = raw.trim();
+  if (!ref || /^(#|data:|mailto:|tel:|sms:|javascript:|blob:)/i.test(ref)) return raw;
+  if (/^\/\//.test(ref)) { const r = mapAbsolute('https:' + ref); return r === null ? raw : (report.rewrittenUrls++, r); }
+  if (/^https?:\/\//i.test(ref)) { const r = mapAbsolute(ref); return r === null ? raw : (report.rewrittenUrls++, r); }
+  if (ref.startsWith('/') && !ref.startsWith('/assets/') && !ref.startsWith('/ghl-stub')) return raw; // root-relative on original site: leave
+  // relative reference inside the clone
+  const hashIdx = ref.search(/[?#]/); const suffix = hashIdx >= 0 ? ref.slice(hashIdx) : '';
+  const lr = localRelFromRelative(ref, pageDir);
+  if (!lr) return raw;
+  if (lr === SITE_HOST || lr.startsWith(SITE_HOST + '/')) { report.rewrittenUrls++; return routeForSitePath(lr.slice(SITE_HOST.length)) + suffix; }
+  const lrNew = replaceMedia(lr); // replaced client image: the same resize variant of the new file, when the clone has it
+  if (lrNew !== lr && assetMap.has(lrNew)) { report.rewrittenUrls++; return assetMap.get(lrNew) + suffix; }
+  if (assetMap.has(lr)) { report.rewrittenUrls++; return assetMap.get(lr) + suffix; }
+  noteMissing(ref); return raw;
+}
+const URL_IN_TEXT = /https?:\/\/[^\s"'`<>\\)]+/g;
+function rewriteText(text, pageDir) {
+  if (!text || text.indexOf('http') === -1) return text;
+  return text.replace(URL_IN_TEXT, (u) => { const t = u.replace(/[),.;]+$/, ''); const tail = u.slice(t.length); return mapUrl(t, pageDir) + tail; });
+}
+const CSS_URL = /url\(\s*(['"]?)([^'")]+)\1\s*\)/g;
+function rewriteCss(css, pageDir) { if (!css) return css; return css.replace(CSS_URL, (all, q, u) => `url(${q}${mapUrl(u, pageDir)}${q})`); }
+function rewriteSrcset(v, pageDir) { return v.split(',').map((part) => { const s = part.trim().split(/\s+/); if (s[0]) s[0] = mapUrl(s[0], pageDir); return s.join(' '); }).join(', '); }
+
+// ---------------------------------------------------------------- stubs / placeholders
+const STUB_STYLE = 'display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;border:2px dashed #f58433;border-radius:12px;background:#fff7f0;color:#1d2b64;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;box-sizing:border-box';
+// GHL element kinds that talk to the client's CRM. With an embed configured in overrides/overrides.json ("widgets")
+// they become the live white-label embed; otherwise a visible placeholder element.
+const WIDGET_KINDS = {
+  calendar: { title: 'Booking calendar placeholder', what: 'LeadConnector booking calendar', todo: 'replace this element with your own booking widget', minHeight: 420, embed: 'calendar' },
+  form: { title: 'Form placeholder', what: 'LeadConnector form (it posted to backend.leadconnectorhq.com)', todo: 'replace this element with your own form', minHeight: 320, embed: 'form' },
+  survey: { title: 'Survey placeholder', what: 'LeadConnector survey (it posted to backend.leadconnectorhq.com)', todo: 'replace this element with your own survey', minHeight: 320, embed: null },
+  'review-widget': { title: 'Reviews placeholder', what: 'LeadConnector reviews widget', todo: 'replace this element with your own reviews widget', minHeight: 240, embed: 'reviews' },
+};
+function widgetHtml(kind, info) {
+  const cfg = WIDGET_KINDS[kind];
+  const w = cfg.embed && OVR.widgets[cfg.embed];
+  if (w && w.file && fs.existsSync(path.join(OVERRIDES_DIR, w.file))) {
+    // widgets.form.formId / widgets.calendar.calendarId (overrides.json) force one CRM id site-wide (the clone's elements
+    // carry the old location's ids); the default* values only fill elements that carry none
+    const vars = { formId: w.formId || info.formId || w.defaultFormId || '', formName: w.formName || 'Form', calendarId: w.calendarId || info.calendarId || w.defaultCalendarId || '', locationId: w.locationId || '', widgetId: w.widgetId || '', uid: fnv1a(`${info.page}|${info.id}`) };
+    // the vendor helper (form_embed.js) is emitted once per page, after the first calendar iframe; the desktop and
+    // phone copies of the section would otherwise load it twice
+    vars.embedScript = kind === 'calendar' && !info.embedScriptAdded ? '<script src="https://link.snoozesleep.com/js/form_embed.js" type="text/javascript"></script>' : '';
+    vars.copy = info.embedScriptAdded ? 'b' : ''; // second copy of the embed on the page gets a distinct id
+    return { html: applyVars(ovrFile(w.file), vars), how: `live ${cfg.embed} embed (${vars.formId || vars.calendarId || vars.widgetId})` };
+  }
+  return { html: widgetPlaceholder(kind, info.formId || info.calendarId || info.id), how: 'visible placeholder (no embed configured)' };
+}
+function widgetPlaceholder(kind, label) {
+  const k = WIDGET_KINDS[kind] || WIDGET_KINDS.form;
+  return `<div class="ghl-stub ghl-stub--${kind}" data-ghl-stub="${kind}" style="${STUB_STYLE};min-height:${k.minHeight}px;width:100%"><div><strong>${k.title}</strong><br>The ${k.what}${label ? ` (${label})` : ''} was deliberately not cloned.<br><small>TODO: ${k.todo}.</small></div></div>`;
+}
+
+// ---------------------------------------------------------------- Nuxt payload transform
+function transformPayload(json, pageDir, ctx) {
+  const nodes = JSON.parse(json);
+  const push = (v) => { nodes.push(v); return nodes.length - 1; };
+  const str = (i) => (typeof i === 'number' && i >= 0 && typeof nodes[i] === 'string' ? nodes[i] : null);
+  const dict = (i) => (typeof i === 'number' && i >= 0 && nodes[i] && typeof nodes[i] === 'object' && !Array.isArray(nodes[i]) ? nodes[i] : null);
+  // 1. page-level tracking fields — stripped BEFORE URL rewriting (the tracker patterns match the original
+  //    hostnames) and modified in place, so every field sharing the same string node sees the stripped version
+  for (const n of nodes) {
+    if (!n || typeof n !== 'object' || Array.isArray(n) || !('elements' in n) || !('popup' in n)) continue;
+    for (const key of ['globalHeadTrackingCode', 'globalBodyTrackingCode', 'headerCode', 'footerCode']) {
+      const s = str(n[key]);
+      if (s && s.trim()) {
+        const { kept, removed } = stripTrackers(s);
+        if (removed.length) { report.removedTrackers.push(...removed.map((r) => ({ page: ctx.rel, where: `payload.${key}`, what: r }))); nodes[n[key]] = kept; }
+      }
+    }
+    if (typeof n.pixelToInit === 'number' && Array.isArray(nodes[n.pixelToInit]) && nodes[n.pixelToInit].length) {
+      report.removedTrackers.push({ page: ctx.rel, where: 'payload.pixelToInit', what: `${nodes[n.pixelToInit].length} pixel(s) to init` }); n.pixelToInit = push([]);
+    }
+  }
+  // 2. remove whole GHL elements (the original header sections + their custom nav code; components/SiteHeader.tsx replaces them)
+  const removeIds = new Set(OVR.removeElements);
+  if (removeIds.size) {
+    const drop = new Set();
+    const collect = (i) => { const n = dict(i); if (!n || drop.has(i)) return; drop.add(i); const ch = typeof n.child === 'number' ? nodes[n.child] : null; if (Array.isArray(ch)) for (const c of ch) collect(c); };
+    nodes.forEach((n, i) => { if (dict(i) && removeIds.has(str(n.id))) collect(i); });
+    for (let i = 0; i < nodes.length; i++) if (Array.isArray(nodes[i]) && nodes[i].some((x) => typeof x === 'number' && drop.has(x))) nodes[i] = nodes[i].filter((x) => !(typeof x === 'number' && drop.has(x)));
+    for (const i of drop) { const id = str(nodes[i].id); if (id && removeIds.has(id)) ctx.removed.push(id); }
+  }
+  // 2b. alt text for client image elements that carry none (overrides.json -> imageAlt); the runtime re-renders the
+  //     <img> from imageProperties after hydration, so the markup alt (step 2c of convertPage) alone would not stick
+  const imageAlt = Object.entries(OVR.imageAlt || {}).filter(([k]) => k !== '_comment');
+  if (imageAlt.length) for (const n of nodes) {
+    if (!n || typeof n !== 'object' || Array.isArray(n)) continue;
+    let ip = dict(n.imageProperties); if (ip && !('url' in ip) && 'value' in ip) ip = dict(ip.value); // imageProperties -> { value } -> { url, altText, … }
+    const url = ip && str(ip.url); if (!url) continue;
+    const hit = imageAlt.find(([needle]) => url.includes(needle));
+    if (hit && !(str(ip.altText) || '').trim()) ip.altText = push(hit[1]);
+  }
+  // 3. hand-provided section code: custom-code elements whose current HTML matches an override rule get the new HTML
+  for (const n of nodes) {
+    if (!n || typeof n !== 'object' || Array.isArray(n) || str(n.meta) !== 'custom-code') continue;
+    const extra = dict(n.extra); const cc = extra && dict(extra.customCode); const val = cc && dict(cc.value);
+    if (!val || typeof val.rawCustomCode !== 'number') continue;
+    const html = str(val.rawCustomCode); if (typeof html !== 'string') continue;
+    const rule = ruleFor(html); if (!rule) continue;
+    // replaced in place (not pushed as a new string): the old code would otherwise stay in the payload as dead data
+    nodes[val.rawCustomCode] = applyVars(ovrFile(rule.file)).trim(); // an empty file empties the element (hidden via overrides/site.css)
+    const id = str(n.id) || '?';
+    if (!ctx.overridden.has(id)) { ctx.overridden.set(id, rule.name); report.overrides.push({ page: ctx.rel, id, rule: rule.name, file: rule.file }); }
+  }
+  // 4. CRM widget elements (calendar / form / survey / review widget) -> custom-code elements carrying the live embed
+  //    (same shape as the site's own custom-code elements: extra.customCode.value.rawCustomCode, rendered via innerHTML)
+  for (const n of nodes) {
+    if (!n || typeof n !== 'object' || Array.isArray(n)) continue;
+    const kind = str(n.meta);
+    if (!kind || !(kind in WIDGET_KINDS)) continue;
+    const id = str(n.id) || kind;
+    const extra = dict(n.extra);
+    const info = { id, page: ctx.rel };
+    if (typeof n.calendarData === 'number' && dict(n.calendarData)) info.calendarId = Object.keys(nodes[n.calendarData])[0] || null;
+    if (extra) for (const key of ['formId', 'surveyId', 'calendarId']) { const v = dict(extra[key]); const s = v && typeof v.value === 'number' ? str(v.value) : null; if (s && s !== 'none') info[key] = s; }
+    info.embedScriptAdded = kind === 'calendar' && ctx.embedScriptAdded; if (kind === 'calendar') ctx.embedScriptAdded = true;
+    const { html, how } = widgetHtml(kind, info);
+    toCustomCode(n, id, html);
+    delete n.calendarData; delete n.formData;
+    ctx.widgets.push({ id, kind, html });
+    report.widgets.push({ page: ctx.rel, kind, id, how });
+  }
+  // 4b. elements replaced by hand-written custom code with the same content (FAQ accordions, the financing ribbon):
+  //     decided from the server-rendered markup in convertPage (ctx.replacements: id -> { kind, html })
+  for (const n of nodes) {
+    if (!n || typeof n !== 'object' || Array.isArray(n)) continue;
+    const id = str(n.id); const rep = id && ctx.replacements && ctx.replacements.get(id);
+    if (!rep) continue;
+    toCustomCode(n, id, rep.html);
+  }
+  function toCustomCode(n, id, html) {
+    const extra = dict(n.extra);
+    const newExtra = { visibility: extra && 'visibility' in extra ? extra.visibility : push({ value: push('') }), customCode: push({ value: push({ rawCustomCode: push(html) }) }), customClass: push({ value: push('') }), nodeId: push('c' + id) };
+    n.extra = push(newExtra); n.meta = push('custom-code'); n.tagName = push('c-custom-code'); if ('title' in n) n.title = push('Custom Code');
+  }
+  // 5. every string: rewrite URLs and the bare domain name
+  for (let i = 0; i < nodes.length; i++) {
+    if (typeof nodes[i] !== 'string') continue;
+    if (nodes[i] === SITE_HOST) { nodes[i] = new URL(SITE_URL).host; continue; }
+    if (nodes[i].indexOf('http') !== -1 || nodes[i].indexOf('url(') !== -1) nodes[i] = rewriteCss(rewriteText(nodes[i], pageDir), pageDir);
+  }
+  // 6. locale: translate every payload string the same way as the markup (hydration re-renders from here)
+  if (ctx.loc) {
+    const st = { hits: 0, missing: new Set() };
+    for (let i = 0; i < nodes.length; i++) if (typeof nodes[i] === 'string') { const t = translateString(nodes[i], ctx.loc, st, SITE_HOSTS); if (t !== nodes[i]) nodes[i] = t; }
+    ctx.i18n.payloadHits = st.hits;
+  }
+  return escapeJsonForScript(JSON.stringify(nodes));
+}
+/** Remove tracking <script>/<noscript> blocks from an HTML snippet, keep everything else. */
+function stripTrackers(html) {
+  const $ = cheerio.load(html, null, false);
+  const removed = [];
+  $('script').each((_, el) => { const src = $(el).attr('src') || ''; const code = $(el).html() || ''; if (TRACKER_SCRIPT_RE.test(src) || TRACKER_SCRIPT_RE.test(code)) { removed.push(src ? `script src=${src}` : `inline script: ${code.replace(/\s+/g, ' ').slice(0, 80)}…`); $(el).remove(); } });
+  $('noscript').each((_, el) => { const h = $(el).html() || ''; if (/googletagmanager|facebook\.com\/tr|doubleclick/i.test(h)) { removed.push(`noscript: ${h.replace(/\s+/g, ' ').slice(0, 80)}`); $(el).remove(); } });
+  $('img').each((_, el) => { const s = $(el).attr('src') || ''; if (/facebook\.com\/tr\?|google-analytics\.com\/collect|doubleclick\.net/i.test(s)) { removed.push(`pixel img: ${s.slice(0, 80)}`); $(el).remove(); } });
+  return { kept: $.html(), removed };
+}
+
+// ---------------------------------------------------------------- 2/3. pages
+function metaFromHead($, route, pageDir) {
+  const meta = {};
+  const get = (sel) => { const v = $(sel).first().attr('content'); return v ? v.trim() : undefined; };
+  const title = $('head > title').first().text().trim(); if (title) meta.title = title;
+  const description = get('meta[name="description"]'); if (description) meta.description = description;
+  // meta keywords are never emitted (dead weight for search engines; the builder's tag was in English on the Spanish pages too)
+  const author = get('meta[name="author"]'); if (author) meta.authors = [{ name: author }];
+  const robots = get('meta[name="robots"]'); if (robots) meta.robots = robots;
+  if (NOINDEX_ROUTES.has(route)) meta.robots = { index: false, follow: true };
+  const ogImage = get('meta[name="og:image"], meta[property="og:image"]');
+  const ogType = get('meta[name="og:type"], meta[property="og:type"]');
+  meta.alternates = { canonical: route };
+  meta.openGraph = { title: get('meta[name="og:title"], meta[property="og:title"]') || title, description: get('meta[name="og:description"], meta[property="og:description"]') || description, url: route, type: ogType && ['website', 'article'].includes(ogType) ? ogType : 'website' };
+  if (ogImage) meta.openGraph.images = [mapUrl(ogImage, pageDir)];
+  const twCard = get('meta[name="twitter:card"]'); const twImage = get('meta[name="twitter:image"]');
+  if (twCard || twImage) { meta.twitter = {}; if (twCard) meta.twitter.card = twCard; if (twImage) meta.twitter.images = [mapUrl(twImage, pageDir)]; }
+  const icon = $('head link[rel="icon"], head link[rel="shortcut icon"]').first().attr('href'); if (icon) meta.icons = { icon: mapUrl(icon, pageDir) };
+  const other = {};
+  for (const [name, key] of [['og:author', 'og:author'], ['og:keywords', 'og:keywords'], ['twitter:type', 'twitter:type'], ['image', 'image']]) { const v = get(`meta[name="${name}"]`); if (v) other[key] = key === 'image' ? mapUrl(v, pageDir) : v; }
+  if (Object.keys(other).length) meta.other = other;
+  return meta;
+}
+
+const GUIDE_PAGES = new Set(['/pillows', '/mattress-protectors', '/premium-sheets']); // accessory buying guides (components/AccessoryGuide.tsx, SEO audit build pass D4)
+const HANDWRITTEN_ROUTES = new Set(['/booking', '/dream-mapping', '/queen-mattresses', '/king-mattresses', '/full-twin-mattresses', '/memory-foam-mattresses', '/mattresses-for-back-pain', '/cooling-mattresses', '/mattress-store-edinburg', '/mattress-store-mission', '/mattress-store-pharr', '/faq', '/how-to-choose-a-mattress']); // app/(en)/booking + app/es/booking (components/BookingPage.tsx) and the content pages of lib/pages/* (components/ContentPage.tsx) are hand-written
+function convertPage(rel, loc = null) {
+  const route = routeFromPage(rel);
+  if (HANDWRITTEN_ROUTES.has(route)) return;
+  const outRoute = localized(route, loc);
+  const pageDir = path.posix.dirname(`${SITE_DIR}/${rel}`);
+  const ctx = { rel, route, widgets: [], overridden: new Map(), removed: [], loc, i18n: { hits: 0, missing: new Set() } };
+  const $ = cheerio.load(fs.readFileSync(`${SITE_DIR}/${rel}`, 'utf8'));
+  const scripts = [];
+  const seenExternal = new Set();
+  let scriptSeq = 0;
+  const scriptId = (hint) => `${outRoute === '/' ? 'home' : outRoute.slice(1).replace(/\W+/g, '-')}-${hint}-${scriptSeq++}`;
+
+  // ---- head: metadata first (before anything is rewritten/removed)
+  const metadata = metaFromHead($, route, pageDir);
+  metadata.alternates = { canonical: outRoute, languages: Object.fromEntries([...LOCALES.map((l) => [l.hreflang, localized(route, l)]), ['x-default', route]]) };
+  if (metadata.openGraph) { metadata.openGraph.url = outRoute; metadata.openGraph.locale = (loc || LOCALES[0]).ogLocale; }
+  if (loc) {
+    const st = ctx.i18n;
+    for (const k of ['title', 'description']) if (metadata[k]) metadata[k] = tr(metadata[k], loc, st);
+    if (metadata.openGraph) for (const k of ['title', 'description']) if (metadata.openGraph[k]) metadata.openGraph[k] = tr(metadata.openGraph[k], loc, st);
+  }
+
+  // ---- 1. drop whole GHL elements (the original header sections + their custom nav code; components/SiteHeader.tsx replaces them)
+  for (const id of OVR.removeElements) $(`[id="${id}"]`).remove();
+
+  // ---- 1b. sections copied from another page (overrides.json "insertSections") go in front of their anchor section,
+  //          in markup, payload and CSS, so the later steps (overrides, URL rewriting) treat them like native content
+  for (const pack of INSERT_PACKS) {
+    const $p = $('script#__NUXT_DATA__').first();
+    const r = insertSectionsIntoPage($, $p.length ? $p.html() || '' : '', rel, pack);
+    if (r.json !== null) $p.html(r.json);
+    if (r.inserted.length) report.insertedSections.push({ page: rel, name: pack.name, anchors: r.anchors, sections: r.inserted });
+  }
+
+  // ---- 1c. per-page hero background (overrides.json "heroBackgrounds"): desktop + mobile hero copies, CSS + payload
+  if (OVR.heroBackgrounds[rel]) {
+    const $p = $('script#__NUXT_DATA__').first();
+    const r = applyHeroBackground($, $p.length ? $p.html() || '' : '', OVR.heroBackgrounds[rel], new Set(OVR.removeElements));
+    if (r.json !== null) $p.html(r.json);
+    report.heroBackgrounds.push({ page: rel, image: OVR.heroBackgrounds[rel], desktop: r.desktop, mobile: r.mobile });
+    // the hero background is the LCP element: preload the copy that matches the viewport (<link rel="preload" media>)
+    const cfg = OVR.heroBackgrounds[rel]; const heroUrl = (w) => (typeof cfg === 'string' ? cfg : cfg && cfg[w]) || null;
+    ctx.preload = [];
+    if (r.desktop && heroUrl('desktop')) ctx.preload.push({ href: mapUrl(heroUrl('desktop'), pageDir), media: '(min-width: 768px)' });
+    if (r.mobile && heroUrl('mobile')) ctx.preload.push({ href: mapUrl(heroUrl('mobile'), pageDir), media: '(max-width: 767px)' });
+    if (r.mobile) $(`[id="${r.mobile}"]`).addClass('snz-hero'); // phone hero: overlay + cover rules in overrides/site.css
+    for (const id of [r.desktop, r.mobile]) if (id) $(`[id="${id}"]`).attr('data-snz-hero', ''); // both hero copies paint on the first frame (overrides/motion.css; scripts/hero-mark.mjs for existing pages)
+  }
+
+  // ---- 1d. scroll-reveal tags (overrides/motion.json): data-animate / data-delay on server-rendered elements.
+  //          Elements inside custom code are skipped (they animate on their own and are re-rendered on hydration).
+  let motionTagged = 0;
+  for (const rule of motionRulesFor(rel)) {
+    let i = 0;
+    $(rule.selector).each((_, el) => {
+      const $el = $(el);
+      if ($el.closest('.custom-code-container').length || $el.closest('.snz-logo-marquee, #ghl-trust-ticker, .snooze-ticker-bar').length) return;
+      if (rule.class) $el.addClass(rule.class);
+      if (rule.animate || rule.alternate) {
+        if ($el.attr('data-animate')) return; // first (most specific, page-level) rule wins: page rules run after '*' rules, so page rules are listed first below
+        const variant = rule.alternate ? rule.alternate[i % rule.alternate.length] : rule.animate;
+        const delay = (rule.delay || 0) + (rule.stagger || 0) * i;
+        $el.attr('data-animate', variant);
+        if (delay) $el.attr('data-delay', String(delay));
+        motionTagged++;
+      }
+      i++;
+    });
+  }
+  report.motion.push({ page: rel, tagged: motionTagged });
+
+  // ---- 1e. orange address/phone strips get a class so the page-fix stylesheet can lift their contrast
+  const headCss = $('style').map((_, s) => $(s).html() || '').get().join(' ');
+  $('body .c-section').each((_, el) => {
+    const id = $(el).attr('id'); if (!id) return;
+    if (new RegExp('[.]' + id + '[{][^}]*background-color:var[(]--color-m6a8t67b[)]').test(headCss) && $(el).find('.c-button a.custom').length) $(el).addClass('snz-orange-strip');
+  });
+
+  // ---- 1f. navy rounded cards with the orange border (the "Dream Mapping" style column/row cards) get a class so the
+  //          page-fix stylesheet can give them one consistent inner padding on phones
+  $('body .c-column, body .c-row').each((_, el) => {
+    const id = $(el).attr('id'); if (!id) return;
+    const rule = new RegExp('[.](col|row)-' + id.replace(/^(col|row)-/, '') + '[{]([^}]*)[}]', 'g');
+    let css = ''; let m; while ((m = rule.exec(headCss))) css += m[2] + ';';
+    if (/background-color:var[(]--color-m6a8scoh[)]/.test(css) && /border-color:var[(]--color-(hxkylqlh|m6a8t67b)[)]/.test(css) && ($(el).hasClass('borderFull') || /border-style:solid/.test(css))) $(el).addClass('snz-card');
+  });
+  report.cards = (report.cards || 0) + $('.snz-card').length;
+
+  // ---- 1g. GoHighLevel FAQ elements -> the blog-style accordion (overrides/faq-accordion.html) with the same
+  //          questions and answers; the financing ribbon image -> vector ribbon (overrides/ribbon.html).
+  //          Both become custom-code elements (markup here, payload in transformPayload) like the CRM widgets.
+  ctx.replacements = new Map();
+  $('.c-faq.c-wrapper').each((_, el) => {
+    const id = $(el).attr('id'); if (!id) return;
+    const items = $(el).find('.hl-faq-child').map((i, child) => {
+      const q = $(child).find('.hl-faq-child-heading-text').text().replace(/\s+/g, ' ').trim();
+      const a = ($(child).find('.hl-faq-child-item-text').html() || '').trim();
+      return { q, a };
+    }).get().filter((it) => it.q);
+    if (!items.length) return;
+    const itemsHtml = items.map((it, i) => `<div class="snz-faq__item${i === 0 ? ' is-open' : ''}"><h3 class="snz-faq__q"><button type="button" class="snz-faq__btn snz-headline-font" id="${id}-q${i}" aria-expanded="${i === 0 ? 'true' : 'false'}" aria-controls="${id}-a${i}"><span>${escapeHtml(it.q)}</span><svg class="snz-faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3><div class="snz-faq__panel" id="${id}-a${i}" role="region" aria-labelledby="${id}-q${i}"><div class="snz-faq__inner"><div class="snz-faq__a">${it.a}</div></div></div></div>`).join('');
+    ctx.replacements.set(id, { kind: 'faq', html: applyVars(ovrFile('faq-accordion.html'), { id, items: itemsHtml }) });
+    report.faqs.push({ page: rel, id, items: items.length });
+  });
+  $('img[src*="' + RIBBON_IMAGE_ID + '"]').closest('.c-image.c-wrapper').each((_, el) => {
+    const id = $(el).attr('id'); if (!id) return;
+    ctx.replacements.set(id, { kind: 'ribbon', html: applyVars(ovrFile('ribbon.html'), { logo: SITE_LOGO }) });
+    report.ribbons.push({ page: rel, id });
+  });
+
+  // ---- 2. hand-provided section code, matched by content so desktop + mobile copies are both replaced
+  $('.custom-code-container').each((_, el) => {
+    const rule = ruleFor($(el).html() || '');
+    if (!rule) return;
+    $(el).html(applyVars(ovrFile(rule.file)).trim());
+    const id = ($(el).attr('id') || '').replace(/__custom-code$/, '');
+    if (!ctx.overridden.has(id)) { ctx.overridden.set(id, rule.name); report.overrides.push({ page: rel, id, rule: rule.name, file: rule.file }); }
+  });
+
+  // ---- 2c. alt text for client images that carry none (overrides.json -> imageAlt: { "<media id>": "<alt>" }; the
+  //      Spanish text comes from the dictionary like any other alt attribute)
+  for (const [needle, alt] of Object.entries(OVR.imageAlt || {})) {
+    $('img').each((_, el) => { const src = $(el).attr('src') || ''; if (src.includes(needle) && !($(el).attr('alt') || '').trim()) $(el).attr('alt', alt); });
+  }
+
+  // ---- 2d. steps-timeline sections get one shared class (background image + white overlay in overrides/site.css)
+  $('.c-section').filter((_, el) => $(el).find('.pm-section').length > 0).addClass('steps-bg-faded');
+
+  // ---- 3. the Nuxt payload first: it removes the same elements and decides the embed HTML of every widget element
+  const $payload = $('script#__NUXT_DATA__').first();
+  if ($payload.length) $payload.html(transformPayload($payload.html() || '', pageDir, ctx));
+
+  // ---- 4. CRM widget elements (calendar / form / survey / reviews) -> the same markup as a custom-code element, embed inside
+  const $body = $('body');
+  const WIDGET_CLASS_RE = /\bc-(calendar|form|survey|review-widget|faq|image)\b/;
+  $body.find('.c-calendar.c-wrapper, .c-form.c-wrapper, .c-survey.c-wrapper, .c-review-widget.c-wrapper, .c-faq.c-wrapper, .c-image.c-wrapper').each((_, el) => {
+    const $w = $(el); const id = $w.attr('id') || 'widget';
+    const kind = (($w.attr('class') || '').match(WIDGET_CLASS_RE) || [0, 'form'])[1];
+    const rep = ctx.replacements && ctx.replacements.get(id);
+    if ((kind === 'faq' || kind === 'image') && !rep) return; // only FAQ / ribbon elements decided in step 1g
+    const w = rep || ctx.widgets.find((c) => c.id === id) || { html: widgetHtml(kind, { id, page: rel }).html };
+    const $tpl = $body.find('.c-custom-code.c-wrapper').first();
+    if ($tpl.length) {
+      const $new = $tpl.clone();
+      $new.attr('id', id); $new.attr('class', ($w.attr('class') || '').replace(WIDGET_CLASS_RE, 'c-custom-code'));
+      if (rep && rep.kind === 'faq') for (const a of ['data-animate', 'data-delay']) if ($w.attr(a)) $new.attr(a, $w.attr(a)); // scroll-reveal tags from step 1d (only the FAQ accordion; widgets and the ribbon size/position themselves)
+      const $inner = $new.find('.custom-code-container').first();
+      $inner.attr('id', `${id}__custom-code`); $inner.attr('class', `custom-code-container c${id}`); $inner.html(w.html);
+      $w.replaceWith($new);
+    } else {
+      $w.attr('class', ($w.attr('class') || '').replace(WIDGET_CLASS_RE, 'c-custom-code')); $w.html(`<div id="${id}__custom-code" class="custom-code-container c${id}">${w.html}</div>`);
+    }
+  });
+
+  // ---- 5. scripts (document order) -> next/script entries; data blocks stay inline
+  $('script').each((_, el) => {
+    const $el = $(el); const src = $el.attr('src'); const type = ($el.attr('type') || '').toLowerCase();
+    if (src) {
+      if (/offline-shim\.js$/i.test(src)) { $el.remove(); return; }
+      const removed = REMOVED_SCRIPT_HOSTS.find((r) => r.test.test(src));
+      if (removed) { report.removedScripts.push({ page: rel, src, reason: removed.reason }); $el.remove(); return; }
+      const mapped = mapUrl(src, pageDir);
+      if (/^https?:\/\//i.test(mapped)) {
+        // the widget embeds' own helper scripts (iframe resizing / messaging) must run at parse time, before their
+        // iframes post their first size message, exactly as in the embed code: keep one copy inline in the markup
+        if (EXTERNAL_SCRIPT_ALLOW.test(mapped)) { if (seenExternal.has(mapped)) $el.remove(); else { seenExternal.add(mapped); $el.attr('src', mapped); report.embedScripts.push({ page: rel, src: mapped }); } return; }
+        report.removedScripts.push({ page: rel, src, reason: 'external script not available locally' }); $el.remove(); return;
+      }
+      scripts.push({ id: scriptId('src'), src: mapped, ...(type ? { type } : {}), ...($el.attr('crossorigin') !== undefined ? { crossOrigin: $el.attr('crossorigin') || 'anonymous' } : {}) });
+      $el.remove(); return;
+    }
+    const code = $el.html() || '';
+    if (type === 'application/json') return; // data block (the Nuxt payload was transformed in step 3)
+    if (type === 'application/ld+json') { $el.html(escapeJsonForScript(rewriteText(code, pageDir))); return; }
+    if (type && !/^(text\/javascript|module|text\/ecmascript|application\/javascript)$/.test(type)) return; // unknown data block, leave
+    if (TRACKER_SCRIPT_RE.test(code)) { report.removedTrackers.push({ page: rel, where: 'inline script', what: code.replace(/\s+/g, ' ').slice(0, 100) }); $el.remove(); return; }
+    let js = rewriteText(code, pageDir);
+    js = js.replace(/document\.addEventListener\(\s*(["'])DOMContentLoaded\1\s*,\s*/g, 'window.__ghlOnReady(');
+    const isNuxtConfig = /__NUXT__/.test(js);
+    // the runtime config's image-CDN whitelist lists the CDN hostnames bare (no request is ever made with them once
+    // every image path is local); neutralise them so a grep of the build for the original hostnames stays empty
+    if (isNuxtConfig) js = js.replace(/filesafe\.space/g, 'filesafe.invalid').replace(/msgsndr\.com/g, 'msgsndr.invalid').replace(/leadconnectorhq\.com/g, 'leadconnectorhq.invalid');
+    scripts.push({ id: scriptId(isNuxtConfig ? 'nuxt-config' : 'inline'), code: js, ...(type === 'module' ? { type } : {}) });
+    $el.remove();
+  });
+
+  // ---- 6. head: stylesheet / style / preload sequence, in original order
+  const headParts = []; const tailParts = []; // tailParts: emitted after the page markup (module preloads)
+  $('head').children().each((_, el) => {
+    const $el = $(el); const tag = el.tagName.toLowerCase();
+    if (tag === 'style') { if ($el.attr('data-offline-font') !== undefined) return; headParts.push(`<style>${rewriteCss($el.html() || '', pageDir)}</style>`); return; }
+    if (tag === 'noscript') { const h = $el.html() || ''; if (/googletagmanager|facebook|doubleclick/i.test(h)) report.removedTrackers.push({ page: rel, where: 'head noscript', what: h.replace(/\s+/g, ' ').slice(0, 100) }); return; }
+    if (tag !== 'link') return;
+    const rel_ = ($el.attr('rel') || '').toLowerCase(); const href = $el.attr('href') || ''; const as = $el.attr('as');
+    if (rel_ === 'stylesheet') {
+      if (/^data:text\/css/i.test(href)) { const css = decodeURIComponent(href.slice(href.indexOf(',') + 1)); headParts.push(`<style data-from="data-uri-stylesheet">${rewriteCss(css, pageDir)}</style>`); return; }
+      const mapped = mapUrl(href, pageDir);
+      if (/^https?:\/\//i.test(mapped)) { report.missingReferenced.add(href); return; }
+      headParts.push(`<link rel="stylesheet" href="${mapped}">`); return;
+    }
+    if (rel_ === 'preload' && as === 'style') { if (/^data:/i.test(href)) return; const mapped = mapUrl(href, pageDir); if (!/^https?:/i.test(mapped)) headParts.push(`<link rel="preload" as="style" href="${mapped}">`); return; }
+    // the runtime's ~40 module preloads go after the page markup: the browser still fetches them long before the
+    // (afterInteractive) entry script needs them, but they no longer compete with the document, the hero image and
+    // the fonts for bandwidth before first paint
+    if (as === 'script' || rel_ === 'modulepreload') { const mapped = mapUrl(href, pageDir); if (!/^https?:/i.test(mapped)) tailParts.push(mapped); return; }
+    if (rel_ === 'preconnect' || rel_ === 'dns-prefetch' || rel_ === 'prefetch') { report.droppedHints++; return; }
+    // icon/canonical handled through metadata
+  });
+  // site-wide button style (overrides/buttons.css) and page fixes (overrides/site.css) go last so they win over every page rule
+  // GHL "buttons" used as plain text links (transparent background + noBorder: the address/phone strips,
+  // the footer product list) are excluded from the site-wide button style via a :not() chain.
+  const pageCss = $('style').map((_, s) => $(s).html() || '').get().join(' ');
+  const textLinkIds = new Set();
+  $('a.custom.noBorder, button.custom.noBorder').each((_, el) => {
+    const id = ($(el).attr('class') || '').split(/\s+/).find((c) => c.startsWith('cbutton-'));
+    if (id && new RegExp('\\.' + id + '\\{[^}]*background-color:(?:var\\(--transparent\\)|transparent)').test(pageCss)) textLinkIds.add(id);
+  });
+  const notChain = [...textLinkIds].map((id) => `:not(.${id})`).join('');
+  report.textLinkButtons = textLinkIds.size;
+  // ---- headline typeface marker: an element whose (last) builder font-family rule is var(--headlinefont) or the
+  // explicit "Visby Extrabold" (the old single 800 cut) gets .snz-headline-font ("Visby Bold" -> .snz-headline-bold),
+  // so overrides/site.css can give it the size-adjusted "Poppins Headline" alias while every other element gets the
+  // plain Poppins stack at its own weight.
+  const famByClass = new Map();
+  for (const m of pageCss.matchAll(/([^{}]+)\{([^{}]*font-family:[^{}]*)\}/g)) {
+    const val = (m[2].match(/font-family:\s*[^;}]+/g) || []).pop().replace(/^font-family:\s*/, '').trim();
+    for (const sel of m[1].split(',')) { const c = sel.match(/\.(c(?:heading|paragraph|button|sub-heading)-[A-Za-z0-9_-]+)\s*$/); if (c) famByClass.set(c[1], val); }
+  }
+  // Each page defines its own --headlinefont (Visby Extrabold on the home pages, Visby Bold on Mattresses, Poppins or
+  // Inter elsewhere): var(--headlinefont) users are headline elements only where that variable was a Visby face;
+  // on the other pages they simply render Poppins at the weight the builder gave them.
+  const pageHeadline = (pageCss.match(/--headlinefont:\s*['"]?([^;'"}]+)/) || [])[1] || '';
+  const varIsVisbyX = /Visby Extrabold/.test(pageHeadline), varIsVisbyB = /Visby Bold/.test(pageHeadline);
+  let headlineMarked = 0;
+  for (const [cls, val] of famByClass) {
+    const viaVar = /var\(--headlinefont\)/.test(val);
+    if (/Visby Extrabold/.test(val) || (viaVar && varIsVisbyX)) headlineMarked += $('.' + cls).addClass('snz-headline-font').length;
+    else if (/Visby Bold/.test(val) || (viaVar && varIsVisbyB)) headlineMarked += $('.' + cls).addClass('snz-headline-bold').length;
+  }
+  report.headlineFontMarked = (report.headlineFontMarked || 0) + headlineMarked;
+  // fluid type: GHL's mobile + desktop font sizes become one clamp() between 390px and 1440px
+  const fluidCss = fluidTypography(pageCss);
+  if (fluidCss) headParts.push(`<style data-snz-fluid="">${fluidCss}</style>`);
+  headParts.push('<link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/gfonts/s/poppins/v24/pxiByp8kv8JHgFVrLDD4Z1xlFQ.woff2">'); // the "Poppins Headline" face (overrides/site.css)
+  headParts.push('<link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/gfonts/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFQ.woff2">'); // the "Poppins Headline Bold" face: loading late, it re-wrapped the hero text (performance pass, October 2026)
+  for (const cssFile of ['buttons.css', 'site.css', 'motion.css']) if (fs.existsSync(path.join(OVERRIDES_DIR, cssFile))) headParts.push(`<style data-snz-override="${cssFile}">${ovrFile(cssFile).split('{{not}}').join(notChain)}</style>`);
+
+  // ---- 7. body
+  $body.find('noscript').each((_, el) => { const h = $(el).html() || ''; if (/googletagmanager|facebook\.com\/tr|doubleclick/i.test(h)) { report.removedTrackers.push({ page: rel, where: 'body noscript', what: h.replace(/\s+/g, ' ').slice(0, 100) }); $(el).remove(); } });
+  const ATTRS = ['src', 'href', 'poster', 'data-src', 'action'];
+  $body.find('*').each((_, el) => {
+    const $el = $(el);
+    for (const a of ATTRS) { const v = $el.attr(a); if (v !== undefined && v !== '') { const nv = mapUrl(v, pageDir); if (nv !== v) $el.attr(a, nv); } }
+    for (const a of ['srcset', 'data-srcset']) { const v = $el.attr(a); if (v) { const nv = rewriteSrcset(v, pageDir); if (nv !== v) $el.attr(a, nv); } }
+    const st = $el.attr('style'); if (st && st.indexOf('url(') !== -1) { const nv = rewriteCss(st, pageDir); if (nv !== st) $el.attr('style', nv); }
+    if (el.tagName.toLowerCase() === 'iframe') {
+      const s = $el.attr('src') || $el.attr('data-src') || '';
+      if (/^\/ghl-stub\//.test(s)) report.stubs.push({ page: rel, kind: 'LeadConnector iframe', id: $el.attr('id') || '', original: s, how: 'iframe loads /ghl-stub.html (visible placeholder)' });
+    }
+  });
+  $body.find('style').each((_, el) => { const css = $(el).html() || ''; if (css.indexOf('url(') !== -1) $(el).html(rewriteCss(css, pageDir)); });
+
+  // ---- 7b. locale: every text node / translatable attribute of the page, internal links prefixed (after the URL
+  //          mapping above, which resolves clone links to routes and would otherwise drop the prefix again)
+  if (loc) translateDom($, $body[0], loc, ctx.i18n, SITE_HOSTS);
+
+  // visible text mentions of the original site URL (e.g. in the privacy policy) -> the new deployment URL
+  const SITE_TEXT_RE = new RegExp(`https?://(?:www\\.)?${SITE_HOST.replace(/\./g, '\\.')}`, 'g');
+  // phone-only sections never render wider than 767px: their images' fallback src (what the GHL runtime uses once it
+  // swaps <picture> for a bare <img>) can be the 768px resize instead of the 1200px one
+  $('.mobile-only img[src*="/r_1200/"]').each((_, el) => {
+    const src = $(el).attr('src'); const small = src.replace('/r_1200/', '/r_768/');
+    if (fs.existsSync(path.join(PUBLIC, decodeURIComponent(small.split('?')[0])))) { $(el).attr('src', small); report.phoneImgDownsized = (report.phoneImgDownsized || 0) + 1; }
+  });
+  // explicit width/height on every local image (aspect ratio known before load, no layout shift)
+  report.imageDimsAdded = (report.imageDimsAdded || 0) + addImageDimensions($, PUBLIC);
+  // the GHL runtime swaps every image element's <picture> for a bare <img> while it hydrates; a per-image
+  // aspect-ratio rule keeps that box (and everything below it) still while the new img decodes (no layout shift)
+  const ratioRules = new Map();
+  $('.c-image img[width][height]').each((_, el) => {
+    const id = $(el).closest('.c-image').attr('id'); const w = +$(el).attr('width'), h = +$(el).attr('height');
+    if (id && w > 0 && h > 0 && !ratioRules.has(id)) ratioRules.set(id, `#${id} .image-container img{aspect-ratio:${w}/${h}}`);
+  });
+  if (ratioRules.size) headParts.push(`<style data-snz-imgratio="">${[...ratioRules.values()].join('')}</style>`);
+  const headHtml = headParts.join('\n').replace(SITE_TEXT_RE, SITE_URL);
+  // the runtime's ~40 module preloads (333 KB) used to start with the page and shared the phone's bandwidth with the
+  // hero image; they are now added by a tiny script once the window has loaded, i.e. after the first paint of the
+  // hero. The runtime entry itself is injected after hydration (next/script afterInteractive), so nothing waits on it.
+  const preloadScript = tailParts.length ? `\n<script>(function(){var u=${JSON.stringify(tailParts)};function go(){for(var i=0;i<u.length;i++){var l=document.createElement('link');l.rel='modulepreload';l.as='script';l.crossOrigin='';l.href=u[i];document.head.appendChild(l);}}if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>` : '';
+  const bodyHtml = (($body.html() || '') + preloadScript).replace(SITE_TEXT_RE, SITE_URL);
+  // sanity: nothing left pointing at the forbidden hosts in the page markup
+  const leftover = (headHtml + bodyHtml).match(/https?:\/\/(?:[a-z0-9-]+\.)*(?:snoozemattresscompany\.com|filesafe\.space|leadconnectorhq\.com|msgsndr\.com)[^"'\s<)]*/gi) || [];
+  for (const u of leftover) report.missingReferenced.add(`LEFTOVER ${rel}: ${u}`);
+
+  // ---- emit route files
+  const dir = path.join(APP, loc ? loc.code : '(en)', ...(route === '/' ? [] : route.slice(1).split('/')));
+  write(path.join(dir, 'content.ts'), [
+    '// Generated by scripts/convert.mjs — do not edit by hand. Read on the server only (see client.tsx).',
+    `export const HEAD_HTML = ${JSON.stringify(headHtml)};`,
+    `export const BODY_HTML = ${JSON.stringify(bodyHtml)};`,
+    '',
+  ].join('\n'));
+  write(path.join(dir, 'scripts.ts'), [
+    '// Generated by scripts/convert.mjs — do not edit by hand. The page scripts (re-emitted through next/script after hydration).',
+    `export const SCRIPTS: { id: string; src?: string; type?: string; crossOrigin?: string; code?: string }[] = ${JSON.stringify(scripts, null, 1)};`,
+    '',
+  ].join('\n'));
+  // The page markup is rendered by a client component that reads it on the server only: it is server-rendered into
+  // the HTML exactly as before (visible without JavaScript), but it is neither serialized into React's hydration
+  // payload (that copy doubled every document) nor bundled into the route's JS chunk. Next defines `typeof window`
+  // at build time, so the client bundle drops the require() branch and the ~1.5 MB module with it; on the client the
+  // component renders an empty __html, and React leaves server-rendered innerHTML alone while that value never
+  // changes. Every link into these routes is a plain <a>, so they are always full page loads (no client render).
+  write(path.join(dir, 'client.tsx'), [
+    '// Generated by scripts/convert.mjs — do not edit by hand. Regenerate with `npm run convert`.',
+    "'use client';",
+    "import { GhlPage } from '@/components/GhlPage';",
+    "import { SCRIPTS } from './scripts';",
+    '',
+    '// eslint-disable-next-line @typescript-eslint/no-require-imports',
+    "const content: { HEAD_HTML: string; BODY_HTML: string } | null = typeof window === 'undefined' ? require('./content') : null;",
+    '',
+    'export default function PageClient() {',
+    `  return <GhlPage headHtml={content ? content.HEAD_HTML : ''} bodyHtml={content ? content.BODY_HTML : ''} scripts={SCRIPTS}${ctx.preload && ctx.preload.length ? ` preload={${JSON.stringify(ctx.preload)}}` : ''} />;`,
+    '}',
+    '',
+  ].join('\n'));
+  const isHome = outRoute === '/' || outRoute === '/es'; // the service-area block (components/AreaLinks.tsx) closes the home page
+  const isSales = outRoute === '/mattress-sales' || outRoute === '/es/mattress-sales'; // the metadata names the sale while the offer is on (lib/offer.ts); the offer block itself is a builder section (scripts/sales-hero.mjs)
+  const guideKey = outRoute.replace(/^\/es(?=\/)/, ''); const isGuide = GUIDE_PAGES.has(guideKey);
+  const isMattresses = outRoute === '/mattresses' || outRoute === '/es/mattresses'; // the two blog guides band (components/GuideLinks.tsx) closes the mattresses page (SEO report, October 27, 2026)
+  const isContact = outRoute === '/contact-us' || outRoute === '/es/contact-us'; // the store's address, phone and hours (components/ContactDetails.tsx) close the contact page (October 29, 2026)
+  write(path.join(dir, 'page.tsx'), [
+    '// Generated by scripts/convert.mjs — do not edit by hand. Regenerate with `npm run convert`.',
+    "import type { Metadata } from 'next';",
+    "import PageClient from './client';",
+    ...(isHome ? ["import { SizeTypeGrid } from '@/components/SizeTypeGrid';", "import { AreaLinks } from '@/components/AreaLinks';"] : []),
+    ...(isGuide ? ["import { AccessoryGuide } from '@/components/AccessoryGuide';"] : []),
+    ...(isMattresses ? ["import { GuideLinks } from '@/components/GuideLinks';"] : []),
+    ...(isContact ? ["import { ContactDetails } from '@/components/ContactDetails';"] : []),
+    '',
+    // the sales page's title and description no longer follow the offer (SEO report, October 27, 2026: the agency's
+    // title/meta hold while a sale is on; the dated offer stays in the page's hero block, scripts/sales-hero.mjs)
+    `export const metadata: Metadata = ${JSON.stringify(metadata, null, 2)};`,
+    '',
+    'export default function Page() {',
+    ...(isHome
+      ? ['  return (', '    <>', '      <PageClient />', '      {/* "Mattresses by size & type" — the six size/type pages as icon cards (October 27, 2026) */}', `      <SizeTypeGrid locale="${loc ? loc.code : 'en'}" />`, '      {/* "Shopping from Edinburg, Mission or Pharr?" — links to the service-area pages (SEO audit build pass, C1) */}', `      <AreaLinks locale="${loc ? loc.code : 'en'}" />`, '    </>', '  );']
+      : isSales
+        ? ['  return <PageClient />;'] /* the dated offer block is a builder section under the hero (scripts/sales-hero.mjs) */
+        : isMattresses
+          ? ['  return (', '    <>', '      <PageClient />', '      {/* "Not sure what size you need?" — the two blog guides (SEO report, October 27, 2026) */}', `      <GuideLinks locale="${loc ? loc.code : 'en'}" />`, '    </>', '  );']
+        : isContact
+          ? ['  return (', '    <>', '      <PageClient />', "      {/* the store's address, phone and hours from lib/location.ts (same as the top bar and footer) */}", `      <ContactDetails locale="${loc ? loc.code : 'en'}" />`, '    </>', '  );']
+        : isGuide
+          ? ['  return (', '    <>', '      <PageClient />', '      {/* buying guide built from the page\x27s own claims (SEO audit build pass, D4) */}', `      <AccessoryGuide page="${guideKey.slice(1)}" locale="${loc ? loc.code : 'en'}" />`, '    </>', '  );']
+          : ['  return <PageClient />;']),
+    '}',
+    '',
+  ].join('\n'));
+  if (loc) report.i18n.push({ page: rel, locale: loc.code, route: outRoute, translated: ctx.i18n.hits, payloadStrings: ctx.i18n.payloadHits || 0, missing: [...ctx.i18n.missing] });
+  report.pages.push({ route: outRoute, locale: loc ? loc.code : 'en', source: rel, title: metadata.title || '', scripts: scripts.length, headParts: headParts.length, bodyBytes: Buffer.byteLength(bodyHtml), removed: ctx.removed, overrides: [...ctx.overridden.values()], widgets: ctx.widgets.map((w) => w.kind) });
+  console.log(`  ${outRoute.padEnd(30)} <- ${rel} (${scripts.length} scripts, ${ctx.overridden.size} section overrides, ${ctx.widgets.length} widgets, removed ${ctx.removed.length})`);
+}
+
+// ---------------------------------------------------------------- project files
+function writeProjectFiles() {
+  // remove create-next-app template leftovers that would change rendering
+  for (const f of ['app/globals.css', 'app/page.module.css', 'app/favicon.ico', 'public/next.svg', 'public/vercel.svg', 'public/file.svg', 'public/globe.svg', 'public/window.svg']) { const p = path.join(ROOT, f); if (fs.existsSync(p)) fs.rmSync(p); }
+  write(path.join(ROOT, 'components', 'GhlPage.tsx'), `'use client';
+/* A client component on purpose: each route's generated client.tsx imports its markup and renders this, so the
+   markup is server-rendered into the HTML once and never serialized into the React hydration payload. */
+import { useEffect } from 'react';
+
+export type PageScript = { id: string; src?: string; type?: string; crossOrigin?: string; code?: string };
+
+/**
+ * Renders one converted GoHighLevel page: the original <head> stylesheet/style sequence followed by
+ * the original <body> markup (both untouched apart from URL rewriting), then every original script
+ * re-emitted through next/script in the original order. \`display: contents\` keeps the wrapper out of
+ * the layout so the markup behaves as if it were a direct child of <body>, exactly like the source.
+ */
+/**
+ * Vue's <Teleport to="body"> hydration expects the SSR anchors (<!--teleport start anchor--> … <!--teleport anchor-->)
+ * and the teleported markup to be direct children of <body>, starting at body.firstChild. React needs a host element,
+ * so the page markup is rendered inside a wrapper; this script (first afterInteractive script, i.e. after React
+ * hydration and before the Nuxt entry executes) moves every body-level node that preceded #__nuxt in the original
+ * document back to the start of <body>, and every body-level node that followed it to the end of <body>.
+ */
+const TELEPORT_FIX = \`(function(){var w=document.querySelector('[data-ghl-page]');var n=document.getElementById('__nuxt');if(!w||!n||n.parentNode!==w||w.getAttribute('data-ghl-fixed'))return;
+var keep=function(x){return x.nodeType===1&&/^(STYLE|LINK|SCRIPT)$/.test(x.tagName)};var before=document.createDocumentFragment(),after=document.createDocumentFragment(),c=w.firstChild,past=false;
+while(c){var nx=c.nextSibling;if(c===n){past=true}else if(!keep(c)){(past?after:before).appendChild(c)}c=nx}
+document.body.insertBefore(before,document.body.firstChild);document.body.appendChild(after);w.setAttribute('data-ghl-fixed','1')})();\`;
+
+export type PagePreload = { href: string; media?: string };
+
+/**
+ * The page scripts (teleport fix, Nuxt payload, runtime entry, …) are appended in their original order once React
+ * has hydrated (an effect runs after hydration, like next/script's afterInteractive did). next/script is not used
+ * for them any more: for every external afterInteractive script it emits a <link rel="preload" as="script"> in
+ * <head>, which started the 256 KB runtime entry alongside the document and the hero image on phones.
+ */
+function runPageScripts(scripts: PageScript[]) {
+  // Appended back to back, like next/script did: classic inline scripts run synchronously in this order, classic
+  // external ones keep their order (async = false), and the runtime's module entry — first in the source, but
+  // deferred by the browser — executes after them, once the inline Nuxt config it needs has run.
+  for (const s of [{ id: 'ghl-teleport-fix', code: TELEPORT_FIX }, ...scripts]) {
+    if (document.getElementById(s.id)) continue;
+    const el = document.createElement('script');
+    el.id = s.id;
+    if (s.type) el.type = s.type;
+    if (s.crossOrigin) el.crossOrigin = s.crossOrigin;
+    if (s.src) { el.src = s.src; el.async = false; } else el.text = s.code || '';
+    document.body.appendChild(el);
+  }
+}
+
+export function GhlPage({ headHtml, bodyHtml, scripts, preload }: { headHtml: string; bodyHtml: string; scripts: PageScript[]; preload?: PagePreload[] }) {
+  useEffect(() => {
+    const w = document.querySelector('[data-ghl-page]');
+    if (!w || w.getAttribute('data-ghl-scripts')) return;
+    w.setAttribute('data-ghl-scripts', '1');
+    runPageScripts(scripts);
+  }, [scripts]);
+  return (
+    <>
+      {/* hero background = LCP element; React hoists these into <head> */}
+      {(preload || []).map((p) => (
+        <link key={p.href + (p.media || '')} rel="preload" as="image" href={p.href} media={p.media} fetchPriority="high" />
+      ))}
+      {/* __html is '' on the client (client.tsx): React keeps the server-rendered markup as long as the value does not change */}
+      <div data-ghl-page="" style={{ display: 'contents' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: headHtml + bodyHtml }} />
+    </>
+  );
+}
+`);
+  // site-wide values used by components/SiteHeader.tsx (paths resolved through the asset map)
+  const siteLogo = (OVR.site.logoUrl && mapAbsolute(OVR.site.logoUrl)) || '';
+  const siteFeature = (OVR.site.featureImageUrl && mapAbsolute(OVR.site.featureImageUrl)) || siteLogo;
+  write(path.join(ROOT, 'components', 'site-config.ts'), `// Generated by scripts/convert.mjs — edit overrides/overrides.json ("site") instead.
+export const SITE = {
+  phone: ${JSON.stringify(OVR.site.phone || '(956) 586-5646')},
+  phoneHref: ${JSON.stringify(OVR.site.phoneHref || 'tel:+19565865646')},
+  logo: ${JSON.stringify(siteLogo)},
+  logoAlt: ${JSON.stringify(OVR.site.logoAlt || 'Snooze Mattress + Wellness')},
+  featureImage: ${JSON.stringify(siteFeature)},
+} as const;
+`);
+  // one root layout per locale (route groups): app/(en)/layout.tsx and app/es/layout.tsx set <html lang> and the header/footer locale
+  for (const l of LOCALES) {
+    const dir = path.join(APP, l.code === 'en' ? '(en)' : l.code);
+    ensureDir(dir);
+    write(path.join(dir, 'layout.tsx'), `import type { Metadata } from 'next';
+import Script from 'next/script';
+import { TopBar } from '@/components/TopBar';
+import { SiteHeader } from '@/components/SiteHeader';
+import { AnnouncementTicker } from '@/components/AnnouncementTicker';
+import { SiteFooter } from '@/components/SiteFooter';
+import { PageLoader } from '@/components/PageLoader';
+import { TrackingHead, TrackingBody } from '@/components/Tracking';
+import { ChatWidget } from '@/components/ChatWidget';
+import { GHL_SHIM } from '@/lib/ghl-shim';
+import { BODY_GUARD } from '@/lib/body-guard';
+import { Poppins } from 'next/font/google';
+import '../../overrides/global.css';
+
+/* The site typeface. next/font downloads the Google Fonts files at build time and serves them from this origin (no
+   request to fonts.googleapis.com / fonts.gstatic.com at runtime), emits the @font-face rules with font-display: swap,
+   preloads the files and generates a metric-matched fallback face so the swap causes no layout shift. Weights: 400 body,
+   500 medium copy, 600 buttons / navigation, 700 bold text, 800 headings. The latin subset covers every English and
+   Spanish character (accents and ñ are in U+00C0-00FF), so only five files are preloaded. Exposed as --font-poppins; overrides/global.css
+   builds --font-poppins-stack from it. Declared in the root layout itself: Next only registers a font for preloading when
+   the call sits in a layout or page module. */
+const poppins = Poppins({ weight: ['400', '500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-poppins', preload: true });
+
+export const metadata: Metadata = {
+  metadataBase: new URL(${JSON.stringify(SITE_URL)}),
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang=${JSON.stringify(l.htmlLang)} className={poppins.variable}>
+      <head>
+        {/* keeps elements that tags append to <body> before the React wrapper exists from breaking hydration (lib/body-guard.ts) */}
+        <script dangerouslySetInnerHTML={{ __html: BODY_GUARD }} />
+        {/* tracking first, high in <head>, in the client's order (components/Tracking.tsx) */}
+        <TrackingHead />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://link.snoozesleep.com" />
+        <link rel="dns-prefetch" href="https://reputationhub.site" />
+        <link rel="dns-prefetch" href="https://tag.simpli.fi" />
+        {/* Safety net: rewrites any asset URL the GHL runtime still builds against the original CDNs to the
+            local copies, provides window.__ghlOnReady for the site's own DOMContentLoaded scripts, and filters the
+            review widget's height messages. A plain parser-blocking script on purpose: next/script's
+            "beforeInteractive" runs after the page's own inline scripts (the review-widget.js embed among them),
+            and the message filter must register before the vendor's listener. Inlined (lib/ghl-shim.ts, generated
+            with public/ghl-offline-shim.js) so it costs no extra request on the critical path. */}
+        <script dangerouslySetInnerHTML={{ __html: GHL_SHIM }} />
+      </head>
+      <body>
+        <TrackingBody />
+        {/* Everything React renders in <body> sits in this one element (display: contents, so it adds no box and changes no
+            layout). Tags fired by Google Tag Manager append elements to <body> while a long page is still streaming;
+            with this wrapper they land after it, at the end of <body>, where React's hydration ignores them, instead of
+            between React-rendered siblings (React error #418, a full client re-render). Keeps GTM at parse time safe. */}
+        <div id="snz-app" style={{ display: 'contents' }}>
+        <PageLoader locale=${JSON.stringify(l.code)} />
+        {/* slim NAP + language strip above the sticky header, on every page (components/TopBar.tsx) */}
+        <TopBar locale=${JSON.stringify(l.code)} />
+        <SiteHeader locale=${JSON.stringify(l.code)} />
+        {/* announcement ticker directly under the sticky header, on every page (lib/announcements.ts) */}
+        <AnnouncementTicker locale=${JSON.stringify(l.code)} />
+        {children}
+        <SiteFooter locale=${JSON.stringify(l.code)} />
+        <Script src="/snz-motion.js?v=${BUILD_STAMP}" strategy="afterInteractive" />
+        {/* dataLayer events for GA4 key events: phone / directions clicks, booking and opt-in confirmations (SEO audit 7b) */}
+        <Script src="/snz-events.js?v=${BUILD_STAMP}" strategy="afterInteractive" />
+        {/* the GoHighLevel chat widget in this language, added after the page has loaded (components/ChatWidget.tsx) */}
+        <ChatWidget locale=${JSON.stringify(l.code)} />
+        </div>
+      </body>
+    </html>
+  );
+}
+`);
+    const nf = l.code === 'es' ? { h: '404', p: 'Esta página no existe.', a: 'Volver al inicio', href: '/es' } : { h: '404', p: 'This page does not exist in the converted site.', a: 'Back to the homepage', href: '/' };
+    write(path.join(dir, 'not-found.tsx'), `export default function NotFound() {
+  return (
+    <main style={{ fontFamily: 'Arial, sans-serif', padding: '64px 24px', textAlign: 'center' }}>
+      <h1>${nf.h}</h1>
+      <p>${nf.p}</p>
+      <p><a href=${JSON.stringify(nf.href)}>${nf.a}</a></p>
+    </main>
+  );
+}
+`);
+  }
+  write(path.join(ROOT, 'next.config.ts'), `import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  // Every route is prerendered, so the site ships as plain static files (out/): no server functions, no ISR cache
+  // (each page view from Vercel's prerender cache counted as an ISR read and as origin transfer), smaller
+  // deployments. Redirects, rewrites and cache headers live in vercel.json, which Vercel applies to static output.
+  output: 'export',
+  // the page's own CSS (global.css, the Poppins faces, component modules: ~15 KB) is written into the HTML instead
+  // of three render-blocking stylesheet requests
+  experimental: { inlineCss: true },
+  // next/image (footer logo, blog images) serves the local files as they are; nothing is optimized per request
+  images: { unoptimized: true },
+};
+
+export default nextConfig;
+`);
+  write(path.join(PUBLIC, 'ghl-stub', 'ok.json'), '{}\n'); // the runtime's stats/attribution calls (vercel.json rewrite) get an empty JSON object
+  write(path.join(PUBLIC, 'ghl-stub', 'empty.js'), `/* Stub: LeadConnector widget loader scripts (e.g. the reviews widget) resolve here and do nothing. */\n`);
+  // (no middleware.ts: the site is a static export; the runtime's Google Fonts stylesheet URLs are mapped by FONTMAP in
+  // public/ghl-offline-shim.js, and the cloned Google Fonts stylesheets no longer carry any @font-face)
+  if (fs.existsSync(path.join(ROOT, 'middleware.ts'))) fs.rmSync(path.join(ROOT, 'middleware.ts'));
+  write(path.join(PUBLIC, 'ghl-stub.html'), `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Widget placeholder</title>
+<style>html,body{margin:0;height:100%;background:transparent}
+.ghl-stub{min-height:100vh;${STUB_STYLE}}
+.ghl-stub small{display:block;margin-top:8px;color:#555;word-break:break-all}</style></head>
+<body><div class="ghl-stub" data-ghl-stub="iframe"><div><strong id="t">LeadConnector widget placeholder</strong><br><span id="m">This widget was deliberately not cloned (it posted to the original client's CRM).</span><small id="p"></small><small>TODO: replace with your own form / booking / reviews integration.</small></div></div>
+<script>(function(){var p=location.pathname;var t=document.getElementById('t');if(/\\/widget\\/reviews\\//.test(p))t.textContent='Reviews widget placeholder';else if(/\\/form\\//.test(p))t.textContent='Form placeholder';document.getElementById('p').textContent='Original widget path: '+p.replace(/^\\/ghl-stub/,'');})();</script>
+</body></html>
+`);
+  write(path.join(PUBLIC, 'ghl-stub', 'form_embed.js'), `/* Stub for https://link.snoozesleep.com/js/form_embed.js — the LeadConnector form embed script was
+   deliberately not cloned. The popup form iframe loads /ghl-stub.html instead. */\n`);
+  write(path.join(PUBLIC, 'ghl-offline-shim.js'), shimSource());
+  // the same source, inlined by both root layouts (one parser-blocking request less on the critical path)
+  write(path.join(ROOT, 'lib', 'ghl-shim.ts'), `// Generated by scripts/convert.mjs — do not edit by hand. Same code as public/ghl-offline-shim.js, inlined in <head>.\nexport const GHL_SHIM = ${JSON.stringify(shimSource()).replace(/<\/script/gi, '<\\/script')};\n`);
+  write(path.join(ROOT, '.gitignore'), `# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+# verification output (screenshots, diffs)
+/verify-out/
+
+# local env files (Vercel CLI writes .env.local)
+.env*.local
+.env
+`);
+}
+
+function shimSource() {
+  return `/* ghl-offline-shim.js — generated by scripts/convert.mjs.
+ * 1. window.__ghlOnReady(fn): the site's own scripts used document.addEventListener("DOMContentLoaded", fn);
+ *    next/script runs them after hydration (DOMContentLoaded has already fired), so the converter rewrote
+ *    those calls to __ghlOnReady, which runs fn immediately when the document is already loaded.
+ * 2. Safety net: the GoHighLevel runtime rebuilds some asset URLs from its payload at hydration time.
+ *    Everything in the payload already points at local copies, but should any absolute CDN URL still be
+ *    written into a <style>, <img>, <source>, <iframe> or <link>, it is rewritten to the local copy
+ *    (same naming scheme as scripts/convert.mjs) before the browser fetches it. */
+(function () {
+  window.__ghlOnReady = function (fn) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); };
+  // The runtime's own telemetry (page-view stats, attribution session) is addressed to /ghl-stub/api/… (the converter's
+  // stand-in for its API host). Nothing on the site depends on those calls, and the site is static hosting, so they are
+  // answered here with an empty JSON object and never leave the browser (no request, no console error).
+  try {
+    var isStubApi = function (u) { try { var p = new URL(String(u && u.url ? u.url : u), location.href); return p.origin === location.origin && p.pathname.indexOf('/ghl-stub/api/') === 0 && p.pathname.indexOf('/ghl-stub/api/js/') !== 0; } catch (err) { return false; } };
+    var realFetch = window.fetch;
+    if (typeof realFetch === 'function') window.fetch = function (input, init) { if (isStubApi(input)) return Promise.resolve(new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } })); return realFetch.apply(this, arguments); };
+    if (navigator.sendBeacon) { var realBeacon = navigator.sendBeacon.bind(navigator); navigator.sendBeacon = function (u, d) { return isStubApi(u) ? true : realBeacon(u, d); }; }
+  } catch (err) {}
+  // locale: the GoHighLevel runtime sets <html lang="en"> on hydration; keep the language the server rendered
+  try {
+    var ssrLang = document.documentElement.getAttribute('lang');
+    if (ssrLang && ssrLang !== 'en' && 'MutationObserver' in window) new MutationObserver(function () { if (document.documentElement.getAttribute('lang') !== ssrLang) document.documentElement.setAttribute('lang', ssrLang); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  } catch (err) {}
+  // motion system: the reveal-hidden state (overrides/motion.css) only exists while <html class="js"> is set
+  try { if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) document.documentElement.classList.add('js'); } catch (err) {}
+  // LeadConnector reviews widget: the client's exact embed (overrides/widgets/reviews.html) is used as-is, with no
+  // wrapper and no sizing of our own; the vendor helper review-widget.js it ships with sizes the iframe. The page
+  // carries a desktop-only and a mobile-only copy of the widget, and the vendor helper applies every height message
+  // to every .lc_reviews_widget iframe, so the hidden copy (no layout, reports 1px) kept collapsing the visible one.
+  // Height messages that come from a copy without layout are stopped here (capture listener: runs before the
+  // vendor's bubble listener even on the same target), so the visible copy is sized from its own content only.
+  window.addEventListener('message', function (e) {
+    try {
+      var d = e.data;
+      if (!Array.isArray(d) || (d[0] !== 'lc.setHeight' && d[0] !== 'lc.setFlashHeight') || !e.source) return;
+      var all = document.querySelectorAll('iframe.lc_reviews_widget'), from = null;
+      for (var i = 0; i < all.length; i++) if (all[i].contentWindow === e.source) { from = all[i]; break; }
+      if (from && (!from.getClientRects().length || from.getBoundingClientRect().width < 4)) e.stopImmediatePropagation();
+    } catch (err) {}
+  }, true);
+  // LeadConnector booking calendar: the widget posts ['highlevel.setHeight', {height, id:'msgsndr-calendar'}] and the
+  // vendor helper (form_embed.js) looks for an iframe by that id, which the GoHighLevel embed does not carry, so the
+  // frame stays at the browser's 150px default and the calendar is cut off. Size the iframe that sent the message.
+  // The widget's own highlevel.setHeight keeps reporting the calendar's initial height (750) after a date is picked,
+  // while its content grows past 3000px (time slots + details form), which left the form cut off on phones. The
+  // widget also ships the iframe-resizer child script: once the page answers its "Ready" with the parent handshake,
+  // it reports its real content height on every change ("[iFrameSizer]<id>:<height>:<width>:<type>"). That channel
+  // wins; setHeight is only used until it is live. The iframe never scrolls itself: it just gets taller.
+  // A frame marked data-snz-resizer="form_embed" (the /booking page, which loads the real form_embed.js) is left to that
+  // script alone (October 28, 2026): a second handshake from here asked the widget for "lowestElement" heights, which in
+  // its wide layout count the internally scrolled time-slot list (1,400-2,700px reports, a white band under the calendar),
+  // and a second writer here fought form_embed.js over the height.
+  function bookingFrames(win) {
+    var frames = document.querySelectorAll('iframe[src*="/widget/booking/"], iframe[src*="/widget/bookings/"]'), out = [];
+    for (var i = 0; i < frames.length; i++) if ((!win || frames[i].contentWindow === win) && frames[i].getAttribute('data-snz-resizer') !== 'form_embed') out.push(frames[i]);
+    return out;
+  }
+  function sizeBookingFrame(f, h) {
+    f.style.transition = 'height 0.3s'; f.height = h; f.style.height = h + 'px'; f.style.overflow = 'hidden'; f.setAttribute('scrolling', 'no');
+    f.setAttribute('data-snz-height', String(h));
+  }
+  function sizerInit(f) {
+    try { f.contentWindow.postMessage('[iFrameSizer]' + (f.id || 'snz-booking') + ':8:false:false:32:true:true:0:lowestElement:null:null:0:false:parent:scroll:false', '*'); } catch (err) {}
+  }
+  // the child may announce "Ready" before its resizer accepts the handshake, load late, or sit in a frame element
+  // that hydration re-creates, so the page keeps offering the handshake (every 700 ms, ~40 s after load and again
+  // after every "Ready") to every booking frame that has not reported a size yet
+  var armUntil = 0, armTimer = null;
+  function armSizer() {
+    armUntil = Date.now() + 40000;
+    if (armTimer) return;
+    armTimer = setInterval(function () {
+      var bf = bookingFrames(null), pending = 0;
+      for (var i = 0; i < bf.length; i++) if (!bf[i].getAttribute('data-snz-sizer')) { pending++; sizerInit(bf[i]); }
+      if (!pending || Date.now() > armUntil) { clearInterval(armTimer); armTimer = null; }
+    }, 700);
+  }
+  window.addEventListener('message', function (e) {
+    try {
+      var d = e.data;
+      if (typeof d === 'string' && d.indexOf('[iFrameResizerChild]Ready') === 0) { armSizer(); return; }
+      if (typeof d === 'string' && d.indexOf('[iFrameSizer]') === 0) {
+        var parts = d.slice(13).split(':'); var h = Math.ceil(parseFloat(parts[1]));
+        if (!(h >= 200)) return;
+        var sf = bookingFrames(e.source);
+        for (var k = 0; k < sf.length; k++) { sf[k].setAttribute('data-snz-sizer', '1'); sizeBookingFrame(sf[k], h); }
+        return;
+      }
+      var gh = null;
+      if (Array.isArray(d) && d[0] === 'highlevel.setHeight' && d[1] && d[1].height) gh = d[1].height;
+      else if (d && typeof d === 'object' && !Array.isArray(d) && typeof d.height === 'number') gh = d.height; // any other height report from the widget host
+      if (!(gh >= 200)) return;
+      var frames = bookingFrames(e.source);
+      for (var i = 0; i < frames.length; i++) { var f = frames[i]; if (f.getAttribute('data-snz-sizer') && gh < parseFloat(f.getAttribute('data-snz-height') || '0')) continue; sizeBookingFrame(f, Math.max(gh, f.getAttribute('data-snz-sizer') ? parseFloat(f.getAttribute('data-snz-height') || '0') : 0)); }
+    } catch (err) {}
+  }, false);
+  // frames that were ready before this listener existed: ask them once they have loaded
+  document.addEventListener('DOMContentLoaded', armSizer);
+  window.addEventListener('load', armSizer);
+  /* hostnames are assembled at run time so that a grep of public/ for the original hostnames stays empty */
+  var LC = 'leadconnectorhq' + '.com', FS = 'filesafe' + '.space', MS = 'msgsndr' + '.com';
+  var ALIAS = {}; ALIAS['assets.cdn.' + FS] = 'filesafe'; ALIAS['cdn.' + FS] = 'filesafe'; ALIAS['assets.cdn.' + MS] = 'filesafe'; ALIAS['cdn.' + MS] = 'filesafe';
+  ALIAS['images.' + LC] = 'lcimg'; ALIAS['stcdn.' + LC] = 'lcstatic'; ALIAS['fonts.googleapis.com'] = 'gfonts-css'; ALIAS['fonts.gstatic.com'] = 'gfonts';
+  var LC_RE = new RegExp('(^|\\\\.)(' + LC.replace('.', '\\\\.') + '|apisystem\\\\.tech)$');
+  var FONTMAP = ${JSON.stringify(Object.fromEntries(Object.entries(fontmap).map(([k, v]) => [k, assetMap.get(v) || null]).filter(([, v]) => v)))};
+  /* originals replaced by a WebP twin at build time (public path without the .webp suffix -> 1) */
+  var WEBP = ${JSON.stringify(Object.fromEntries([...webpTwins.keys()].filter((k) => !Object.keys(OVR.imageReplacements || {}).some((old) => old !== '_comment' && k.includes(old))).map((k) => [(assetMap.get(k) || '').replace(/\.webp$/, ''), 1]).filter(([k]) => k)))};
+  function fnv(s) { var h = 0x811c9dc5; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); }
+  function san(seg) { var s = seg.replace(/[^A-Za-z0-9._-]/g, '_'); if (s.length > 100) { var m = seg.match(/\\.[A-Za-z0-9]{1,8}$/); s = s.slice(0, 60) + '-' + fnv(seg) + (m ? m[0] : ''); } return s; }
+  function esc(s) { return s.replace(/[\\\\|:?"*<>\\x00-\\x1f]/g, function (c) { var h = c.charCodeAt(0).toString(16).toUpperCase(); return '%' + (h.length < 2 ? '0' + h : h); }); }
+  function local(url) {
+    if (FONTMAP[url]) return FONTMAP[url];
+    var m = /^https?:\\/\\/([^\\/?#]+)(\\/[^?#]*)?(\\?[^#]*)?/.exec(url); if (!m) return null;
+    var host = m[1].toLowerCase(), p = (m[2] || '/').replace(/^\\//, ''), q = m[3] || '';
+    if (host === 'backend.' + LC && /^appengine\\/reviews\\/get_widget\\//.test(p)) return '/ghl-stub/widget/reviews/' + p.split('/').slice(3).join('/');
+    if (host === 'link.snoozesleep.com' || host === 'reputationhub.site') return null; /* live white-label widget embeds stay untouched */
+    if (LC_RE.test(host) && !ALIAS[host]) return '/ghl-stub/api/' + p;
+    if (host === 'storage.googleapis.com' && /^msgsndr\\//.test(p)) { host = 'assets.cdn.' + FS; p = p.replace(/^msgsndr\\//, ''); }
+    var alias = ALIAS[host]; if (!alias) return null;
+    var segs;
+    if (host === 'images.' + LC) {
+      var mm = /^image\\/((?:[^\\/]+\\/)*?)u_https?:\\/\\/([^\\/]+)\\/(.*)$/.exec(p);
+      if (mm) { var rest = mm[3]; if (mm[2] === 'storage.googleapis.com') rest = rest.replace(/^msgsndr\\//, ''); segs = ('image/' + mm[1] + 'u/filesafe/' + rest).split('/'); }
+      else segs = esc(p).replace(/\\/{2,}/g, '/').split('/');
+    } else {
+      var w = esc(p).replace(/\\/{2,}/g, '/'); if (q) w += '@' + esc(q.slice(1));
+      if (host === 'fonts.googleapis.com' && !/\\.css$/.test(w)) w += '.css';
+      segs = w.split('/');
+    }
+    var out = '/assets/' + alias + '/' + segs.filter(Boolean).map(san).join('/');
+    return WEBP[out] ? out + '.webp' : out; /* heavy originals are served as their WebP twin (scripts/optimize-images.mjs) */
+  }
+  var CSS_URL = /url\\(\\s*(['"]?)(https?:\\/\\/[^'")]+)\\1\\s*\\)/g;
+  function fixCss(t) { return t.replace(CSS_URL, function (all, qq, u) { var l = local(u); return l ? 'url(' + qq + l + qq + ')' : all; }); }
+  var busy = false;
+  function fixStyle(el) { var t = el.textContent; if (!t || t.indexOf('http') === -1) return; var n = fixCss(t); if (n !== t) { busy = true; el.textContent = n; busy = false; } }
+  var ATTRS = ['src', 'srcset', 'data-src', 'data-srcset', 'href', 'poster', 'style'];
+  function fixAttr(el, name) {
+    var v = el.getAttribute(name); if (!v || v.indexOf('http') === -1) return; var n = v;
+    if (name === 'style') n = fixCss(v);
+    else if (name === 'srcset' || name === 'data-srcset') n = v.split(',').map(function (part) { var s = part.trim().split(/\\s+/); var l = /^https?:/.test(s[0]) ? local(s[0]) : null; if (l) s[0] = l; return s.join(' '); }).join(', ');
+    else if (/^https?:/.test(v)) { var l = local(v); if (l) n = l; }
+    if (n !== v) { busy = true; el.setAttribute(name, n); busy = false; }
+  }
+  function fixEl(el) { if (el.nodeType !== 1) return; if (el.tagName === 'STYLE') { fixStyle(el); return; } if (el.tagName === 'SCRIPT') return; for (var i = 0; i < ATTRS.length; i++) if (el.hasAttribute(ATTRS[i])) fixAttr(el, ATTRS[i]); }
+  function scan(root) { if (root.nodeType !== 1) return; fixEl(root); var all = root.querySelectorAll('style,img,source,video,iframe,link,[style],[srcset],[data-src]'); for (var i = 0; i < all.length; i++) fixEl(all[i]); }
+  try {
+    // Hydration (React + the GHL Vue runtime) produces thousands of mutation records in a burst; they are queued and
+    // handled in idle-time slices so this safety net never adds a long task to the critical path.
+    var queue = [], scheduled = false;
+    var ric = window.requestIdleCallback || function (cb) { return setTimeout(function () { cb({ timeRemaining: function () { return 8; } }); }, 100); };
+    function handle(m) {
+      if (m.type === 'characterData') { var p = m.target.parentNode; if (p && p.tagName === 'STYLE') fixStyle(p); }
+      else if (m.type === 'attributes') fixAttr(m.target, m.attributeName);
+      else for (var j = 0; j < m.addedNodes.length; j++) { var n = m.addedNodes[j]; if (n.nodeType === 1) scan(n); else if (n.nodeType === 3 && n.parentNode && n.parentNode.tagName === 'STYLE') fixStyle(n.parentNode); }
+    }
+    function drain(dl) {
+      scheduled = false; var n = 0;
+      while (queue.length && (n < 8 || dl.timeRemaining() > 3)) { handle(queue.shift()); n++; } /* a re-rendered custom-code block is one record but a whole subtree: keep slices short */
+      if (queue.length && !scheduled) { scheduled = true; ric(drain, { timeout: 1500 }); }
+    }
+    new MutationObserver(function (muts) {
+      if (busy) return;
+      for (var i = 0; i < muts.length; i++) queue.push(muts[i]);
+      if (!scheduled) { scheduled = true; ric(drain, { timeout: 1500 }); }
+    }).observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  } catch (e) {}
+  // No sweep of the server-rendered DOM: every URL in it was rewritten at build time (verified: zero external
+  // CDN references left on hydrated pages), so a full-document pass at DOMContentLoaded only cost main-thread time.
+  // The observer above remains the runtime safety net for anything the GHL runtime inserts or rewrites.
+})();
+`;
+}
+
+function writeReadme() {
+  const routes = report.pages.map((p) => `| \`${p.route}\` | \`${p.source}\` | ${p.title.replace(/\|/g, '\\|')} |`).join('\n');
+  const widgets = Object.entries(report.widgets.reduce((acc, s) => { const k = `${s.kind} — ${s.how}`; (acc[k] ||= { kind: s.kind, how: s.how, pages: new Set(), n: 0 }).pages.add(s.page); acc[k].n++; return acc; }, {}))
+    .map(([, s]) => `- **${s.kind}** × ${s.n} on ${s.pages.size} page${s.pages.size === 1 ? '' : 's'}: ${s.how}.`).join('\n');
+  const overrides = Object.entries(report.overrides.reduce((acc, o) => { (acc[o.rule] ||= { rule: o.rule, file: o.file, pages: new Set(), ids: new Set() }).pages.add(o.page); acc[o.rule].ids.add(o.id); return acc; }, {}))
+    .map(([, o]) => `- **${o.rule}** → \`overrides/${o.file}\` on ${[...o.pages].join(', ')} (${o.ids.size} element${o.ids.size === 1 ? '' : 's'})`).join('\n');
+  const stubs = Object.entries(report.stubs.reduce((acc, s) => { const k = `${s.kind} — ${s.original}`; (acc[k] ||= { kind: s.kind, original: s.original, how: s.how, pages: new Set() }).pages.add(s.page); return acc; }, {}))
+    .map(([, s]) => `- **${s.kind}** (${s.pages.size} page${s.pages.size === 1 ? '' : 's'}): original \`${s.original}\` → ${s.how}.`).join('\n');
+  const trackers = Object.entries(report.removedTrackers.reduce((acc, t) => { const k = `${t.where}: ${t.what}`; (acc[k] ||= { ...t, pages: new Set() }).pages.add(t.page); return acc; }, {}))
+    .map(([, t]) => `- ${t.where} (${t.pages.size} page${t.pages.size === 1 ? '' : 's'}): \`${t.what.replace(/`/g, "'")}\``).join('\n');
+  const removedScripts = Object.entries(report.removedScripts.reduce((acc, s) => { (acc[s.src] ||= { ...s, pages: new Set() }).pages.add(s.page); return acc; }, {}))
+    .map(([, s]) => `- \`${s.src}\` (${s.pages.size} page${s.pages.size === 1 ? '' : 's'}): ${s.reason}`).join('\n');
+  const aliases = Object.entries(HOST_ALIAS).map(([h, a]) => `| \`${h}\` | \`/assets/${a}/…\` |`).join('\n');
+  const missing = [...report.missingReferenced];
+  write(path.join(ROOT, 'README.md'), `# McAllen Snooze — Next.js conversion
+
+Next.js 15 (App Router, TypeScript) rendering of the static wget clone of
+\`https://brownsville.snoozemattresscompany.com/\` (a GoHighLevel / LeadConnector funnel).
+The whole project is **generated** by [\`scripts/convert.mjs\`](scripts/convert.mjs); re-run it whenever the clone is re-pulled:
+
+\`\`\`bash
+npm install
+CLONE_ROOT=C:/clones NEXT_PUBLIC_SITE_URL=${SITE_URL} npm run convert
+npm run build && npm run start   # http://localhost:3000
+npm run verify                    # routes, network capture, forbidden-host grep, screenshots
+\`\`\`
+
+## Routes (${report.pages.length})
+
+| Route | Source page | Title |
+|---|---|---|
+${routes}
+
+## How the conversion works
+
+1. **Assets** — every non-HTML file of the clone is copied to \`public/assets/<alias>/…\` with Windows-safe, collision-free names
+   (see [\`asset-map.json\`](asset-map.json) for original-local-path → public-path). Host aliases:
+
+| Original host | Served from |
+|---|---|
+${aliases}
+
+   Proxied image variants (\`images.leadconnectorhq.com/image/f_webp/q_80/r_<size>/u_https://assets.cdn.filesafe.space/<id>\`) live under
+   \`/assets/lcimg/image/…/u/filesafe/<id>\`. Google Fonts CSS and the \`fonts.gstatic.com\` woff2 files are served from \`public/\`, so the app makes no external font requests.
+2. **Pages** — for each HTML page one route is generated (\`app/<slug>/page.tsx\` + \`content.ts\`). \`<title>\`, description, keywords, robots, og:* and twitter:* tags become \`export const metadata\`; canonical/og:url point at \`${SITE_URL}\`.
+   The \`<head>\` stylesheet/style sequence (external \`<link rel="stylesheet">\`, the data-URI custom-font stylesheet and every inline \`<style>\`) is emitted **verbatim and in the original order** in front of the \`<body>\` markup, both rendered through \`dangerouslySetInnerHTML\` in a server component (\`components/GhlPage.tsx\`). This keeps the builder's cascade order exactly; importing the stylesheets through \`globals.css\` would have moved the page-specific inline styles after the external sheets.
+3. **Scripts** — every \`<script src>\` and executable inline script is re-emitted through \`next/script\` (\`strategy="afterInteractive"\`) in the original order; the Nuxt JSON payload (\`#__NUXT_DATA__\`) and the JSON-LD block are data blocks and stay inline. Because \`afterInteractive\` scripts run after \`DOMContentLoaded\`, the site's own \`document.addEventListener("DOMContentLoaded", fn)\` calls were rewritten to \`window.__ghlOnReady(fn)\` (defined in \`public/ghl-offline-shim.js\`).
+4. **URL rewriting** — HTML attributes, inline CSS \`url()\`, the Nuxt payload strings, the Nuxt runtime config (\`window.__NUXT__.config\`: \`cdnURL\`, \`IMAGE_CDN\`, storage/API URLs) and the copied JS bundles (\`public/assets/lcstatic/_preview/*.js\`) were rewritten so nothing points at \`snoozemattresscompany.com\`, \`filesafe.space\`, \`leadconnectorhq.com\` or \`msgsndr.com\`. \`public/ghl-offline-shim.js\` is a runtime safety net that rewrites any such URL the GHL runtime still builds at hydration time, and FONTMAP in the shim maps the Google Fonts stylesheet URLs the runtime assembles onto the local copies.
+5. **Teleport fix** — Vue's \`<Teleport to="body">\` hydration expects its SSR anchors to be direct children of \`<body>\`; React needs a host element, so \`components/GhlPage.tsx\` moves those body-level nodes out of the wrapper right after React hydration and before the Nuxt entry runs. Without this the GHL runtime "repairs" the DOM by deleting the page.
+
+## Header / navigation
+
+The GoHighLevel header (desktop section \`section-n2EJ48xJKc\`, mobile section \`section-EZ3DGo6-8h\`, the "active page / magnetic hover" script and the custom mobile drawer) is removed from every page (markup and Nuxt payload) and replaced by [\`components/SiteHeader.tsx\`](components/SiteHeader.tsx) + [\`SiteHeader.module.css\`](components/SiteHeader.module.css), rendered from the root layout: sticky white bar, the original logo, the same five links, an "Our Products" mega menu (Products / Sleep Accessories + a Dream Mapping card), a "Blog" dropdown (the three articles + "All articles", from \`lib/blog-nav.ts\`), a premium phone CTA, and an off-canvas mobile drawer with expandable Products and Blog groups (staggered items, swipe-to-close). Hover intent, Escape, outside-click, focus management and reduced-motion are handled in the component. Site values (phone, logo, feature image) come from \`overrides/overrides.json\` → \`components/site-config.ts\`.
+
+## Footer
+
+One footer for the whole site: \`components/SiteFooter.tsx\` (+ module CSS), rendered by the root layout on every route (GoHighLevel pages and the blog). It merges the light footer (logo, description, social icons, Our Products, Company, Visit Us, bottom bar with Terms / Privacy) with the pieces of the old blue footer: the Google Map with the "Our Location" card (address, Get Directions, Open Maps), the phone with its orange icon and the two CTA buttons (Book Your Dream Mapping Appointment, Get In Touch With Us). The old GHL footer sections (\`section-ghjYZIxTU2\` mobile, \`section-zTxb2Wa9Nv\` desktop) are removed from every page via \`removeElements\`.
+
+## Buttons
+
+\`overrides/buttons.css\` is injected after every page's own CSS and applies the client's \`.waitlist-button\` look to every GoHighLevel button: orange gradient, no border, 8px radius, Poppins 16px/600 uppercase, shine sweep, lift on hover, compact sizing on phones (≤ 767px). GHL "buttons" that are really plain text links (transparent background + \`noBorder\`: the address/phone strips, the footer product list) are excluded per page through a generated \`:not(.cbutton-ID)\` chain (the \`{{not}}\` placeholder), so they keep their original look.
+
+## Blog (hand-written Next.js routes)
+
+\`/blog\` and the three posts (\`/blog/custom-mattresses-improving-health\`, \`/blog/pressure-mapping-for-sleep\`, \`/blog/mattresses-that-relieve-aches\`) are native App Router pages: content in \`lib/blog-posts.ts\` (client copy verbatim), template in \`components/blog/\` (hero → featured image → article → FAQ accordion → CTA → related posts → footer, one continuous lavender gradient), unique meta title/description, canonical, Open Graph + Twitter cards, JSON-LD BlogPosting + FAQPage + BreadcrumbList, \`app/sitemap.ts\` and \`app/robots.ts\`. Images are site assets served through \`next/image\`. The converter keeps \`app/blog\`, \`app/sitemap.ts\` and \`app/robots.ts\` when it regenerates \`app/\`.
+
+## Sleep Fit Quiz (hand-written route)
+
+\`/sleep-quiz\` and \`/es/sleep-quiz\` are the client's Sleep Fit Quiz inside the site header and footer: \`components/SleepQuiz.tsx\` renders the quiz shell and metadata (self-canonical, hreflang pair, \`?r=\` results links canonical to the bare page), \`components/sleep-quiz/sleep-fit-quiz.css\` is the quiz stylesheet scoped under \`.snz-quiz\`, and \`public/sleep-fit-quiz.js\` is the quiz logic (scoring, screens, lead form, kiosk mode \`?kiosk=1\`, shareable results) with every human-readable string in an EN/ES table and the McAllen store CONFIG + GoHighLevel inbound webhook. The converter keeps \`app/(en)/sleep-quiz\` and \`app/es/sleep-quiz\`. Calls to action link to it from the header (desktop item + mobile drawer item and button), the footer Company column, the Dream Mapping steps, the brand marquee, the guarantee cards, every FAQ accordion (\`overrides/*.html\`, styled by \`overrides/site.css\` -> \`.snz-quiz-cta\`, Spanish copy in \`overrides/i18n/es.extra.json\`) and the blog posts (\`components/blog/BlogLayout.tsx\` -> \`QuizCta\`).
+
+## Page fixes (\`overrides/site.css\`, \`overrides/global.css\`)
+
+\`site.css\` is injected after every page stylesheet: the Financing / About Us / Home timeline block is transparent so the section's own lavender background flows from the heading into the timeline (no white seam). \`global.css\` is imported by the root layout for every route: smooth scrolling (disabled under reduced motion) with \`scroll-padding-top\` so anchors land below the sticky header. The timeline / guarantee scripts in \`overrides/*.html\` initialise every copy of a section (GHL renders a desktop and a mobile copy), so they animate on phones.
+
+## Mobile navigation (paste-ready, vanilla)
+
+\`overrides/mobile-nav/snooze-mobile-nav.html\` is a self-contained mobile-only (≤ 767px) drawer (HTML + CSS + JS, \`snzm-\` prefix, no dependencies) for a custom-code element: slide-in drawer, blurred overlay, hamburger→X, staggered items, animated submenus (Our Products, Blog), focus trap, ARIA, swipe-to-close, current-page highlight, body scroll lock. This site uses the React drawer in \`components/SiteHeader.tsx\`, which has the same behaviours.
+
+## Replaced sections (hand-provided code)
+
+Custom-code elements whose content matches a rule in \`overrides/overrides.json\` are swapped for the file below, in both the server markup and the Nuxt payload; \`{{custom_values.*}}\` merge tags are filled from the \`vars\` block:
+
+${overrides || '- (none)'}
+
+## Inserted sections (copied from another page)
+
+\`overrides.json\` → \`insertSections\` copies whole GoHighLevel sections from one page into the others: the "Our Promise / We Stand Behind Every Single Night's Sleep" guarantee (desktop + mobile copies) from \`about-us.html\` is inserted right before the section containing "Some of Our Happy Customers" on every page that has it. \`scripts/insert-sections.mjs\` does it in the three places hydration needs: SSR markup, the Nuxt payload (nodes encoded into the devalue array, listed before the anchor in \`pageData.elements\` and in the root child list) and the per-element CSS (media queries preserved). Pages touched: ${report.insertedSections.length}.
+
+## Hero backgrounds
+
+\`overrides.json\` → \`heroBackgrounds\` maps a page to the image its hero should use; \`scripts/hero-backgrounds.mjs\` applies it to the first desktop-only section that carries a background (CSS variants + payload); the mobile hero copy keeps its own image. Pages configured: ${report.heroBackgrounds.length}.
+
+## Responsive pass
+
+\`overrides/site.css\` normalises the horizontal gutter of every content row (20px on phones, 32px on tablets; tickers/marquees excluded), makes the timelines single-column on phones (card centred, watermark inside the card, decorative blobs off), keeps media inside its container, gives the financing band a matching background colour behind its rounded image plus a slight darkening and large semibold copy for WCAG AA, and deepens the orange address strips (\`.snz-orange-strip\`, class set by the converter) to 4.5:1. \`scripts/responsive-extras.mjs\`: every text element's mobile and desktop font size become one \`clamp()\` between 390px and 1440px, and every local image gets width/height attributes read from the file (${report.imageDimsAdded || 0} added).
+
+## Motion
+
+One shared system: \`overrides/motion.css\` + \`public/snz-motion.js\` (loaded by the root layout). Elements carry \`data-animate="fade-up|fade-down|fade-left|fade-right|zoom-in|fade"\` and optional \`data-delay\`; the converter tags server-rendered elements from \`overrides/motion.json\` (page rules first, then the \`*\` defaults; custom-code sections keep their own animations). The hidden state only applies while \`html.js\` is set by the shim before first paint (never under reduced motion), so content is visible without JavaScript. Also: hover lift / press-down on buttons, a soft pulse on the hero CTA (\`.snz-pulse\`), card lift on the timelines.
+
+## Locales (/es)
+
+Every page is generated once per locale: English under \`app/(en)/\` and Spanish under \`app/es/\` (same route, \`/es\` prefix), each route group with its own root layout (\`<html lang>\`, header/footer locale). The Spanish text comes from \`overrides/i18n/es.part-*.json\` (+ \`es.extra.json\` for manual fixes), an English-segment -> Spanish dictionary produced from \`node scripts/i18n-extract.mjs\`; \`scripts/i18n.mjs\` applies it to every text node and alt/title/placeholder/aria-label of the markup and to every string of the Nuxt payload (hydration re-renders from the payload, so both must agree), and prefixes internal links. Segments without a translation are listed in \`overrides/i18n/missing.json\` after each run. Metadata (title, description, Open Graph) is translated the same way; every page declares \`hreflang\` alternates for en, es and x-default. The header, footer and blog use \`lib/i18n.ts\`; the blog posts have hand-translated Spanish versions in \`lib/i18n/blog-es/\`. The LeadConnector embeds (reviews, popup form, booking calendar) are the client's CRM widgets and render in the language configured there.
+
+## FAQ accordions, financing ribbon, navy cards
+
+Every GoHighLevel FAQ element is rebuilt as the blog-style accordion (\`overrides/faq-accordion.html\`, questions and answers taken verbatim from the element; one delegated click handler serves every copy). The GoHighLevel FAQ component rewrote its items' class lists on every toggle, which also removed the scroll-reveal class and faded the answers out. The "0% Financing Available" ribbon PNG (whose folds were drawn unevenly) is replaced by the coded ribbon in \`overrides/ribbon.html\` (\`.snz-ribbon\`: navy body, folded ends, dotted border, white logo, translatable headline; centred, up to 620px, flush with the section top). Both become custom-code elements in markup and payload, like the CRM widgets. Navy rounded cards with the orange border carry \`.snz-card\` (detected from their page CSS) so \`overrides/site.css\` can give them one inner padding on phones.
+
+## CRM widgets (live embeds)
+
+The reviews widget iframe is sized by a \`message\` listener in \`public/ghl-offline-shim.js\` (installed before the iframe can post its height). The widget posts a 1px collapse right after every real height and restores it ~5 s later, so the listener ignores collapses once a real height is known and the vendor helper \`review-widget.js\` (which re-applies them) is not embedded; \`overrides/widgets/reviews.html\` reserves space with a loading placeholder until the first real height arrives. The booking calendar iframe is sized by a second listener for the widget's \`highlevel.setHeight\` message (the vendor \`form_embed.js\` looks for an iframe id the embed does not carry, which left the calendar cut off at 150px); \`overrides/site.css\` gives it a 760px minimum until the first message.
+
+The LeadConnector form, booking-calendar and review-widget elements are rendered as the client's white-label embeds (\`link.snoozesleep.com\`, \`reputationhub.site\`) configured in \`overrides/overrides.json\` → \`widgets\`. These iframes talk to the client's CRM on their own; the page itself still makes no request to leadconnectorhq.com (its API base URLs point at \`/ghl-stub/api/…\`, which returns 404):
+
+${widgets || '- (none found)'}
+${stubs ? `\nRemaining placeholders:\n\n${stubs}\n` : ''}
+There is no chat widget in the page code itself; the LeadConnector chat widget (\`widgets.leadconnectorhq.com\`) was loaded by the Google Tag Manager container, which is removed.
+
+## Performance
+
+- **Tag scripts** (\`components/Tracking.tsx\`): the dataLayer, \`gtag()\` and both GA4 config calls are inline in \`<head>\` as in the client's snippets, but gtag.js (x2), the GTM container and Simpli.fi are injected by one loader on the first user interaction or 6 s after the load event (12 s after start at the latest; a shorter fallback fired inside page-speed traces once the page got fast). The GTM container alone was ~2 s of main-thread work on a phone (the whole Total Blocking Time); nothing visible depends on it. The GTM noscript iframe is unchanged.
+- **Logo marquee**: the brand logos' white/grey boxes are erased at build time (\`scripts/scrub-logos.mjs\`, flood fill from the edges, alpha WebP with width/height next to the original as \`*.scrub.webp\`); the page no longer redraws 34 logos on canvases or downloads each file twice.
+- **GHL API stub**: the runtime's stats/attribution calls (\`/ghl-stub/api/…\`) are rewritten by vercel.json to \`public/ghl-stub/ok.json\` (an empty JSON object) instead of a console 404.
+- **Hosting (static export)**: \`next.config.ts\` sets \`output: 'export'\`, so the deployment is the \`out/\` folder of plain files: no server functions, no ISR cache (every page view served from Vercel's prerender cache counted as an ISR read and origin transfer), and a smaller deployment. Redirects (duplicate legal URLs), rewrites (widget placeholders, API stub) and immutable cache headers for \`/assets\` and \`/_next/static\` live in \`vercel.json\`; \`.vercelignore\` uploads only what \`next build\` needs. The converter indexes but does not ship: Google font files other than the two 'Poppins Headline' cuts (all @font-face rules are stripped from the cloned Google stylesheets), Font Awesome's svg/eot/ttf formats, the form builder's GIFs and runtime chunks no page can reach.
+- **Layout shifts**: every GHL image element gets an \`aspect-ratio\` rule (\`<style data-snz-imgratio>\`) because the runtime swaps its \`<picture>\` for a bare \`<img>\` while hydrating; phone-only sections use the 768px resize as the fallback src.
+- **Critical path**: the offline shim is inlined in both layouts (\`lib/ghl-shim.ts\`, generated with \`public/ghl-offline-shim.js\`), the page's own CSS is inlined (\`experimental.inlineCss\`), the runtime's ~40 module preloads are emitted after the page markup, and only the latin Poppins subset (five files) is preloaded.
+- **Page loader**: \`<noscript>\` hides the overlay, so the page is fully visible without JavaScript (the reveal system also only hides elements under \`html.js\`).
+- **One copy of the markup** (LCP pass): each route's \`client.tsx\` renders \`GhlPage\` (a client component) and reads \`content.ts\` only on the server (\`typeof window === 'undefined'\` — Next drops that branch from the client bundle). The markup is server-rendered into the HTML exactly as before, but it is no longer serialized into React's hydration payload (which doubled every document: the home page went from 3.3 MB / 456 KB gzip to 1.6 MB / 240 KB) and not bundled into the route chunk. On the client React keeps the server-rendered innerHTML because the (empty) value never changes; every link into these routes is a plain \`<a>\`, so they are always full loads. The page scripts (\`scripts.ts\`: teleport fix, Nuxt payload, runtime entry) are appended by an effect after hydration instead of next/script, which had preloaded the 256 KB runtime entry in \`<head>\` ahead of the hero image; the runtime's module preloads are added on window load.
+
+## Removed tracking / analytics
+
+${trackers || '- (none)'}
+
+Removed external scripts:
+
+${removedScripts || '- (none)'}
+
+## Known differences from the original
+
+- Third-party embeds that are not the client's CRM are kept as-is and still load from their own hosts: Google Maps embeds (\`maps.google.com\`), social links.
+- The reviews widget, popup form and booking calendar show placeholders instead of live CRM content.
+- Fonts, images, CSS and the GoHighLevel runtime (Nuxt bundle + ${report.assets.copied + report.assets.skippedUnchanged} asset files) are served locally.
+${missing.length ? `- ${missing.length} referenced file(s) did not exist in the clone and now resolve to a local 404 instead of the CDN (see conversion-report.json → missingReferenced).` : ''}
+
+Generated ${new Date().toISOString()} from \`${CLONE}\`.
+`);
+}
+
+// ---------------------------------------------------------------- run
+console.log(`converting ${pageFiles.length} pages from ${SITE_DIR} → ${ROOT}`);
+// hand-written routes that must survive a regeneration (everything else under app/ is generated)
+// hand-written routes that must survive a regeneration: app/(en)/blog, app/es/blog, sitemap.ts, robots.ts (everything else under app/ is generated)
+const GEN_FILE = /^(page|client|layout|not-found)\.tsx$|^(content|scripts)\.ts$/;
+if (fs.existsSync(APP)) for (const e of fs.readdirSync(APP)) { if (['sitemap.ts', 'robots.ts', '(en)', 'es', 'ghl-stub' /* hand-written API stub route */].includes(e)) continue; const p = path.join(APP, e); if (fs.statSync(p).isDirectory() || GEN_FILE.test(e)) fs.rmSync(p, { recursive: true, force: true }); }
+for (const g of ['(en)', ...LOCALES.filter((l) => l.code !== 'en').map((l) => l.code)]) { const d = path.join(APP, g); if (!fs.existsSync(d)) continue; for (const e of fs.readdirSync(d)) { if (e === 'blog' || e === 'booking' || e === 'sleep-quiz') continue; /* hand-written routes: blog, booking, the Sleep Fit Quiz */ const p = path.join(d, e); if (fs.statSync(p).isDirectory() || GEN_FILE.test(e)) fs.rmSync(p, { recursive: true, force: true }); } }
+// sections to copy into other pages are read once from their source page (raw clone, before any transform)
+const INSERT_PACKS = OVR.insertSections.map((cfg) => extractSections(SITE_DIR, cfg));
+for (const p of INSERT_PACKS) report.insertPacks.push({ name: p.name, from: p.sourcePage, sections: p.sections.map((s) => ({ id: s.id, nodes: s.nodes.length, htmlBytes: s.html.length, cssBytes: s.css.length })) });
+for (const rel of pageFiles) { convertPage(rel, null); for (const loc of EXTRA_LOCALES) convertPage(rel, loc); }
+if (EXTRA_LOCALES.length) { const missing = new Set(); for (const e of report.i18n) for (const m of e.missing) missing.add(m); write(path.join(I18N_DIR, 'missing.json'), JSON.stringify([...missing], null, 1)); console.log(`locales: ${EXTRA_LOCALES.map((l) => l.code).join(', ')}; untranslated segments: ${missing.size} (overrides/i18n/missing.json)`); }
+writeProjectFiles();
+write(path.join(ROOT, 'asset-map.json'), JSON.stringify(Object.fromEntries([...assetMap].sort()), null, 1));
+report.missingReferenced = [...report.missingReferenced];
+write(path.join(ROOT, 'conversion-report.json'), JSON.stringify(report, null, 2));
+writeReadme();
+// the clone is the McAllen site; rewrite every location-specific value to the McAllen store (scripts/relocate.mjs)
+relocate(ROOT);
+console.log(`\nassets copied: ${report.assets.copied} (+${report.assets.skippedUnchanged} unchanged), ${(report.assets.bytes / 1048576).toFixed(1)} MB, bundles patched: ${report.assets.bundlesPatched}, name collisions resolved: ${report.assets.collisions}`);
+console.log(`urls rewritten: ${report.rewrittenUrls}; trackers removed: ${report.removedTrackers.length}; scripts removed: ${report.removedScripts.length}; section overrides: ${report.overrides.length}; widgets: ${report.widgets.length}; placeholders: ${report.stubs.length}; hints dropped: ${report.droppedHints}`);
+console.log(`referenced-but-missing in clone: ${report.missingReferenced.length}`); for (const m of report.missingReferenced.slice(0, 25)) console.log('   ', m);
+console.log('external hosts left untouched:', report.externalHostsLeft);

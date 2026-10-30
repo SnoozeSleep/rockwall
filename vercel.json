@@ -1,0 +1,76 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/terms-conditions", "destination": "/terms-conditions-page", "permanent": true },
+    { "source": "/es/terms-conditions", "destination": "/es/terms-conditions-page", "permanent": true },
+    { "source": "/privacy-policy-page-1", "destination": "/privacy-policy-page", "permanent": true },
+    { "source": "/es/privacy-policy-page-1", "destination": "/es/privacy-policy-page", "permanent": true },
+    { "source": "/home-page", "destination": "/", "permanent": true },
+    { "source": "/main-page", "destination": "/", "permanent": true },
+    { "source": "/es/home-page", "destination": "/es", "permanent": true },
+    { "source": "/es/main-page", "destination": "/es", "permanent": true },
+    { "source": "/post/pressure-map-for-sleep", "destination": "/blog/pressure-mapping-for-sleep", "permanent": true },
+    { "source": "/es/post/pressure-map-for-sleep", "destination": "/es/blog/pressure-mapping-for-sleep", "permanent": true },
+    { "source": "/mattress-financing-mcallen-tx", "destination": "/mattress-financing", "permanent": true },
+    { "source": "/es/mattress-financing-mcallen-tx", "destination": "/es/mattress-financing", "permanent": true },
+    { "source": "/massage-chairs-402809", "destination": "/massage-chairs", "permanent": true },
+    { "source": "/es/massage-chairs-402809", "destination": "/es/massage-chairs", "permanent": true },
+    { "source": "/review", "destination": "/", "permanent": true },
+    { "source": "/es/review", "destination": "/es", "permanent": true },
+    { "source": "/optin-page", "destination": "/contact-us", "permanent": true },
+    { "source": "/es/optin-page", "destination": "/es/contact-us", "permanent": true },
+    { "source": "/optin-page/", "destination": "/contact-us", "permanent": true },
+    { "source": "/es/optin-page/", "destination": "/es/contact-us", "permanent": true },
+    { "source": "/optin-page-sp", "destination": "/es/contact-us", "permanent": true },
+    { "source": "/es/optin-page-sp", "destination": "/es/contact-us", "permanent": true },
+    { "source": "/optin-page-:id(\\d{1,8})", "destination": "/contact-us", "permanent": true },
+    { "source": "/es/optin-page-:id(\\d{1,8})", "destination": "/es/contact-us", "permanent": true },
+    { "source": "/home-", "destination": "/", "permanent": true },
+    { "source": "/home-:id(-?\\d{1,8})", "destination": "/", "permanent": true },
+    { "source": "/es/home-", "destination": "/es", "permanent": true },
+    { "source": "/es/home-:id(-?\\d{1,8})", "destination": "/es", "permanent": true },
+    { "source": "/myblog", "destination": "/blog", "permanent": true },
+    { "source": "/es/myblog", "destination": "/es/blog", "permanent": true },
+    { "source": "/post/Custom-Mattresses-Improving-Health", "destination": "/blog/custom-mattresses-improving-health", "permanent": true },
+    { "source": "/post/Mattresses-That-Relieve-Aches", "destination": "/blog/mattresses-that-relieve-aches", "permanent": true },
+    { "source": "/es/post/Custom-Mattresses-Improving-Health", "destination": "/es/blog/custom-mattresses-improving-health", "permanent": true },
+    { "source": "/es/post/Mattresses-That-Relieve-Aches", "destination": "/es/blog/mattresses-that-relieve-aches", "permanent": true },
+    { "source": "/post/:slug", "destination": "/blog/:slug", "permanent": true },
+    { "source": "/es/post/:slug", "destination": "/es/blog/:slug", "permanent": true },
+    { "source": "/:slug-sp", "destination": "/es/:slug", "permanent": true },
+    { "source": "/es/:slug-sp", "destination": "/es/:slug", "permanent": true },
+    { "source": "/:slug-:id(\\d{4,6})", "destination": "/:slug", "permanent": true },
+    { "source": "/es/:slug-:id(\\d{4,6})", "destination": "/es/:slug", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/ghl-stub/widget/:path*", "destination": "/ghl-stub" },
+    { "source": "/ghl-stub/form/:path*", "destination": "/ghl-stub" },
+    { "source": "/ghl-stub/link/:path*", "destination": "/ghl-stub" },
+    { "source": "/ghl-stub/api/js/:path*", "destination": "/ghl-stub/empty.js" },
+    { "source": "/ghl-stub/api/:path*", "destination": "/ghl-stub/ok.json" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/ghl-offline-shim.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/snz-motion.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/snz-events.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}

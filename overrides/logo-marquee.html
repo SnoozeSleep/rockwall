@@ -1,0 +1,176 @@
+<!-- ============================================================
+   SNOOZE — ENDLESS LOGO MARQUEE  (v2.2 — real background removal)
+   What changed vs v1:
+   • No blank gaps: the logos are lazy-loaded (SEO audit, Oct 2026 — 8b;
+     scripts/logo-marquee-patch.mjs sets loading="lazy", the brand alt
+     text and a small script that switches them to eager as soon as the
+     strip comes within one viewport, so every logo is cached before it
+     scrolls into view) and any logo whose file fails to load auto-hides
+     itself in BOTH sets, so the loop stays seamless. The loop copy
+     reuses the same files: one request per logo.
+   • No more greyish boxes: the converter erases the grey/white
+     background baked into each logo file at build time
+     (scripts/scrub-logos.mjs: flood fill inward from the image
+     edges, light details INSIDE a logo are kept) and serves an
+     alpha WebP with width/height set. A logo whose file the
+     clone lacks keeps the CSS whitening filter as the fallback.
+   Paste this entire block into its own GHL Custom HTML element,
+   replacing the old marquee block.
+   ============================================================ -->
+
+<style>
+  .snz-logo-marquee {
+    /* ── Tune everything here ── */
+    --lm-w:     170px;                 /* every image box: width    */
+    --lm-h:     80px;                  /* every image box: height   */
+    --lm-gapx:  28px;                  /* half the distance between images (28 = 56px gap) */
+    --lm-speed: 45s;                   /* lower = faster            */
+    --lm-hover-scale: 1.15;            /* how big a logo grows on hover (1.15 = +15%) */
+
+    position: relative;
+    width: 100%;
+    background: #FFFFFF;
+    overflow: hidden;
+    padding: 26px 0;
+    /* Soft left/right edge fade, same as the ticker */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  }
+  .snz-logo-marquee * { box-sizing: border-box; }
+
+  .snz-logo-marquee__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: snzLogoScroll var(--lm-speed) linear infinite;
+  }
+  .snz-logo-marquee:hover .snz-logo-marquee__track { animation-play-state: paused; }
+
+  .snz-logo-marquee__set {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* Identical box for every image = identical size + identical spacing */
+  .snz-logo-marquee__item {
+    position: relative;
+    width: var(--lm-w);
+    height: var(--lm-h);
+    margin: 0 var(--lm-gapx);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .snz-logo-marquee__item img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    /* Blends white / light-grey backgrounds inside the logo files
+       into the white strip — no grey boxes, no shadowed cards */
+    mix-blend-mode: multiply;
+    filter: brightness(1.12) contrast(1.16); /* fallback whitening — only for a logo the build could not scrub */
+    transition: transform .3s ease;
+    will-change: transform;
+    transform-origin: center;
+  }
+  /* Hover grow (desktop pointers only, so touch devices never get a stuck hover state): transform only,
+     so neighbours never shift; the hovered item rises above its neighbours; the strip's own vertical
+     padding gives the enlarged logo room. */
+  @media (hover: hover) and (pointer: fine) {
+    .snz-logo-marquee__item:hover { z-index: 5; }
+    .snz-logo-marquee__item:hover img { transform: scale(var(--lm-hover-scale)); }
+  }
+  /* Scrubbed at build time (alpha WebP): no whitening filter, brand colors render exactly */
+  .snz-logo-marquee__item img.snz-scrubbed {
+    mix-blend-mode: normal;
+    filter: none;
+  }
+
+  @keyframes snzLogoScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 600px) {
+    .snz-logo-marquee { --lm-w: 118px; --lm-h: 56px; --lm-gapx: 17px; padding: 18px 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .snz-logo-marquee__track { animation: none; }
+    .snz-logo-marquee__item img { transition: none; }
+    .snz-logo-marquee__item:hover img { transform: none; }
+  }
+</style>
+
+
+<script>(function(){if(window.__snzMarqueeEager)return;window.__snzMarqueeEager=1;var near=[];function eager(box){box.querySelectorAll('.snz-logo-marquee img[loading="lazy"]').forEach(function(i){i.loading='eager'})}function arm(){var ms=document.querySelectorAll('.snz-logo-marquee');if(!ms.length)return;if(!('IntersectionObserver' in window)){ms.forEach(function(m){eager(m.closest('.c-section')||m)});return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;io.unobserve(e.target);near.push(e.target);eager(e.target)})},{rootMargin:'100% 0px'});ms.forEach(function(m){io.observe(m.closest('.c-section')||m)});var n=0,t=setInterval(function(){near.forEach(eager);if(++n>24)clearInterval(t)},500)}if(document.readyState==='complete')setTimeout(arm,0);else window.addEventListener('load',function(){setTimeout(arm,0)})})();</script><div class="snz-logo-marquee" role="marquee" aria-label="Brands we carry">
+  <div class="snz-logo-marquee__track">
+
+    <!-- ── SET 1 ── -->
+    <div class="snz-logo-marquee__set">
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f503a84abba640bb0b486.png" alt="BedTech mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039dc6b0a15e53bc0be.png" alt="Helix mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f503999074f5ef6d34d4b.png" alt="Bedgear at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/ARD47WoZpqaZSQ9MSxLD/media/6adfbe1967528ab60776dea7.png" alt="Brooklyn Bedding mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039fe4291bd1091759a.png" alt="Beautyrest mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039cf50f900f2814ec2.png" alt="DreamFit at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039fe4291bd109175a0.png" alt="Serta mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f50372b48e84b4fa8ae5d.png" alt="Stearns &amp; Foster mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f50378921ecbd9ca94ef7.png" alt="Puffy mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5037a6a03cda06a1d795.png" alt="Tempur-Pedic mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f50378921ecbd9ca94ef2.png" alt="Spring Air mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5037f762745222a0f1d5.png" alt="Sealy mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5037f762745222a0f1da.png" alt="King Koil mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f502ddc6b0a15e53b8cba.png" alt="Snooze-O-Pedic mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f502da6a03cda06a1aa88.png" alt="Sleeptone at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f502df762745222a0f105.png" alt="Flowt by King Koil mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      </div>
+
+    <!-- ── SET 2 (exact clone — creates the seamless endless loop) ── -->
+    <div class="snz-logo-marquee__set" aria-hidden="true">
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f503a84abba640bb0b486.png" alt="BedTech mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039dc6b0a15e53bc0be.png" alt="Helix mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f503999074f5ef6d34d4b.png" alt="Bedgear at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/ARD47WoZpqaZSQ9MSxLD/media/6adfbe1967528ab60776dea7.png" alt="Brooklyn Bedding mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039fe4291bd1091759a.png" alt="Beautyrest mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039cf50f900f2814ec2.png" alt="DreamFit at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5039fe4291bd109175a0.png" alt="Serta mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f50372b48e84b4fa8ae5d.png" alt="Stearns &amp; Foster mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f50378921ecbd9ca94ef7.png" alt="Puffy mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5037a6a03cda06a1d795.png" alt="Tempur-Pedic mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f50378921ecbd9ca94ef2.png" alt="Spring Air mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5037f762745222a0f1d5.png" alt="Sealy mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f5037f762745222a0f1da.png" alt="King Koil mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f502ddc6b0a15e53b8cba.png" alt="Snooze-O-Pedic mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f502da6a03cda06a1aa88.png" alt="Sleeptone at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      <div class="snz-logo-marquee__item"><img fetchpriority="low" src="https://assets.cdn.filesafe.space/gsqZfpbY5MmVessxREvK/media/6a7f502df762745222a0f105.png" alt="Flowt by King Koil mattresses at Snooze McAllen" loading="lazy" decoding="async" draggable="false" onerror="this.closest('.snz-logo-marquee__item').style.display='none'"></div>
+      </div>
+
+  </div>
+</div>
+
+<!-- Sleep Fit Quiz call to action under the logos (the site button style, overrides/buttons.css; layout in overrides/site.css) -->
+<div class="snz-quiz-cta" data-animate="fade-up">
+  <p class="snz-quiz-cta__line">Not sure which mattress is right for you?</p>
+  <div class="c-button c-wrapper snz-quiz-cta__btn"><a href="/sleep-quiz" class="cbutton-snzquiz waitlist-button custom btn-vp btn-hp borderFull radius15 none text-center"><span class="main-heading-group"><span class="main-heading-button">Take the 60-Second Sleep Quiz <svg class="snz-ico snz-ico--arrow" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg></span></span></a></div>
+</div>
+
+
+<!--
+═══════════════════════════════════════════════
+  HOW TO CUSTOMIZE (all in the variables at the top):
+  • Image size   -> --lm-w and --lm-h (every image sits in this same box)
+  • Spacing      -> --lm-gapx (28px = a 56px gap between every image)
+  • Speed        -> --lm-speed (lower = faster)
+  • Hover size   -> --lm-hover-scale (1.22 = grows 22% on hover)
+  • Grey boxes   -> erased at build time by scripts/scrub-logos.mjs (it deletes
+                   light grey-ish pixels connected to the image edge). If one
+                   logo still shows a darker grey box, lower LIGHT there from
+                   192 to ~170 — or re-upload that logo with a transparent bg.
+  • Keep SET 1 and SET 2 identical for a seamless loop
+═══════════════════════════════════════════════
+-->
