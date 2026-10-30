@@ -148,20 +148,20 @@
  "widgets": {
   "form": {
    "file": "widgets/form.html",
-   "formId": "0BTnYKylVR6OcWJug3r8",
-   "defaultFormId": "0BTnYKylVR6OcWJug3r8",
+   "formId": "",
+   "defaultFormId": "",
    "formName": "Optin",
-   "_comment": "formId (Rockwall) overrides the form id carried by every clone element; defaultFormId is the fallback for elements without one"
+   "_comment": "Rockwall: EMPTY until the client supplies the ids (lib/integrations.json is the live copy; scripts/integrations.mjs and scripts/reviews-cta.mjs rewrite the generated pages from it). formId overrides the form id carried by every clone element; defaultFormId is the fallback for elements without one"
   },
   "calendar": {
    "file": "widgets/calendar.html",
-   "calendarId": "lrAns7Z8j3vEJW3DC0Yr",
-   "defaultCalendarId": "lrAns7Z8j3vEJW3DC0Yr"
+   "calendarId": "",
+   "defaultCalendarId": ""
   },
   "reviews": {
    "file": "widgets/reviews.html",
-   "locationId": "ARD47WoZpqaZSQ9MSxLD",
-   "widgetId": "67f5847f79c4ab793baf0087"
+   "locationId": "",
+   "widgetId": ""
   }
  },
  "removeElements": [

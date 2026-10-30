@@ -34,7 +34,7 @@ const NEW = {
 };
 
 /* Leftover patterns; `ok` returns true when the hit is expected in that context. */
-const TOOLING = /^scripts\/(relocate|audit-location)\.mjs$|^README\.md$|^overrides\/i18n\//; // the mapping, this audit, the McAllen build history, the translation memory of the clone
+const TOOLING = /^scripts\/(relocate|audit-location|integrations|reviews-cta)\.mjs$|^README\.md$|^overrides\/i18n\//; // the mapping and the scripts that rewrite the old ids (they must name them), this audit, the McAllen build history, the translation memory of the clone
 const LEFTOVERS = [
   // ---- location copy
   { group: 'location', name: 'McAllen', re: /mcallen/gi, ok: (ctx, file) => TOOLING.test(file) },
@@ -61,7 +61,7 @@ const LEFTOVERS = [
   { group: 'integrations', name: 'McAllen GA4 / Simpli.fi', re: /G-9R1JGVBRBR|G-TS1RXQVPYT|b781856a/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'integrations', name: 'GTM-TVPN94M (McAllen container; keep only if the agency confirms it is shared)', re: /GTM-TVPN94M/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'integrations', name: 'McAllen form / calendar / reviews widget ids', re: /0BTnYKylVR6OcWJug3r8|lrAns7Z8j3vEJW3DC0Yr|67f5847f79c4ab793baf0087/g, ok: (ctx, file) => TOOLING.test(file) || /overrides\/overrides\.json$/.test(file) },
-  { group: 'integrations', name: 'tel: not E.164', re: /tel:(?!\+14697691300)[^"'\\\s<>]+/g, ok: (ctx, file) => /^scripts\/|^README|^public\//.test(file) || /tel:\/mailto:|tel:\$\{/.test(ctx) }, // public/: the quiz and events scripts build or test tel: links in code
+  { group: 'integrations', name: 'tel: not E.164', re: /(?<![a-z-])tel:(?!\+14697691300)[^"'\\\s<>]+/g, ok: (ctx, file) => /^scripts\/|^README|^public\//.test(file) || /tel:\/mailto:|tel:\$\{/.test(ctx) }, // public/: the quiz and events scripts build or test tel: links in code
 ];
 
 const SKIP = new Set(['node_modules', '.next', '.git', 'verify-out', 'public', '.vercel', 'out']);

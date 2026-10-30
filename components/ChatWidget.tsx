@@ -11,13 +11,16 @@
  * copy and hours are managed in the client's CRM.
  */
 import { useEffect } from 'react';
+import { INTEGRATIONS } from '@/lib/integrations';
 
-const WIDGET_IDS = { en: '6ada7129c5fa6117307c554f', es: '6ada73894325b023027e7371' } as const;
+/* [ROCKWALL_CHAT_EN] / [ROCKWALL_CHAT_ES] in lib/integrations.json (Rockwall, October 31, 2026): an empty id means no
+   widget is loaded in that language; the previous location's widget ids were not carried over. */
+const WIDGET_IDS = INTEGRATIONS.chatWidgetId;
 const SCRIPT_ID = 'snz-chat-widget';
 
 export function ChatWidget({ locale }: { locale: 'en' | 'es' }) {
   useEffect(() => {
-    if (document.getElementById(SCRIPT_ID)) return;
+    if (!WIDGET_IDS[locale] || document.getElementById(SCRIPT_ID)) return;
     let idle = 0;
     let timer = 0;
     const add = () => {

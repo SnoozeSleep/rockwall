@@ -1,67 +1,73 @@
 'use client';
-/* Tracking tags for every page, rendered once by both root layouts (and by the converter's layout template):
-   the client's snippets VERBATIM and IN THE CLIENT'S ORDER, high in <head>, all loading at parse time —
-     1. Google tag (gtag.js) G-9R1JGVBRBR + its config
-     2. Google Tag Manager GTM-TVPN94M (the standard inline loader; it injects an async gtm.js)
-     3. Simpli.fi (async)
-     4. Google tag (gtag.js) G-TS1RXQVPYT + its config
-   plus the GTM noscript iframe as the first element we render in <body> (Next.js itself emits an empty
-   <div hidden> before it). Both GA4 properties are intentional: never merge or dedupe them. Nothing waits for an
-   interaction, the load event or consent (a previous performance pass deferred the tags until the first
-   interaction and GA4 stopped recording visitors who bounced). Site events (phone_click, directions_click,
-   booking_confirmation, optin_submit, quiz events) go to the same dataLayer from public/snz-events.js.
+/* Tracking tags for every page, rendered once by both root layouts (and by the converter's layout template), high in
+   <head>, all loading at parse time, in the order the client's snippets use:
+     1. Google tag (gtag.js) + its config, once per GA4 measurement id
+     2. Google Tag Manager (the standard inline loader; it injects an async gtm.js)
+   plus the GTM noscript iframe as the first element we render in <body> (Next.js itself emits an empty <div hidden>
+   before it). Nothing waits for an interaction, the load event or consent (a previous performance pass deferred the tags
+   until the first interaction and GA4 stopped recording visitors who bounced). Site events (phone_click,
+   directions_click, booking_confirmation, optin_submit, quiz events) go to the same dataLayer from public/snz-events.js
+   and public/sleep-fit-quiz.js, whether or not a tag is configured.
+
+   Rockwall (October 31, 2026): the ids come from lib/integrations.json — [ROCKWALL_GTM] and [ROCKWALL_GA4] — and are
+   EMPTY until the client supplies them, so this component renders nothing and no tag loads. The previous location's
+   tags (two GA4 properties, its GTM container and a Simpli.fi pixel) were not carried over; its container goes in only
+   if the agency confirms it is shared.
 
    Why this is a client component: React 19 treats every `<script async src>` as a hoistable resource and moves it
-   ahead of the rest of <head>, which put the two gtag.js loaders and Simpli.fi before the inline config / GTM
-   snippets. A script that has an onLoad handler is rendered in place instead, so each async loader carries a no-op
-   onLoad (it adds nothing to the HTML) and the order in view-source is exactly the client's.
+   ahead of the rest of <head>, which would put the gtag.js loaders before the inline config / GTM snippets. A script
+   that has an onLoad handler is rendered in place instead, so each async loader carries a no-op onLoad (it adds nothing
+   to the HTML) and the order in view-source is exactly the snippets' order.
 
-   Hydration safety: tags fired by the GTM container (CallRail number swapping and others) insert elements into
-   <body> while a long page is still streaming. components/GhlPage.tsx keeps the server-rendered page markup and puts
-   it back if React ever has to re-render the tree after such an insertion, so the page never comes back blank. */
+   Hydration safety: tags fired by a GTM container (CallRail number swapping and others) insert elements into <body>
+   while a long page is still streaming. components/GhlPage.tsx keeps the server-rendered page markup and puts it back
+   if React ever has to re-render the tree after such an insertion, so the page never comes back blank. */
+import { Fragment } from 'react';
+import { INTEGRATIONS } from '@/lib/integrations';
 
 const keep = () => {};
+const { gtmId, ga4Ids } = INTEGRATIONS;
 
-/* The client's snippets, character for character. */
-const GTAG_PRIMARY_CONFIG = `
+/* The standard snippets, with the id filled in. */
+const gtagConfig = (id: string) => `
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-9R1JGVBRBR');
+  gtag('config', '${id}');
 `;
-const GTM_SNIPPET = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+const gtmSnippet = (id: string) => `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-TVPN94M');`;
-const GTAG_SECONDARY_CONFIG = `
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-TS1RXQVPYT');
-`;
-const GTM_NOSCRIPT = `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVPN94M"
+})(window,document,'script','dataLayer','${id}');`;
+const gtmNoscript = (id: string) => `<iframe src="https://www.googletagmanager.com/ns.html?id=${id}"
 height="0" width="0" style="display:none;visibility:hidden"></iframe>`;
 
-/** <head> tags, in the client's order. */
+/** <head> tags, in the snippets' order; nothing while no id is configured. */
 export function TrackingHead() {
+  if (!gtmId && !ga4Ids.length) return null;
   return (
     <>
-      {/* Google tag (gtag.js) */}
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-9R1JGVBRBR" onLoad={keep} />
-      <script dangerouslySetInnerHTML={{ __html: GTAG_PRIMARY_CONFIG }} />
-      {/* Google Tag Manager */}
-      <script dangerouslySetInnerHTML={{ __html: GTM_SNIPPET }} />
-      {/* End Google Tag Manager */}
-      <script async src="https://tag.simpli.fi/sifitag/b781856a-502d-46d8-a1da-c8e46665edab" onLoad={keep} />
-      {/* Google tag (gtag.js) */}
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS1RXQVPYT" onLoad={keep} />
-      <script dangerouslySetInnerHTML={{ __html: GTAG_SECONDARY_CONFIG }} />
+      <link rel="preconnect" href="https://www.googletagmanager.com" />
+      {ga4Ids.map((id) => (
+        <Fragment key={id}>
+          {/* Google tag (gtag.js) */}
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${id}`} onLoad={keep} />
+          <script dangerouslySetInnerHTML={{ __html: gtagConfig(id) }} />
+        </Fragment>
+      ))}
+      {gtmId ? (
+        <>
+          {/* Google Tag Manager */}
+          <script dangerouslySetInnerHTML={{ __html: gtmSnippet(gtmId) }} />
+          {/* End Google Tag Manager */}
+        </>
+      ) : null}
     </>
   );
 }
 
-/** Google Tag Manager (noscript), immediately after <body>. */
+/** Google Tag Manager (noscript), immediately after <body>; nothing while no container is configured. */
 export function TrackingBody() {
-  return <noscript dangerouslySetInnerHTML={{ __html: GTM_NOSCRIPT }} />;
+  return gtmId ? <noscript dangerouslySetInnerHTML={{ __html: gtmNoscript(gtmId) }} /> : null;
 }

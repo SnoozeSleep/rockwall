@@ -1,0 +1,17 @@
+{
+  "_comment": "Third-party ids for the Rockwall store (clone brief, October 31, 2026). Every value is a placeholder until the client supplies it, and an EMPTY value DISABLES that integration: nothing is rendered and no request is made. The previous location's ids were never carried over. Read by components/Tracking.tsx, components/ChatWidget.tsx, components/BookingPage.tsx, components/SleepQuiz.tsx (quiz webhook), scripts/integrations.mjs (the contact form embeds inside the generated pages: run `node scripts/integrations.mjs` after changing formId) and scripts/reviews-cta.mjs (reviews widget). The dataLayer events phone_click, directions_click, booking_confirmation, optin_submit and quiz_completed (public/snz-events.js, public/sleep-fit-quiz.js) keep firing regardless and reach the container / property as soon as one is set.",
+  "gtmId": "",
+  "_gtmId": "[ROCKWALL_GTM] Google Tag Manager container id. The previous location's container was not carried over: use it here only if the agency confirms that container is shared.",
+  "ga4Ids": [],
+  "_ga4Ids": "[ROCKWALL_GA4] Google Analytics 4 measurement id(s), one gtag.js loader + config each. The previous location's two GA4 properties and its Simpli.fi tag were removed.",
+  "chatWidgetId": { "en": "", "es": "" },
+  "_chatWidgetId": "[ROCKWALL_CHAT_EN] / [ROCKWALL_CHAT_ES] LeadConnector chat widget ids (one per language); loaded after the page is idle, never styled by the site.",
+  "quizWebhookUrl": "",
+  "_quizWebhookUrl": "[ROCKWALL_QUIZ_WEBHOOK] the Rockwall sub-account's inbound webhook URL for the Sleep Fit Quiz lead (Automation -> Workflows -> trigger). Empty = the quiz runs but the lead is not sent (logged to the console).",
+  "calendarId": "",
+  "_calendarId": "[ROCKWALL_CALENDAR_URL] the Dream Mapping booking calendar id, the <id> in https://link.snoozesleep.com/widget/booking/<id>. Empty = /booking shows the phone call to action where the calendar goes.",
+  "formId": "",
+  "_formId": "[ROCKWALL_FORM_ID] the contact (opt-in) form id, the <id> in https://link.snoozesleep.com/widget/form/<id>. Empty = the pages show a card with the phone number and e-mail where the form goes. Run `node scripts/integrations.mjs` after changing it.",
+  "reviewsWidget": { "locationId": "", "widgetId": "" },
+  "_reviewsWidget": "[ROCKWALL_REVIEWS_WIDGET] the LeadConnector reviews widget, reputationhub.site/reputation/widgets/review_widget/<locationId>?widgetId=<widgetId>. Empty = the 'Leave us a Google review' call to action. Run `node scripts/reviews-cta.mjs` after changing it."
+}

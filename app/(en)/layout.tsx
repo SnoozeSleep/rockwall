@@ -33,10 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: BODY_GUARD }} />
         {/* tracking first, high in <head>, in the client's order (components/Tracking.tsx) */}
         <TrackingHead />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://link.snoozesleep.com" />
         <link rel="dns-prefetch" href="https://reputationhub.site" />
-        <link rel="dns-prefetch" href="https://tag.simpli.fi" />
         {/* Safety net: rewrites any asset URL the GHL runtime still builds against the original CDNs to the
             local copies, provides window.__ghlOnReady for the site's own DOMContentLoaded scripts, and filters the
             review widget's height messages. A plain parser-blocking script on purpose: next/script's

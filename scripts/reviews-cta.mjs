@@ -33,7 +33,14 @@ const COPY = {
 /* the badge's alt text (overrides.json imageAlt + es.extra.json) in the markup and as a payload string */
 const BADGE_ALTS = ['Google Verified Reviews badge with five stars', 'Insignia de reseñas verificadas de Google con cinco estrellas'];
 
+/* [ROCKWALL_REVIEWS_WIDGET] (lib/integrations.json): once the Rockwall reviews widget ids are supplied, the client's embed
+   (overrides/widgets/reviews.html) takes the call to action's place, between the same markers */
+const INTEGRATIONS = JSON.parse(fs.readFileSync(path.join(ROOT, 'lib/integrations.json'), 'utf8'));
+const REVIEWS_IDS = { locationId: String(INTEGRATIONS.reviewsWidget?.locationId || '').trim(), widgetId: String(INTEGRATIONS.reviewsWidget?.widgetId || '').trim() };
+const REVIEWS_TEMPLATE = fs.readFileSync(path.join(ROOT, 'overrides/widgets/reviews.html'), 'utf8').trim();
+
 function block(locale) {
+  if (REVIEWS_IDS.locationId && REVIEWS_IDS.widgetId) return START + REVIEWS_TEMPLATE.replace(/\{\{locationId\}\}/g, REVIEWS_IDS.locationId).replace(/\{\{widgetId\}\}/g, REVIEWS_IDS.widgetId) + END;
   const c = COPY[locale] || COPY.en;
   const url = ROCKWALL.gbpUrl;
   const button = url

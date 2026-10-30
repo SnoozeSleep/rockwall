@@ -1,6 +1,7 @@
 import Script from 'next/script';
 import { SITE } from './site-config';
 import { LOCATION } from '@/lib/location';
+import { INTEGRATIONS } from '@/lib/integrations';
 import { PageSchema } from './PageSchema';
 import { Icon, type IconName } from './icons';
 import type { Locale } from '@/lib/i18n';
@@ -61,6 +62,8 @@ const COPY = {
     pickTime: 'Pick a Time Above',
     questions: (phone: string) => `Questions? Call ${phone}`,
     noJsBook: 'Open the booking calendar',
+    /* while no calendar id is configured (lib/integrations.json) */
+    pending: 'Online booking is being set up for this store. Call us and a Sleep Coach will book your free Dream Mapping fitting.',
   },
   es: {
     title: '¡Da el Primer Paso Hacia un',
@@ -80,14 +83,18 @@ const COPY = {
     pickTime: 'Elige un horario arriba',
     questions: (phone: string) => `¿Preguntas? Llama al ${phone}`,
     noJsBook: 'Abrir el calendario de citas',
+    pending: 'La reserva en línea está en preparación para esta tienda. Llámanos y un Sleep Coach agenda tu Dream Mapping gratis.',
   },
 };
 /* one icon per step: the sensor bed, the five minutes, the Sleep Coach, free with no obligation, couples */
 const VISIT_ICONS: IconName[] = ['sensor-bed', 'clock', 'user', 'badge-check', 'people'];
 
-/* Rockwall Dream Mapping calendar (the client's embed: id = `<calendarId>_<timestamp>`) */
-export const BOOKING_CALENDAR_ID = 'lrAns7Z8j3vEJW3DC0Yr';
-const BOOKING_EMBED_ID = `${BOOKING_CALENDAR_ID}_1788459899479`;
+/* The Dream Mapping booking calendar: [ROCKWALL_CALENDAR_URL] in lib/integrations.json — the id in
+   https://link.snoozesleep.com/widget/booking/<id> (the client's embed names the iframe `<calendarId>_<timestamp>`).
+   Empty until the client supplies it: the page then shows the phone call to action where the calendar goes, and never
+   the previous location's calendar. */
+export const BOOKING_CALENDAR_ID = INTEGRATIONS.calendarId;
+const BOOKING_EMBED_ID = `${BOOKING_CALENDAR_ID || 'calendar'}_1788459899479`;
 
 /* Height guard for the calendar iframe (October 27, 2026; made deterministic October 28, 2026).
    The widget reports its height two ways: iframe-resizer messages ("[iFrameSizer]<id>:<height>:<width>:<trigger>"), which
@@ -144,25 +151,35 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
         </div>
       </div>
 
-      <iframe
-        className={styles.calendar}
-        src={`https://link.snoozesleep.com/widget/booking/${BOOKING_CALENDAR_ID}`}
-        title={locale === 'es' ? 'Calendario de citas de Dream Mapping' : 'Dream Mapping booking calendar'}
-        allow="payment"
-        style={{ width: '100%', border: 'none', overflow: 'hidden' }}
-        scrolling="no"
-        id={BOOKING_EMBED_ID}
-        data-snz-resizer="form_embed"
-      />
-      <script dangerouslySetInnerHTML={{ __html: CALENDAR_HEIGHT_GUARD }} />
-      {/* without JavaScript nothing sizes the embed and the widget inside it cannot run: a link opens the booking widget
-          on its own page, and the phone number is the fallback that always works */}
-      <noscript>
-        <div className={styles.noJs}>
-          <a className={styles.visitBtn} href={`https://link.snoozesleep.com/widget/booking/${BOOKING_CALENDAR_ID}`} target="_blank" rel="noopener noreferrer">{t.noJsBook}</a>
-          <a className={styles.visitCall} href={SITE.phoneHref}><Icon name="phone" /> {t.questions(SITE.phone)}</a>
+      {BOOKING_CALENDAR_ID ? (
+        <>
+          <iframe
+            className={styles.calendar}
+            src={`https://link.snoozesleep.com/widget/booking/${BOOKING_CALENDAR_ID}`}
+            title={locale === 'es' ? 'Calendario de citas de Dream Mapping' : 'Dream Mapping booking calendar'}
+            allow="payment"
+            style={{ width: '100%', border: 'none', overflow: 'hidden' }}
+            scrolling="no"
+            id={BOOKING_EMBED_ID}
+            data-snz-resizer="form_embed"
+          />
+          <script dangerouslySetInnerHTML={{ __html: CALENDAR_HEIGHT_GUARD }} />
+          {/* without JavaScript nothing sizes the embed and the widget inside it cannot run: a link opens the booking widget
+              on its own page, and the phone number is the fallback that always works */}
+          <noscript>
+            <div className={styles.noJs}>
+              <a className={styles.visitBtn} href={`https://link.snoozesleep.com/widget/booking/${BOOKING_CALENDAR_ID}`} target="_blank" rel="noopener noreferrer">{t.noJsBook}</a>
+              <a className={styles.visitCall} href={SITE.phoneHref}><Icon name="phone" /> {t.questions(SITE.phone)}</a>
+            </div>
+          </noscript>
+        </>
+      ) : (
+        /* [ROCKWALL_CALENDAR_URL] not supplied yet (lib/integrations.json): the phone is the way to book */
+        <div className={styles.pending} id={BOOKING_EMBED_ID}>
+          <p className={styles.pendingText}>{t.pending}</p>
+          <a className={styles.visitBtn} href={SITE.phoneHref}><Icon name="phone" /> {t.questions(SITE.phone)}</a>
         </div>
-      </noscript>
+      )}
 
       <section className={styles.visit} aria-labelledby="visit-title">
         <div className={styles.visitInner}>
@@ -179,13 +196,13 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
             ))}
           </ol>
           <div className={styles.visitCtas}>
-            <a className={styles.visitBtn} href={`#${BOOKING_EMBED_ID}`}>{t.pickTime}</a>
+            {BOOKING_CALENDAR_ID ? <a className={styles.visitBtn} href={`#${BOOKING_EMBED_ID}`}>{t.pickTime}</a> : null}
             <a className={styles.visitCall} href={SITE.phoneHref}><Icon name="phone" /> {t.questions(SITE.phone)}</a>
           </div>
         </div>
       </section>
       </main>
-      <Script src="https://link.snoozesleep.com/js/form_embed.js" strategy="afterInteractive" />
+      {BOOKING_CALENDAR_ID ? <Script src="https://link.snoozesleep.com/js/form_embed.js" strategy="afterInteractive" /> : null}
     </>
   );
 }

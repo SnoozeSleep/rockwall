@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import type { Locale } from '@/lib/i18n';
 import { PageSchema } from './PageSchema';
+import { INTEGRATIONS } from '@/lib/integrations';
 import './sleep-quiz/sleep-fit-quiz.css';
 
 /* The Snooze Sleep Fit Quiz as a site page (/sleep-quiz, /es/sleep-quiz), hand-written like the booking page
@@ -12,12 +13,12 @@ import './sleep-quiz/sleep-fit-quiz.css';
    own top bar and © line are not needed. Styles are the quiz's own stylesheet scoped under .snz-quiz
    (components/sleep-quiz/sleep-fit-quiz.css). The quiz logic is public/sleep-fit-quiz.js, loaded after hydration
    so React never re-renders the subtree the quiz mutates; it reads the language from data-lang and sends the
-   lead to the Rockwall GoHighLevel inbound webhook (CONFIG inside the script). */
+   lead to the Rockwall GoHighLevel inbound webhook ([ROCKWALL_QUIZ_WEBHOOK] in lib/integrations.json, passed in as window.__snzQuizWebhook). */
 
 const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const FAVICON = '/assets/filesafe/qR8peonBlnjGI3ZuLHQP/media/695b9e7d17768458ae206a19.png';
 const OG_IMAGE = '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a90ca4e747464c6b3a3be10.png.webp';
-export const QUIZ_SCRIPT = '/sleep-fit-quiz.js?v=3';
+export const QUIZ_SCRIPT = '/sleep-fit-quiz.js?v=4';
 
 const META: Record<Locale, { title: string; description: string; ogLocale: string; noscript: string }> = {
   en: {
@@ -78,6 +79,8 @@ export function SleepQuiz({ locale = 'en' }: { locale?: Locale }) {
           </main>
         </div>
       </div>
+      {/* [ROCKWALL_QUIZ_WEBHOOK] (lib/integrations.json): the quiz script reads window.__snzQuizWebhook; empty = the lead is not sent */}
+      <script dangerouslySetInnerHTML={{ __html: `window.__snzQuizWebhook=${JSON.stringify(INTEGRATIONS.quizWebhookUrl)};` }} />
       <Script src={QUIZ_SCRIPT} strategy="afterInteractive" />
     </>
   );

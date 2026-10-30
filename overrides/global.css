@@ -389,3 +389,11 @@ html[lang="es"] #heading-JQfUWePMYv h2 { max-width: none; font-size: min(46px, 5
 img[src*="7eeb64ed-8497-4240-a956-802db60e201b"], img[src*="bae599bb-e93f-4cd3-95a1-31b6fdc0acef"] { display: none !important; }
 /* the Dream Mapping station photo standing in for the storefront photo ([ROCKWALL_STOREFRONT_PHOTO]) keeps its own proportions */
 img[src*="6a7577049a9c7792ea57899a"] { aspect-ratio: 1000 / 667 !important; }
+
+/* ---- Contact form placeholder (scripts/integrations.mjs): until the Rockwall form id is supplied ([ROCKWALL_FORM_ID] in
+   lib/integrations.json) the generated pages show the phone number and e-mail where the LeadConnector form goes. ---- */
+.snz-form-pending { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 0 auto; max-width: 640px; padding: 28px 22px; border-radius: 16px; background: #fff; border: 1px solid rgba(0, 20, 137, 0.09); box-shadow: 0 10px 30px -22px rgba(0, 20, 137, 0.35); text-align: center; font-family: var(--font-poppins-stack); color: #1e223c; }
+.snz-form-pending__text { margin: 0; font-size: 16px; line-height: 1.55; }
+.snz-form-pending__links { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.6; overflow-wrap: anywhere; }
+.snz-form-pending__links a { color: #001489 !important; text-decoration: none !important; }
+.snz-form-pending__links a:hover { color: #f58433 !important; }
