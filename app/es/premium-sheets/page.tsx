@@ -6,8 +6,8 @@ import { PAGE_SCHEMA } from './schema';
 import { AccessoryGuide } from '@/components/AccessoryGuide';
 
 export const metadata: Metadata = {
-  "title": "Sábanas Premium en McAllen, TX | Snooze Mattress",
-  "description": "Las sábanas correctas pueden transformar tu descanso. Las sábanas premium de Snooze Mattress + Wellness en McAllen: suavidad, frescura y durabilidad.",
+  "title": "Sábanas Premium en Rockwall, TX | Snooze Mattress",
+  "description": "Las sábanas correctas pueden transformar tu descanso. Las sábanas premium de Snooze Mattress + Wellness en Rockwall: suavidad, frescura y durabilidad.",
   "alternates": {
     "canonical": "/es/premium-sheets",
     "languages": {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Sábanas Premium en McAllen, TX | Snooze Mattress",
-    "description": "Las sábanas correctas pueden transformar tu descanso. Las sábanas premium de Snooze Mattress + Wellness en McAllen: suavidad, frescura y durabilidad.",
+    "title": "Sábanas Premium en Rockwall, TX | Snooze Mattress",
+    "description": "Las sábanas correctas pueden transformar tu descanso. Las sábanas premium de Snooze Mattress + Wellness en Rockwall: suavidad, frescura y durabilidad.",
     "url": "/es/premium-sheets",
     "type": "website",
     "images": [

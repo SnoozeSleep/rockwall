@@ -7,22 +7,22 @@ export const PAGE: ContentPage = {
   kind: 'product',
   copy: {
     en: {
-      title: 'Queen Mattresses in McAllen, TX | Snooze Mattress',
-      description: 'Queen mattresses in McAllen, TX from Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix and more, fitted to you in a free Dream Mapping session.',
+      title: 'Queen Mattresses in Rockwall, TX | Snooze Mattress',
+      description: 'Queen mattresses in Rockwall, TX from Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix and more, fitted to you in a free Dream Mapping session.',
       crumb: 'Queen Mattresses',
       eyebrow: 'Mattresses by size',
-      h1: 'Queen mattresses in McAllen, TX',
+      h1: 'Queen mattresses in Rockwall, TX',
       intro: [
-        'A queen mattress is 60 inches wide and 80 inches long, the standard size for a couple in a regular bedroom and a roomy choice for one person. At Snooze Mattress + Wellness in McAllen you can try queen models from the brands on the showroom floor and let a free Dream Mapping fitting show you which ones match the way you sleep.',
+        'A queen mattress is 60 inches wide and 80 inches long, the standard size for a couple in a regular bedroom and a roomy choice for one person. At Snooze Mattress + Wellness in Rockwall you can try queen models from the brands on the showroom floor and let a free Dream Mapping fitting show you which ones match the way you sleep.',
       ],
       sections: [
         { h2: 'Who a queen is right for', paragraphs: [
           'Queen is the size most bedrooms are planned around: wide enough for two adults to sleep comfortably without the footprint of a king, and long enough for most sleepers. It leaves room for nightstands in a 10-by-10-foot room, which is why it is the most common choice for primary bedrooms and the usual pick for a well-furnished guest room.',
           'Couples who want more space than a full without going to a king, taller sleepers who need the extra five inches of length over a full, and anyone who shares the bed with a child or a pet on weekend mornings all tend to land on a queen.',
-          'Not sure between full, queen and king? Our [mattress size guide](/blog/mattress-size-guide-mcallen) has the real dimensions, room sizes and who each size suits.',
+          'Not sure between full, queen and king? Our [mattress size guide](/how-to-choose-a-mattress) has the real dimensions, room sizes and who each size suits.',
         ] },
         { h2: 'Queen brands and comfort levels at Snooze', paragraphs: [
-          'The McAllen showroom carries Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, Puffy, King Koil, Brooklyn Bedding, Spring Air and Snooze-O-Pedic, from luxury comfort and advanced sleep technology to budget-friendly options. Comfort levels run from plush to firm, so there is a queen for side sleepers who need pressure relief at the shoulders and hips as well as for back and stomach sleepers who need firmer support.',
+          'The Rockwall showroom carries Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, Puffy, King Koil, Brooklyn Bedding, Spring Air and Snooze-O-Pedic, from luxury comfort and advanced sleep technology to budget-friendly options. Comfort levels run from plush to firm, so there is a queen for side sleepers who need pressure relief at the shoulders and hips as well as for back and stomach sleepers who need firmer support.',
           'Ask a Sleep Coach which models are on the floor in queen; the selection changes with the season and the current sale.',
         ] },
         { h2: 'Find your queen with Dream Mapping', paragraphs: [
@@ -44,25 +44,25 @@ export const PAGE: ContentPage = {
         { question: 'Can I put a queen mattress on an adjustable base?', answer: 'Yes. Adjustable bases are available for queen mattresses, with customizable head and foot positioning.' },
         { question: 'Do you deliver queen mattresses?', answer: 'Yes. Delivery and setup are free on orders over $999, and we can haul away your old mattress.' },
       ],
-      cta: { title: 'Try queen mattresses in McAllen', text: 'A free five-minute Dream Mapping fitting shows you which queen models fit the way you sleep.', button: 'Book a free fitting' },
+      cta: { title: 'Try queen mattresses in Rockwall', text: 'A free five-minute Dream Mapping fitting shows you which queen models fit the way you sleep.', button: 'Book a free fitting' },
     },
     es: {
-      title: 'Colchones Queen en McAllen, TX | Snooze Mattress',
-      description: 'Colchones queen en McAllen, TX de Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix y más, ajustados a ti con Dream Mapping gratis.',
+      title: 'Colchones Queen en Rockwall, TX | Snooze Mattress',
+      description: 'Colchones queen en Rockwall, TX de Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix y más, ajustados a ti con Dream Mapping gratis.',
       crumb: 'Colchones Queen',
       eyebrow: 'Colchones por tamaño',
-      h1: 'Colchones queen en McAllen, TX',
+      h1: 'Colchones queen en Rockwall, TX',
       intro: [
-        'Un colchón queen mide 60 pulgadas de ancho por 80 de largo: el tamaño estándar para una pareja en una recámara normal y una opción amplia para una sola persona. En Snooze Mattress + Wellness en McAllen puedes probar modelos queen de las marcas de la sala de exhibición y dejar que una sesión gratis de Dream Mapping te muestre cuáles van con tu forma de dormir.',
+        'Un colchón queen mide 60 pulgadas de ancho por 80 de largo: el tamaño estándar para una pareja en una recámara normal y una opción amplia para una sola persona. En Snooze Mattress + Wellness en Rockwall puedes probar modelos queen de las marcas de la sala de exhibición y dejar que una sesión gratis de Dream Mapping te muestre cuáles van con tu forma de dormir.',
       ],
       sections: [
         { h2: 'Para quién es un queen', paragraphs: [
           'Queen es el tamaño alrededor del cual se planean la mayoría de las recámaras: lo bastante ancho para que dos adultos duerman cómodos sin ocupar lo que ocupa un king, y lo bastante largo para casi cualquier persona. Deja espacio para los burós en una recámara de 10 por 10 pies, por eso es la elección más común para la recámara principal y la habitual para un cuarto de visitas bien amueblado.',
           'Las parejas que quieren más espacio que un full sin llegar al king, las personas altas que necesitan las cinco pulgadas extra de largo sobre un full, y quien comparte la cama con un hijo o una mascota los fines de semana suelen terminar en un queen.',
-          '¿No sabes si elegir full, queen o king? Nuestra [guía de tamaños de colchón](/es/blog/guia-tamanos-de-colchon-mcallen) tiene las medidas reales, los tamaños de recámara y para quién es cada tamaño.',
+          '¿No sabes si elegir full, queen o king? Nuestra [guía de tamaños de colchón](/es/how-to-choose-a-mattress) tiene las medidas reales, los tamaños de recámara y para quién es cada tamaño.',
         ] },
         { h2: 'Marcas y niveles de comodidad en queen', paragraphs: [
-          'La sala de exhibición de McAllen tiene Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, Puffy, King Koil, Brooklyn Bedding, Spring Air y Snooze-O-Pedic, desde comodidad de lujo y tecnología avanzada de sueño hasta opciones económicas. Los niveles de comodidad van de plush a firme, así que hay un queen tanto para quien duerme de lado y necesita alivio de presión en hombros y caderas como para quien duerme boca arriba o boca abajo y necesita soporte más firme.',
+          'La sala de exhibición de Rockwall tiene Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, Puffy, King Koil, Brooklyn Bedding, Spring Air y Snooze-O-Pedic, desde comodidad de lujo y tecnología avanzada de sueño hasta opciones económicas. Los niveles de comodidad van de plush a firme, así que hay un queen tanto para quien duerme de lado y necesita alivio de presión en hombros y caderas como para quien duerme boca arriba o boca abajo y necesita soporte más firme.',
           'Pregunta a un Sleep Coach qué modelos están en piso en tamaño queen; la selección cambia con la temporada y con la oferta vigente.',
         ] },
         { h2: 'Encuentra tu queen con Dream Mapping', paragraphs: [
@@ -84,7 +84,7 @@ export const PAGE: ContentPage = {
         { question: '¿Puedo poner un colchón queen en una base ajustable?', answer: 'Sí. Hay bases ajustables para colchones queen, con posición de cabeza y pies personalizable.' },
         { question: '¿Entregan colchones queen?', answer: 'Sí. La entrega e instalación son gratis en compras mayores de $999, y podemos llevarnos tu colchón viejo.' },
       ],
-      cta: { title: 'Prueba colchones queen en McAllen', text: 'Una sesión gratis de Dream Mapping de cinco minutos te muestra qué modelos queen van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Prueba colchones queen en Rockwall', text: 'Una sesión gratis de Dream Mapping de cinco minutos te muestra qué modelos queen van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
     },
   },
 };

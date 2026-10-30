@@ -8,7 +8,7 @@ export const PAGE_SCHEMA: JsonLd[] = [
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "¿Por qué elegir Snooze Mattress + Wellness en McAllen?",
+        "name": "¿Por qué elegir Snooze Mattress + Wellness en Rockwall?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Porque tienes los mejores precios de colchones de la ciudad gracias a nuestras ofertas competitivas y a que igualamos precios, una Garantía de Confort de Sueño única para tu colchón nuevo, y un negocio familiar que te recibe con una sonrisa en nuestras pijamas Snooze Blues. ¡Sería un honor atenderte!"
@@ -72,7 +72,7 @@ export const PAGE_SCHEMA: JsonLd[] = [
       },
       {
         "@type": "Question",
-        "name": "¿Por qué elegir Snooze Mattress + Wellness en McAllen, TX?",
+        "name": "¿Por qué elegir Snooze Mattress + Wellness en Rockwall, TX?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Porque tienes los mejores precios de colchones de la ciudad gracias a nuestras ofertas competitivas y a que igualamos precios, una Garantía de Confort de Sueño única para tu colchón nuevo, y un negocio familiar que te recibe con una sonrisa en nuestras pijamas Snooze Blues. ¡Sería un honor atenderte!"
@@ -88,13 +88,13 @@ export const PAGE_SCHEMA: JsonLd[] = [
         "@type": "ListItem",
         "position": 1,
         "name": "Inicio",
-        "item": "https://mcallen.snoozemattresscompany.com/es"
+        "item": "https://rockwall.snoozemattresscompany.com/es"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Sillón Reclinable",
-        "item": "https://mcallen.snoozemattresscompany.com/es/sleep-recliner"
+        "item": "https://rockwall.snoozemattresscompany.com/es/sleep-recliner"
       }
     ]
   }

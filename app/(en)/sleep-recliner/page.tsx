@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Sleep Recliner (Zcliner) in McAllen, TX | Snooze Mattress",
-  "description": "The SleepRecliner (Zcliner®) by Flexsteel, available at Snooze Mattress + Wellness in McAllen: advanced comfort technology with therapeutic positioning.",
+  "title": "Sleep Recliner (Zcliner) in Rockwall, TX | Snooze Mattress",
+  "description": "The SleepRecliner (Zcliner®) by Flexsteel, available at Snooze Mattress + Wellness in Rockwall: advanced comfort technology with therapeutic positioning.",
   "alternates": {
     "canonical": "/sleep-recliner",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Sleep Recliner (Zcliner) in McAllen, TX | Snooze Mattress",
-    "description": "The SleepRecliner (Zcliner®) by Flexsteel, available at Snooze Mattress + Wellness in McAllen: advanced comfort technology with therapeutic positioning.",
+    "title": "Sleep Recliner (Zcliner) in Rockwall, TX | Snooze Mattress",
+    "description": "The SleepRecliner (Zcliner®) by Flexsteel, available at Snooze Mattress + Wellness in Rockwall: advanced comfort technology with therapeutic positioning.",
     "url": "/sleep-recliner",
     "type": "website",
     "images": [

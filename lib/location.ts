@@ -1,48 +1,49 @@
-/* The store. Used by the footer (address, map, social links) and the site-wide LocalBusiness JSON-LD.
-   scripts/relocate.mjs carries the same values for the generated GoHighLevel pages: change both together.
-   Business name and NAP as the client wrote them for the SEO audit (October 2026): "Snooze Mattress + Wellness",
-   7913 N 10th St, Suite 130, McAllen, TX 78504 · (956) 586-5646 · Mon–Sat 10 AM–7 PM, Sun 12–6 PM
-   (scripts/brand-nap.mjs applies the same wording to the generated pages). No legal entity name is asserted anywhere:
-   the registered name is NEEDS CLIENT INPUT. */
+/* The store. Used by the top bar, the footer (address, map, social links), the contact page's details, the content
+   pages' call-to-action line and the site-wide LocalBusiness JSON-LD. scripts/relocate.mjs (ROCKWALL) carries the same
+   values for the generated GoHighLevel pages: change both together.
+   Rockwall, TX location (client brief, October 31, 2026): "Snooze Mattress + Wellness", 919 E Interstate 30, Suite 101,
+   Rockwall, TX 75032 · (469) 769-1300 · Mon–Sat 10 AM–7 PM, Sun 10 AM–6 PM · jadams@snoozemattresscompany.com.
+   Values the client has not supplied yet are empty strings or null and marked NEEDS CLIENT INPUT; the components that
+   read them render nothing for an empty value (no icon, no sameAs entry, no geo). */
 export const LOCATION = {
   name: 'Snooze Mattress + Wellness',
-  legalName: 'Snooze Mattress + Wellness', // confirmed by the client (October 22, 2026): the legal name is the display name
-  street: '7913 N 10th St, Suite 130',
-  city: 'McAllen',
+  legalName: 'Snooze Mattress + Wellness', // the legal name is the display name (confirmed for the brand, October 22, 2026)
+  street: '919 E Interstate 30, Suite 101',
+  city: 'Rockwall',
   region: 'TX',
-  postalCode: '78504',
+  postalCode: '75032',
   country: 'US',
-  phone: '(956) 586-5646',
-  phoneHref: 'tel:+19565865646',
-  phoneIntl: '+1 956-586-5646',
-  email: 'northmcallen@snoozemattresscompany.com',
-  /* coordinates of the storefront (10th & Auburn); taken from the store's Google Maps link */
-  geo: { latitude: 26.2746879, longitude: -98.2189774 },
+  phone: '(469) 769-1300',
+  phoneHref: 'tel:+14697691300',
+  phoneIntl: '+1 469-769-1300',
+  email: 'jadams@snoozemattresscompany.com',
+  /* GeoCoordinates of the storefront: NEEDS CLIENT INPUT ([ROCKWALL_GEO], read off the Google Business Profile once the
+     Place ID is supplied). null = the LocalBusiness schema carries no geo property. */
+  geo: null as null | { latitude: number; longitude: number },
   social: {
-    facebook: 'https://www.facebook.com/p/Snooze-Mattress-Wellness-61575812121380/',
-    instagram: 'https://www.instagram.com/snoozemcallen',
-    youtube: 'https://www.youtube.com/@SnoozeMcAllen',
+    facebook: 'https://www.facebook.com/people/Snooze-Mattress-Wellness-Rockwall-TX/61582495686069/',
+    instagram: 'https://www.instagram.com/rockwalltxsnooze/',
+    youtube: '', // no Rockwall channel was supplied: '' = no footer icon, not in sameAs
+    tiktok: '', // [ROCKWALL_TIKTOK] NEEDS CLIENT INPUT (or NONE): '' = no footer icon, not in sameAs
   },
-  /* Google Maps: the query is the business name + the exact NAP, so the map and the directions link resolve to the
-     store's own listing (SEO audit, October 2026 — section 6b; scripts/brand-nap.mjs writes the same URLs into the
-     generated pages' location cards). */
-  /* The store's Google Business Profile listing (Place ID supplied by the client, October 21, 2026): the top bar's
-     address link and the footer's "Get Directions" / "Open Maps" links open it, the LocalBusiness schema lists it in
-     sameAs and hasMap. The footer map embed keeps its business-name query. */
-  placeId: 'ChIJBYBxOXChZYYR48f71GAS7YY',
-  gbpUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJBYBxOXChZYYR48f71GAS7YY',
-  mapLink: 'https://www.google.com/maps/place/?q=place_id:ChIJBYBxOXChZYYR48f71GAS7YY',
-  mapEmbed: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+7913+N+10th+St%2C+Suite+130%2C+McAllen%2C+TX+78504&output=embed',
-  /* LocalBusiness schema (components/LocalBusinessJsonLd.tsx, SEO audit section 5a) */
-  storefrontImage: '/assets/filesafe/ARD47WoZpqaZSQ9MSxLD/media/684480ff2c95c570cfc22e24.jpeg.webp', // the storefront photo of the location card
+  /* The store's Google Business Profile: [ROCKWALL_PLACE_ID] NEEDS CLIENT INPUT. Until then the map links are a Google
+     Maps search for the exact address, and the "Leave us a Google review" button (scripts/reviews-cta.mjs) stays hidden. */
+  placeId: '',
+  gbpUrl: '',
+  mapLink: 'https://www.google.com/maps/search/?api=1&query=919+E+Interstate+30+Suite+101+Rockwall+TX+75032',
+  mapEmbed: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+919+E+Interstate+30%2C+Suite+101%2C+Rockwall%2C+TX+75032&output=embed',
+  /* LocalBusiness schema image (components/LocalBusinessJsonLd.tsx). [ROCKWALL_STOREFRONT_PHOTO] NEEDS CLIENT INPUT:
+     the previous location's storefront photo must not represent this store, so until a Rockwall photo arrives the site's Dream
+     Mapping station photo stands in here and in the pages' location cards (scripts/relocate.mjs). */
+  storefrontImage: '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a7577049a9c7792ea57899a.png.webp',
   priceRange: '$$',
-  areaServed: ['McAllen', 'Edinburg', 'Mission', 'Pharr'],
+  areaServed: ['Rockwall'],
   hours: {
-    en: ['Mon–Sat 10 AM–7 PM', 'Sun 12–6 PM'],
-    es: ['Lun–Sáb 10 AM–7 PM', 'Dom 12–6 PM'],
+    en: ['Mon–Sat 10 AM–7 PM', 'Sun 10 AM–6 PM'],
+    es: ['Lun–Sáb 10 AM–7 PM', 'Dom 10 AM–6 PM'],
   },
   openingHours: [
     { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], opens: '10:00', closes: '19:00' },
-    { days: ['Sunday'], opens: '12:00', closes: '18:00' },
+    { days: ['Sunday'], opens: '10:00', closes: '18:00' },
   ],
 } as const;

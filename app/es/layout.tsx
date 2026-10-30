@@ -22,7 +22,7 @@ import '../../overrides/global.css';
 const poppins = Poppins({ weight: ['400', '500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-poppins', preload: true });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mcallen.snoozemattresscompany.com"),
+  metadataBase: new URL("https://rockwall.snoozemattresscompany.com"),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

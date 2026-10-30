@@ -1,4 +1,4 @@
-/* Snooze McAllen — dataLayer events for GA4 key events (SEO audit, October 2026 — section 7b).
+/* Snooze Rockwall — dataLayer events for GA4 key events (SEO audit, October 2026 — section 7b).
    Loaded by both root layouts after hydration. Pushes to window.dataLayer (read by the GTM container and gtag):
      phone_click            — a tel: link was clicked          { phone_number, link_text, page_path }
      directions_click       — a Google Maps link was clicked   { link_url, link_text, page_path }

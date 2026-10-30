@@ -3,19 +3,20 @@ import { SITE } from './site-config';
 import type { Locale } from '@/lib/i18n';
 
 /* Site-wide LocalBusiness schema, rendered by the footer exactly once on every route (both locales) — the one
-   LocalBusiness record of the McAllen store (SEO audit, October 2026 — section 5a). The builder's own copy that
+   LocalBusiness record of the Rockwall store (SEO audit, October 2026 — section 5a). The builder's own copy that
    the GoHighLevel runtime injected into <head> after hydration is removed from every page payload by
    scripts/page-schema.mjs, so this block is the only one.
    @type: schema.org has no "MattressStore" type (the audit's wording; the term exists only as a Google Business
    Profile category), and an unknown type fails every validator, so the nearest valid Store subtype is used,
-   FurnitureStore, together with LocalBusiness. Everything else is as the audit lists it: name, address, geo,
-   telephone, opening hours, priceRange, url, storefront image, sameAs (Facebook, Instagram, YouTube and the Google
-   Business Profile URL once the client supplies it — lib/location.ts gbpUrl) and areaServed. No AggregateRating or
-   Review markup, on purpose. */
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+   FurnitureStore, together with LocalBusiness. Everything else comes from lib/location.ts: name, address, telephone,
+   email, opening hours, priceRange, url, image, sameAs (Facebook, Instagram, and YouTube, TikTok and the Google
+   Business Profile URL when the client supplies them — empty values are left out), hasMap and areaServed; geo only
+   once the coordinates are supplied. No AggregateRating or Review markup, on purpose. */
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 
 export function LocalBusinessJsonLd({ locale = 'en' }: { locale?: Locale }) {
   const L = LOCATION;
+  const sameAs = [L.social.facebook, L.social.instagram, L.social.youtube, L.social.tiktok, L.gbpUrl].filter(Boolean);
   const data = {
     '@context': 'https://schema.org',
     '@type': ['FurnitureStore', 'LocalBusiness'],
@@ -36,9 +37,9 @@ export function LocalBusinessJsonLd({ locale = 'en' }: { locale?: Locale }) {
       postalCode: L.postalCode,
       addressCountry: L.country,
     },
-    geo: { '@type': 'GeoCoordinates', latitude: L.geo.latitude, longitude: L.geo.longitude },
-    hasMap: L.gbpUrl,
-    sameAs: [L.social.facebook, L.social.instagram, L.social.youtube, L.gbpUrl],
+    ...(L.geo ? { geo: { '@type': 'GeoCoordinates', latitude: L.geo.latitude, longitude: L.geo.longitude } } : {}),
+    hasMap: L.gbpUrl || L.mapLink,
+    sameAs,
     openingHoursSpecification: L.openingHours.map((h) => ({
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: h.days.map((d) => `https://schema.org/${d}`),

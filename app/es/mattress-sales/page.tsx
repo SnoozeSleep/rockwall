@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Ofertas de Colchones en McAllen, TX | Snooze Mattress",
-  "description": "Ofertas de colchones en Snooze Mattress, McAllen, TX: ahorros por marca, financiamiento especial y Dream Mapping gratis. Detalles en tienda.",
+  "title": "Ofertas de Colchones en Rockwall, TX | Snooze Mattress",
+  "description": "Ofertas de colchones en Snooze Mattress, Rockwall, TX: ahorros por marca, financiamiento especial y Dream Mapping gratis. Detalles en tienda.",
   "alternates": {
     "canonical": "/es/mattress-sales",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Ofertas de Colchones en McAllen, TX | Snooze Mattress",
-    "description": "Ofertas de colchones en Snooze Mattress, McAllen, TX: ahorros por marca, financiamiento especial y Dream Mapping gratis. Detalles en tienda.",
+    "title": "Ofertas de Colchones en Rockwall, TX | Snooze Mattress",
+    "description": "Ofertas de colchones en Snooze Mattress, Rockwall, TX: ahorros por marca, financiamiento especial y Dream Mapping gratis. Detalles en tienda.",
     "url": "/es/mattress-sales",
     "type": "website",
     "images": [

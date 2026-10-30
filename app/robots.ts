@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 // static export (next.config output: 'export'): generated once at build time, served as a plain file
 export const dynamic = 'force-static';
 
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 
 /* /robots.txt: everything is crawlable except the offline placeholders under /ghl-stub (the contact page, /contact-us,
    included: it is indexable). The booking and Dream Mapping thank-you pages (/thank/you, /dream/map/thank/you) are

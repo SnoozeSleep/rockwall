@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Camas y Bases Ajustables en McAllen, TX | Snooze Mattress",
-  "description": "Camas y bases ajustables en McAllen, TX en Snooze Mattress + Wellness: más comodidad, soporte y alivio de presión, menos ronquidos. Pruébalas en la tienda.",
+  "title": "Camas y Bases Ajustables en Rockwall, TX | Snooze Mattress",
+  "description": "Camas y bases ajustables en Rockwall, TX en Snooze Mattress + Wellness: más comodidad, soporte y alivio de presión, menos ronquidos. Pruébalas en tienda.",
   "alternates": {
     "canonical": "/es/adjustable-mattress-bases",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Camas y Bases Ajustables en McAllen, TX | Snooze Mattress",
-    "description": "Camas y bases ajustables en McAllen, TX en Snooze Mattress + Wellness: más comodidad, soporte y alivio de presión, menos ronquidos. Pruébalas en la tienda.",
+    "title": "Camas y Bases Ajustables en Rockwall, TX | Snooze Mattress",
+    "description": "Camas y bases ajustables en Rockwall, TX en Snooze Mattress + Wellness: más comodidad, soporte y alivio de presión, menos ronquidos. Pruébalas en tienda.",
     "url": "/es/adjustable-mattress-bases",
     "type": "website",
     "images": [

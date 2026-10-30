@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LIVE = process.argv.includes('--live'); const VERBOSE = process.argv.includes('--verbose');
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const TYPES = new Set(['ContactPage', 'FurnitureStore', 'LocalBusiness', 'Store', 'PostalAddress', 'GeoCoordinates', 'OpeningHoursSpecification', 'City', 'State', 'Country', 'ImageObject', 'Organization', 'FAQPage', 'Question', 'Answer', 'BreadcrumbList', 'ListItem', 'BlogPosting', 'Article', 'WebPage', 'Person', 'Service', 'Offer', 'ContactPoint', 'WebSite', 'AdministrativeArea']);
 const FORBIDDEN = new Set(['AggregateRating', 'Review', 'Rating']);
 const BUSINESS = new Set(['FurnitureStore', 'LocalBusiness', 'Store']);

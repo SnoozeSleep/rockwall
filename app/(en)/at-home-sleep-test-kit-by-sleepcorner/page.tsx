@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "At-Home Sleep Test Kit in McAllen, TX | Snooze Mattress",
-  "description": "The At-Home Sleep Test Kit by SleepCorner at Snooze Mattress + Wellness in McAllen: an FDA-cleared overnight test reviewed by licensed sleep professionals.",
+  "title": "At-Home Sleep Test Kit in Rockwall, TX | Snooze Mattress",
+  "description": "The At-Home Sleep Test Kit by SleepCorner at Snooze Mattress + Wellness in Rockwall: an FDA-cleared overnight test read by licensed sleep professionals.",
   "alternates": {
     "canonical": "/at-home-sleep-test-kit-by-sleepcorner",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "At-Home Sleep Test Kit in McAllen, TX | Snooze Mattress",
-    "description": "The At-Home Sleep Test Kit by SleepCorner at Snooze Mattress + Wellness in McAllen: an FDA-cleared overnight test reviewed by licensed sleep professionals.",
+    "title": "At-Home Sleep Test Kit in Rockwall, TX | Snooze Mattress",
+    "description": "The At-Home Sleep Test Kit by SleepCorner at Snooze Mattress + Wellness in Rockwall: an FDA-cleared overnight test read by licensed sleep professionals.",
     "url": "/at-home-sleep-test-kit-by-sleepcorner",
     "type": "website",
     "images": [

@@ -7,8 +7,8 @@ import { ContactDetails } from '@/components/ContactDetails';
 
 export const metadata: Metadata = {
   "robots": { "index": true, "follow": true },
-  "title": "Contact Snooze Mattress in McAllen, TX | Snooze Mattress",
-  "description": "Contact Snooze Mattress + Wellness in McAllen: call (956) 586-5646, visit 7913 N 10th St, Suite 130 or send a message to book a free Dream Mapping fitting.",
+  "title": "Contact Snooze Mattress in Rockwall, TX | Snooze Mattress",
+  "description": "Contact Snooze Mattress + Wellness in Rockwall: call (469) 769-1300, visit 919 E Interstate 30, Suite 101 or send a message to book a free fitting.",
   "alternates": {
     "canonical": "/contact-us",
     "languages": {
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Contact Snooze Mattress in McAllen, TX | Snooze Mattress",
-    "description": "Contact Snooze Mattress + Wellness in McAllen: call (956) 586-5646, visit 7913 N 10th St, Suite 130 or send a message to book a free Dream Mapping fitting.",
+    "title": "Contact Snooze Mattress in Rockwall, TX | Snooze Mattress",
+    "description": "Contact Snooze Mattress + Wellness in Rockwall: call (469) 769-1300, visit 919 E Interstate 30, Suite 101 or send a message to book a free fitting.",
     "url": "/contact-us",
     "type": "website",
     "images": [

@@ -9,7 +9,6 @@ const L = '/assets/lcimg/image/f_webp/q_80/r_1200/u/filesafe';
 /* site images reused for the blog (all already part of the site's assets; heavy originals are served as the WebP
    twins scripts/optimize-images.mjs writes next to them, same name + .webp) */
 export const IMG = {
-  store: { src: `${L}/ARD47WoZpqaZSQ9MSxLD/media/684480ff2c95c570cfc22e24.jpeg`, width: 1200, height: 900 },
   station: { src: `${B}/6a7577049a9c7792ea57899a.png.webp`, width: 1000, height: 667 },
   pressureMap: { src: `${A}/11c4f704-6266-4eea-8702-295bb6974c13.png.webp`, width: 1537, height: 1094 },
   sleeper: { src: `${A}/1871b85e-a9ee-4965-9e56-f7b289ce90fa.jpeg.webp`, width: 1920, height: 720 },

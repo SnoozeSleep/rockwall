@@ -7,5 +7,5 @@ import { SCRIPTS } from './scripts';
 const content: { HEAD_HTML: string; BODY_HTML: string } | null = typeof window === 'undefined' ? require('./content') : null;
 
 export default function PageClient() {
-  return <GhlPage headHtml={content ? content.HEAD_HTML : ''} bodyHtml={content ? content.BODY_HTML : ''} scripts={SCRIPTS} preload={[{"href":"/assets/filesafe/ARD47WoZpqaZSQ9MSxLD/media/699c969010bc9c1e4d659063.png.webp","media":"(min-width: 768px)"},{"href":"/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a9899f9da522bf173a9bd91.png.webp","media":"(max-width: 767px)"}]} />;
+  return <GhlPage headHtml={content ? content.HEAD_HTML : ''} bodyHtml={content ? content.BODY_HTML : ''} scripts={SCRIPTS} preload={[{"href":"/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a9899f9da522bf173a9bd91.png.webp","media":"(min-width: 768px)"},{"href":"/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a9899f9da522bf173a9bd91.png.webp","media":"(max-width: 767px)"}]} />;
 }

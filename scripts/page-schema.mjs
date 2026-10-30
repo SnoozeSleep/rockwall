@@ -20,7 +20,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
 const cheerio = require('cheerio');
 const CHECK = process.argv.includes('--check');
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const BS = String.fromCharCode(92);
 const escapeJsonForScript = (json) => json.split('<').join(BS + 'u003C').split(String.fromCharCode(0x2028)).join(BS + 'u2028').split(String.fromCharCode(0x2029)).join(BS + 'u2029');
 
@@ -38,7 +38,7 @@ const PRODUCT_NAMES = {
 const HOME = { en: 'Home', es: 'Inicio' };
 /* the contact page (/contact-us, October 29, 2026): ContactPage about the store (the site-wide LocalBusiness record,
    @id …/#store, rendered by the footer and unchanged) + BreadcrumbList Home › Contact Us; name = the page's H1 */
-const CONTACT = { '/contact-us': { en: { name: 'Contact Snooze Mattress in McAllen', crumb: 'Contact Us' }, es: { name: 'Contacta a Snooze Mattress en McAllen', crumb: 'Contáctanos' } } };
+const CONTACT = { '/contact-us': { en: { name: 'Contact Snooze Mattress in Rockwall', crumb: 'Contact Us' }, es: { name: 'Contacta a Snooze Mattress en Rockwall', crumb: 'Contáctanos' } } };
 
 const pages = []; (function walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'content.ts' && fs.existsSync(path.join(d, 'page.tsx'))) pages.push(d); } })(path.join(ROOT, 'app'));
 const rel = (f) => path.relative(ROOT, f).split(path.sep).join('/');

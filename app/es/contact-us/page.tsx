@@ -7,8 +7,8 @@ import { ContactDetails } from '@/components/ContactDetails';
 
 export const metadata: Metadata = {
   "robots": { "index": true, "follow": true },
-  "title": "Contacta a Snooze Mattress en McAllen, TX | Snooze Mattress",
-  "description": "Contacta a Snooze Mattress + Wellness en McAllen: llama al (956) 586-5646, visita 7913 N 10th St, Suite 130 o escríbenos y agenda tu Dream Mapping gratis.",
+  "title": "Contacta a Snooze Mattress en Rockwall, TX | Snooze Mattress",
+  "description": "Contacta a Snooze Mattress + Wellness en Rockwall: llama al (469) 769-1300, visita 919 E Interstate 30, Suite 101 o escríbenos y agenda tu ajuste gratis.",
   "alternates": {
     "canonical": "/es/contact-us",
     "languages": {
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Contacta a Snooze Mattress en McAllen, TX | Snooze Mattress",
-    "description": "Contacta a Snooze Mattress + Wellness en McAllen: llama al (956) 586-5646, visita 7913 N 10th St, Suite 130 o escríbenos y agenda tu Dream Mapping gratis.",
+    "title": "Contacta a Snooze Mattress en Rockwall, TX | Snooze Mattress",
+    "description": "Contacta a Snooze Mattress + Wellness en Rockwall: llama al (469) 769-1300, visita 919 E Interstate 30, Suite 101 o escríbenos y agenda tu ajuste gratis.",
     "url": "/es/contact-us",
     "type": "website",
     "images": [

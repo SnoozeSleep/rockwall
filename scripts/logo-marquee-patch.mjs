@@ -6,7 +6,7 @@
  *     eager as soon as the marquee comes within one viewport of the screen, so the moving strip never shows a blank
  *     gap (a lazy image that enters the strip's visible window loads too late) while nothing is fetched for a marquee
  *     far below the fold;
- *   - alt text "<Brand> mattresses at Snooze McAllen" (bedding brands: "<Brand> at Snooze McAllen"), Spanish on /es;
+ *   - alt text "<Brand> mattresses at Snooze Rockwall" (bedding brands: "<Brand> at Snooze Rockwall"), Spanish on /es;
  *   - the second (loop) copy of the strip uses the same URLs as the first, so the browser makes one request per logo.
  *   node scripts/logo-marquee-patch.mjs            (npm run marquee)   — after `npm run convert`
  *   node scripts/logo-marquee-patch.mjs --check                        — report only
@@ -39,7 +39,7 @@ const BRANDS = {
   '6a7f502da6a03cda06a1aa88': { name: 'Sleeptone', bedding: true },
   '6a7f502df762745222a0f105': { name: 'Flowt by King Koil' },
 };
-const altFor = (id, locale) => { const b = BRANDS[id]; if (!b) return null; const n = b.name.replace(/&/g, '&amp;'); if (locale === 'es') return b.bedding ? `${n} en Snooze McAllen` : `Colchones ${n} en Snooze McAllen`; return b.bedding ? `${n} at Snooze McAllen` : `${n} mattresses at Snooze McAllen`; };
+const altFor = (id, locale) => { const b = BRANDS[id]; if (!b) return null; const n = b.name.replace(/&/g, '&amp;'); if (locale === 'es') return b.bedding ? `${n} en Snooze Rockwall` : `Colchones ${n} en Snooze Rockwall`; return b.bedding ? `${n} at Snooze Rockwall` : `${n} mattresses at Snooze Rockwall`; };
 
 /* the eager switch: runs once per document, armed only after the window load event (so the logo fetches never compete
    with the hero image / LCP: measured on the mattresses page, switching at DOMContentLoaded pushed the LCP from 3.4 s

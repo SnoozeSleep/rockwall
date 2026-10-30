@@ -11,25 +11,25 @@ import './sleep-quiz/sleep-fit-quiz.css';
    own top bar and © line are not needed. Styles are the quiz's own stylesheet scoped under .snz-quiz
    (components/sleep-quiz/sleep-fit-quiz.css). The quiz logic is public/sleep-fit-quiz.js, loaded after hydration
    so React never re-renders the subtree the quiz mutates; it reads the language from data-lang and sends the
-   lead to the McAllen GoHighLevel inbound webhook (CONFIG inside the script). */
+   lead to the Rockwall GoHighLevel inbound webhook (CONFIG inside the script). */
 
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const FAVICON = '/assets/filesafe/qR8peonBlnjGI3ZuLHQP/media/695b9e7d17768458ae206a19.png';
 const OG_IMAGE = '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a90ca4e747464c6b3a3be10.png.webp';
 export const QUIZ_SCRIPT = '/sleep-fit-quiz.js?v=3';
 
 const META: Record<Locale, { title: string; description: string; ogLocale: string; noscript: string }> = {
   en: {
-    title: 'Sleep Fit Quiz | Snooze Mattress in McAllen',
+    title: 'Sleep Fit Quiz | Snooze Mattress in Rockwall',
     description: 'Answer 5 quick questions about how you sleep and find the comfort level, support level and mattress features your body needs. Free, in 60 seconds.',
     ogLocale: 'en_US',
-    noscript: 'The Sleep Fit Quiz needs JavaScript. Call (956) 586-5646 or visit Snooze Mattress + Wellness at 7913 N 10th St, Suite 130, McAllen, TX 78504 and we will find your fit in person.',
+    noscript: 'The Sleep Fit Quiz needs JavaScript. Call (469) 769-1300 or visit Snooze Mattress + Wellness at 919 E Interstate 30, Suite 101, Rockwall, TX 75032 and we will find your fit in person.',
   },
   es: {
-    title: 'Sleep Fit Quiz | Snooze Mattress en McAllen',
+    title: 'Sleep Fit Quiz | Snooze Mattress en Rockwall',
     description: 'Responde 5 preguntas rápidas sobre cómo duermes y descubre la comodidad, el soporte y las características de colchón que necesitas. Gratis, 60 segundos.',
     ogLocale: 'es_US',
-    noscript: 'El Sleep Fit Quiz necesita JavaScript. Llama al (956) 586-5646 o visita Snooze Mattress + Wellness en 7913 N 10th St, Suite 130, McAllen, TX 78504 y encontraremos tu ajuste en persona.',
+    noscript: 'El Sleep Fit Quiz necesita JavaScript. Llama al (469) 769-1300 o visita Snooze Mattress + Wellness en 919 E Interstate 30, Suite 101, Rockwall, TX 75032 y encontraremos tu ajuste en persona.',
   },
 };
 

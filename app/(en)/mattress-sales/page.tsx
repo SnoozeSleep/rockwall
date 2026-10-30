@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Mattress Sales & Deals in McAllen, TX | Snooze Mattress",
-  "description": "Current mattress deals at Snooze Mattress in McAllen, TX: brand savings, special financing and a free Dream Mapping fitting. See store for details.",
+  "title": "Mattress Sales & Deals in Rockwall, TX | Snooze Mattress",
+  "description": "Current mattress deals at Snooze Mattress in Rockwall, TX: brand savings, special financing and a free Dream Mapping fitting. See store for details.",
   "alternates": {
     "canonical": "/mattress-sales",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Mattress Sales & Deals in McAllen, TX | Snooze Mattress",
-    "description": "Current mattress deals at Snooze Mattress in McAllen, TX: brand savings, special financing and a free Dream Mapping fitting. See store for details.",
+    "title": "Mattress Sales & Deals in Rockwall, TX | Snooze Mattress",
+    "description": "Current mattress deals at Snooze Mattress in Rockwall, TX: brand savings, special financing and a free Dream Mapping fitting. See store for details.",
     "url": "/mattress-sales",
     "type": "website",
     "images": [

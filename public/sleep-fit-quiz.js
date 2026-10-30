@@ -1,5 +1,5 @@
 /* =================================================================================
-   SNOOZE SLEEP FIT QUIZ — McAllen site build (mcallen.snoozemattresscompany.com)
+   SNOOZE SLEEP FIT QUIZ — Rockwall site build (rockwall.snoozemattresscompany.com)
    =================================================================================
    The single-store quiz (sleep-fit-quiz.html) as the site's /sleep-quiz and /es/sleep-quiz pages. Rendered by
    components/SleepQuiz.tsx (markup + scoped stylesheet); this file is loaded after hydration and boots on the
@@ -15,23 +15,23 @@
   if (!root || root.dataset.booted) return;
   root.dataset.booted = "1";
   const LANG = root.getAttribute("data-lang") === "es" ? "es" : "en";
-  const SITE_URL = "https://mcallen.snoozemattresscompany.com";
+  const SITE_URL = "https://rockwall.snoozemattresscompany.com";
   const PREFIX = LANG === "es" ? "/es" : "";
 
 /* =================================================================================
-   CONFIG — McAllen store
+   CONFIG — Rockwall store
    ================================================================================= */
 const CONFIG = {
   brand: "Snooze Mattress + Wellness",
 
   store: {
-    id: "mcallen",
-    name: "Snooze Mattress + Wellness – McAllen",
-    phone: "(956) 586-5646",
-    address: "7913 N 10th St, Suite 130, McAllen, TX 78504",
+    id: "rockwall",
+    name: "Snooze Mattress + Wellness – Rockwall",
+    phone: "(469) 769-1300",
+    address: "919 E Interstate 30, Suite 101, Rockwall, TX 75032",
     bookingUrl: SITE_URL + PREFIX + "/booking",      // Dream Mapping booking page
     shopUrl: SITE_URL + PREFIX + "/mattresses",      // mattresses page
-    // McAllen sub-account Inbound Webhook URL (Automation -> Workflows -> trigger)
+    // Rockwall sub-account Inbound Webhook URL (Automation -> Workflows -> trigger)
     webhookUrl: "https://services.leadconnectorhq.com/hooks/ARD47WoZpqaZSQ9MSxLD/webhook-trigger/00b3cdec-7a6f-4184-95ec-81210f1e7bc8"
   }
 };

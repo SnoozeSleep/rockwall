@@ -6,8 +6,8 @@ import { PAGE_SCHEMA } from './schema';
 import { AccessoryGuide } from '@/components/AccessoryGuide';
 
 export const metadata: Metadata = {
-  "title": "Almohadas en McAllen, TX para Tu Descanso | Snooze Mattress",
-  "description": "Almohadas en McAllen, TX para tu forma de dormir: de lado, boca arriba o boca abajo. Almohadas premium en Snooze Mattress + Wellness para tu descanso.",
+  "title": "Almohadas en Rockwall, TX para Tu Descanso | Snooze Mattress",
+  "description": "Almohadas en Rockwall, TX para tu forma de dormir: de lado, boca arriba o boca abajo. Almohadas premium en Snooze Mattress + Wellness para tu descanso.",
   "alternates": {
     "canonical": "/es/pillows",
     "languages": {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Almohadas en McAllen, TX para Tu Descanso | Snooze Mattress",
-    "description": "Almohadas en McAllen, TX para tu forma de dormir: de lado, boca arriba o boca abajo. Almohadas premium en Snooze Mattress + Wellness para tu descanso.",
+    "title": "Almohadas en Rockwall, TX para Tu Descanso | Snooze Mattress",
+    "description": "Almohadas en Rockwall, TX para tu forma de dormir: de lado, boca arriba o boca abajo. Almohadas premium en Snooze Mattress + Wellness para tu descanso.",
     "url": "/es/pillows",
     "type": "website",
     "images": [

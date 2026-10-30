@@ -6,7 +6,7 @@ import { altBlogPath, postsFor } from '@/lib/blog-posts';
 import { localizeHref } from '@/lib/i18n';
 import LASTMOD from '@/lib/lastmod.json';
 
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 
 /* Public, indexable pages of the converted site (hand-maintained; regeneration keeps this file). Every page exists in
    English and Spanish (/es/...); each sitemap entry lists both as hreflang alternates. Not listed on purpose: the
@@ -41,9 +41,6 @@ const PAGES: Array<[path: string, priority: number]> = [
   ['/memory-foam-mattresses', 0.8],
   ['/mattresses-for-back-pain', 0.8],
   ['/cooling-mattresses', 0.8],
-  ['/mattress-store-edinburg', 0.7],
-  ['/mattress-store-mission', 0.7],
-  ['/mattress-store-pharr', 0.7],
   ['/faq', 0.7],
   ['/how-to-choose-a-mattress', 0.8],
   ['/privacy-policy-page', 0.3],

@@ -3,11 +3,10 @@ import type { Metadata } from 'next';
 import PageClient from './client';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
-import { GuideLinks } from '@/components/GuideLinks';
 
 export const metadata: Metadata = {
-  "title": "Colchones en McAllen, TX: Marcas Líderes | Snooze Mattress",
-  "description": "Colchones en McAllen, TX: Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, King Koil y más, ajustados a ti en una sesión gratis de Dream Mapping.",
+  "title": "Colchones en Rockwall, TX: Marcas Líderes | Snooze Mattress",
+  "description": "Colchones en Rockwall, TX: Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, King Koil y más, ajustados a ti en una sesión gratis de Dream Mapping.",
   "alternates": {
     "canonical": "/es/mattresses",
     "languages": {
@@ -17,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Colchones en McAllen, TX: Marcas Líderes | Snooze Mattress",
-    "description": "Colchones en McAllen, TX: Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, King Koil y más, ajustados a ti en una sesión gratis de Dream Mapping.",
+    "title": "Colchones en Rockwall, TX: Marcas Líderes | Snooze Mattress",
+    "description": "Colchones en Rockwall, TX: Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, Helix, King Koil y más, ajustados a ti en una sesión gratis de Dream Mapping.",
     "url": "/es/mattresses",
     "type": "website",
     "images": [
@@ -45,9 +44,7 @@ export default function Page() {
     <>
       {/* page-level JSON-LD (scripts/page-schema.mjs) */}
       <PageSchema items={PAGE_SCHEMA} />
-      <PageClient />
-      {/* "Not sure what size you need?" — the two blog guides (SEO report, October 27, 2026) */}
-      <GuideLinks locale="es" />
+      <PageClient />
     </>
   );
 }

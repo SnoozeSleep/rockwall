@@ -1,3 +1,29 @@
+# Rockwall Snooze — Next.js site
+
+**This repository is the Snooze Mattress + Wellness site for Rockwall, TX** (919 E Interstate 30, Suite 101 · (469) 769-1300 ·
+Mon–Sat 10 AM–7 PM, Sun 10 AM–6 PM), cloned on October 31, 2026 from the McAllen site's `main` branch (commit `2749672`, its
+latest production commit) and relocated with [`scripts/relocate.mjs`](scripts/relocate.mjs) (stage 2, McAllen → Rockwall).
+The location values live in [`lib/location.ts`](lib/location.ts) and in `ROCKWALL` inside `scripts/relocate.mjs`: change both together.
+
+What changed for Rockwall (one commit per section of the client's brief):
+
+- **Localised.** Every McAllen value (city, address, phone, e-mail, social links, hours, domain, map links) rewritten in the
+  generated pages, the hand-written components and the scripts that write page copy; the Rio Grande Valley / South Texas
+  copy rewritten for Rockwall (qualitative only: hot summers). Removed as McAllen-only: the Edinburg / Mission / Pharr
+  service-area pages and the home page's "Shopping from…" band, the McAllen reviews and the "Google Verified Reviews"
+  badge (the reviews section carries a "Leave us a Google review" call to action instead — `scripts/reviews-cta.mjs`, the
+  button hidden until the Place ID is supplied), the staff names, the McAllen blog posts (`/blog` shows "New articles
+  coming soon"; the header's Blog item is a plain link until articles exist) and the drive-time copy. The McAllen
+  storefront photo, and the home / About Us / Financing hero composites that include it together with a "22+ reviews"
+  badge, are replaced by the site's own brand imagery until Rockwall photos arrive.
+- **Placeholders still needed from the client** are marked `NEEDS CLIENT INPUT` in `lib/location.ts` and
+  `scripts/relocate.mjs` and listed in the build report.
+
+Everything below this line is the McAllen build's documentation, kept as the history of the code this site was cloned
+from; read "McAllen" there as the previous location.
+
+---
+
 # McAllen Snooze — Next.js conversion
 
 Next.js 15 (App Router, TypeScript) rendering of the static wget clone of

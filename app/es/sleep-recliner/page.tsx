@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Sillón Reclinable Zcliner en McAllen, TX | Snooze Mattress",
-  "description": "El SleepRecliner (Zcliner®) de Flexsteel, disponible en Snooze Mattress + Wellness en McAllen: tecnología de confort avanzada con posiciones terapéuticas.",
+  "title": "Sillón Reclinable Zcliner en Rockwall, TX | Snooze Mattress",
+  "description": "El SleepRecliner (Zcliner®) de Flexsteel, disponible en Snooze Mattress + Wellness en Rockwall: tecnología de confort avanzada con posiciones terapéuticas.",
   "alternates": {
     "canonical": "/es/sleep-recliner",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Sillón Reclinable Zcliner en McAllen, TX | Snooze Mattress",
-    "description": "El SleepRecliner (Zcliner®) de Flexsteel, disponible en Snooze Mattress + Wellness en McAllen: tecnología de confort avanzada con posiciones terapéuticas.",
+    "title": "Sillón Reclinable Zcliner en Rockwall, TX | Snooze Mattress",
+    "description": "El SleepRecliner (Zcliner®) de Flexsteel, disponible en Snooze Mattress + Wellness en Rockwall: tecnología de confort avanzada con posiciones terapéuticas.",
     "url": "/es/sleep-recliner",
     "type": "website",
     "images": [

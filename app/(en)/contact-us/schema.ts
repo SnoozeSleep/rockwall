@@ -5,15 +5,15 @@ export const PAGE_SCHEMA: JsonLd[] = [
   {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    "@id": "https://mcallen.snoozemattresscompany.com/contact-us#webpage",
-    "url": "https://mcallen.snoozemattresscompany.com/contact-us",
-    "name": "Contact Snooze Mattress in McAllen",
+    "@id": "https://rockwall.snoozemattresscompany.com/contact-us#webpage",
+    "url": "https://rockwall.snoozemattresscompany.com/contact-us",
+    "name": "Contact Snooze Mattress in Rockwall",
     "inLanguage": "en-US",
     "about": {
-      "@id": "https://mcallen.snoozemattresscompany.com/#store"
+      "@id": "https://rockwall.snoozemattresscompany.com/#store"
     },
     "mainEntity": {
-      "@id": "https://mcallen.snoozemattresscompany.com/#store"
+      "@id": "https://rockwall.snoozemattresscompany.com/#store"
     }
   },
   {
@@ -24,13 +24,13 @@ export const PAGE_SCHEMA: JsonLd[] = [
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://mcallen.snoozemattresscompany.com"
+        "item": "https://rockwall.snoozemattresscompany.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Contact Us",
-        "item": "https://mcallen.snoozemattresscompany.com/contact-us"
+        "item": "https://rockwall.snoozemattresscompany.com/contact-us"
       }
     ]
   }

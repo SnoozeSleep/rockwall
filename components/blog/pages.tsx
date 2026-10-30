@@ -8,7 +8,7 @@ import styles from '@/components/blog/blog.module.css';
 import { altBlogPath, getPost, postsFor, relatedPosts, type BlogPost } from '@/lib/blog-posts';
 import { localizeHref, ui, type Locale } from '@/lib/i18n';
 
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const FAVICON = '/assets/filesafe/qR8peonBlnjGI3ZuLHQP/media/695b9e7d17768458ae206a19.png';
 const OG_LOCALE: Record<Locale, string> = { en: 'en_US', es: 'es_US' };
 const LANG: Record<Locale, string> = { en: 'en-US', es: 'es-US' };
@@ -25,15 +25,19 @@ const postAlternates = (post: BlogPost, locale: Locale) => {
   return { canonical: localizeHref(own, locale), languages: { 'en-US': en, 'es-US': es, 'x-default': en } };
 };
 
+/* the site's Open Graph image, used while the blog has no post to take the newest featured image from */
+const OG_IMAGE = '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a90ca4e747464c6b3a3be10.png.webp';
+
 export function blogIndexMetadata(locale: Locale): Metadata {
   const t = ui(locale).blog;
   const posts = postsFor(locale);
+  const image = posts[0]?.featured.src || OG_IMAGE;
   return {
     title: t.indexMetaTitle,
     description: t.indexMetaDesc,
     alternates: alternates('/blog', locale),
-    openGraph: { type: 'website', title: t.indexMetaTitle, description: t.ogDesc, url: localizeHref('/blog', locale), locale: OG_LOCALE[locale], images: [posts[0].featured.src] },
-    twitter: { card: 'summary_large_image', images: [posts[0].featured.src] },
+    openGraph: { type: 'website', title: t.indexMetaTitle, description: t.ogDesc, url: localizeHref('/blog', locale), locale: OG_LOCALE[locale], images: [image] },
+    twitter: { card: 'summary_large_image', images: [image] },
     icons: { icon: FAVICON },
   };
 }
@@ -52,11 +56,16 @@ export function BlogIndexPage({ locale }: { locale: Locale }) {
         </div>
       </header>
       <main className={`${styles.container} ${styles.indexGrid}`}>
-        <div className={styles.cards}>
-          {posts.map((p) => (
-            <PostCard key={p.slug} post={p} headingLevel="h2" locale={locale} />
-          ))}
-        </div>
+        {posts.length ? (
+          <div className={styles.cards}>
+            {posts.map((p) => (
+              <PostCard key={p.slug} post={p} headingLevel="h2" locale={locale} />
+            ))}
+          </div>
+        ) : (
+          /* no articles yet (lib/blog-posts.ts): the empty state, then the showroom call to action */
+          <p className={styles.empty}>{t.empty}</p>
+        )}
         <BlogCta locale={locale} />
         <div style={{ height: 'clamp(48px, 6vw, 80px)' }} />
       </main>

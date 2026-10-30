@@ -7,13 +7,13 @@ export const PAGE: ContentPage = {
   kind: 'guide',
   copy: {
     en: {
-      title: 'Mattresses for Back Pain in McAllen, TX | Snooze Mattress',
-      description: 'Mattresses for back pain and side sleepers in McAllen, TX: a free Dream Mapping scan finds your pressure points and the Sleep Coach finds the support.',
+      title: 'Mattresses for Back Pain in Rockwall, TX | Snooze Mattress',
+      description: 'Mattresses for back pain and side sleepers in Rockwall, TX: a free Dream Mapping scan finds your pressure points and the Sleep Coach finds the support.',
       crumb: 'Back Pain & Side Sleepers',
       eyebrow: 'Mattresses by need',
-      h1: 'Mattresses for back pain and side sleepers in McAllen',
+      h1: 'Mattresses for back pain and side sleepers in Rockwall',
       intro: [
-        'If you wake up stiff, or your shoulder and hip ache after a night on your side, the mattress is the first thing to check. Snooze Mattress + Wellness in McAllen does not guess at the answer: a free Dream Mapping fitting shows where your body is carrying pressure and where it is losing support, and the Sleep Coach walks you to the mattresses built for that pattern.',
+        'If you wake up stiff, or your shoulder and hip ache after a night on your side, the mattress is the first thing to check. Snooze Mattress + Wellness in Rockwall does not guess at the answer: a free Dream Mapping fitting shows where your body is carrying pressure and where it is losing support, and the Sleep Coach walks you to the mattresses built for that pattern.',
       ],
       sections: [
         { h2: 'What the pressure map shows about back pain', paragraphs: [
@@ -21,7 +21,7 @@ export const PAGE: ContentPage = {
           'Steady, even support that keeps the spine in line is what helps reduce lower-back pressure and morning stiffness; pressure-relieving comfort layers that let shoulders and hips sink in just enough are what stop pressure points waking you. Most back-pain shoppers need a measured balance of both, which is exactly what the map is for.',
         ] },
         { h2: 'Side sleepers', paragraphs: [
-          'On your side, the body’s weight concentrates on a shoulder and a hip. A surface that is too firm pushes back on them; one that is too soft lets the hips drop and bends the spine. The fitting usually puts side sleepers in the plush to medium range with zoned support underneath, and a pillow that fills the gap between ear and shoulder finishes the job. The pillows on the McAllen floor are chosen for the sleeper’s position too.',
+          'On your side, the body’s weight concentrates on a shoulder and a hip. A surface that is too firm pushes back on them; one that is too soft lets the hips drop and bends the spine. The fitting usually puts side sleepers in the plush to medium range with zoned support underneath, and a pillow that fills the gap between ear and shoulder finishes the job. The pillows on the Rockwall floor are chosen for the sleeper’s position too.',
         ] },
         { h2: 'Back and stomach sleepers', paragraphs: [
           'Back sleepers do best when the lower back is supported without the hips sinking; stomach sleepers need the firmest support of all so the midsection does not sag. The map shows whether your current mattress is letting you sink, and the Sleep Coach can take you straight to the medium-firm and firm models from Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, King Koil, Brooklyn Bedding, Spring Air, Helix and Snooze-O-Pedic.',
@@ -44,16 +44,16 @@ export const PAGE: ContentPage = {
         { question: 'Does an adjustable base help with back pain?', answer: 'Raising the head and feet relieves pressure and supports a healthier sleep posture; try one on the showroom floor with your mattress choice.' },
         { question: 'Is the fitting free?', answer: 'Yes, and there is no obligation to buy.' },
       ],
-      cta: { title: 'Map your pressure points, free', text: 'Five minutes on the Dream Mapping bed in McAllen shows what your back needs from a mattress.', button: 'Book a free fitting' },
+      cta: { title: 'Map your pressure points, free', text: 'Five minutes on the Dream Mapping bed in Rockwall shows what your back needs from a mattress.', button: 'Book a free fitting' },
     },
     es: {
       title: 'Colchones para Dolor de Espalda y de Lado | Snooze Mattress',
-      description: 'Colchones para dolor de espalda y dormir de lado en McAllen, TX: un escaneo gratis de Dream Mapping encuentra tus puntos de presión y el soporte.',
+      description: 'Colchones para dolor de espalda y dormir de lado en Rockwall, TX: un escaneo gratis de Dream Mapping encuentra tus puntos de presión y el soporte.',
       crumb: 'Dolor de Espalda y Dormir de Lado',
       eyebrow: 'Colchones por necesidad',
-      h1: 'Colchones para dolor de espalda y para dormir de lado en McAllen',
+      h1: 'Colchones para dolor de espalda y para dormir de lado en Rockwall',
       intro: [
-        'Si despiertas con rigidez, o te duelen el hombro y la cadera después de una noche de lado, el colchón es lo primero que hay que revisar. Snooze Mattress + Wellness en McAllen no adivina la respuesta: una sesión gratis de Dream Mapping muestra dónde tu cuerpo carga presión y dónde pierde soporte, y el Sleep Coach te lleva a los colchones hechos para ese patrón.',
+        'Si despiertas con rigidez, o te duelen el hombro y la cadera después de una noche de lado, el colchón es lo primero que hay que revisar. Snooze Mattress + Wellness en Rockwall no adivina la respuesta: una sesión gratis de Dream Mapping muestra dónde tu cuerpo carga presión y dónde pierde soporte, y el Sleep Coach te lleva a los colchones hechos para ese patrón.',
       ],
       sections: [
         { h2: 'Qué muestra el mapa de presión sobre el dolor de espalda', paragraphs: [
@@ -61,7 +61,7 @@ export const PAGE: ContentPage = {
           'Un soporte firme y parejo que mantenga la columna alineada es lo que ayuda a reducir la presión lumbar y la rigidez matutina; unas capas de confort que alivien la presión y dejen que hombros y caderas se hundan lo justo son las que evitan que los puntos de presión te despierten. La mayoría de quienes compran por dolor de espalda necesitan un balance medido de ambas cosas, y para eso es el mapa.',
         ] },
         { h2: 'Si duermes de lado', paragraphs: [
-          'De lado, el peso del cuerpo se concentra en un hombro y una cadera. Una superficie demasiado firme los empuja; una demasiado suave deja caer las caderas y dobla la columna. El ajuste suele poner a quienes duermen de lado entre plush y medio con soporte por zonas debajo, y una almohada que llene el espacio entre la oreja y el hombro completa el trabajo. Las almohadas del piso de McAllen también se eligen según la posición al dormir.',
+          'De lado, el peso del cuerpo se concentra en un hombro y una cadera. Una superficie demasiado firme los empuja; una demasiado suave deja caer las caderas y dobla la columna. El ajuste suele poner a quienes duermen de lado entre plush y medio con soporte por zonas debajo, y una almohada que llene el espacio entre la oreja y el hombro completa el trabajo. Las almohadas del piso de Rockwall también se eligen según la posición al dormir.',
         ] },
         { h2: 'Si duermes boca arriba o boca abajo', paragraphs: [
           'Boca arriba lo mejor es que la zona lumbar tenga soporte sin que las caderas se hundan; boca abajo se necesita el soporte más firme de todos para que la parte media no se hunda. El mapa muestra si tu colchón actual te deja hundirte, y el Sleep Coach puede llevarte directo a los modelos medio-firmes y firmes de Tempur-Pedic, Sealy, Stearns & Foster, Beautyrest, King Koil, Brooklyn Bedding, Spring Air, Helix y Snooze-O-Pedic.',
@@ -84,7 +84,7 @@ export const PAGE: ContentPage = {
         { question: '¿Una base ajustable ayuda con el dolor de espalda?', answer: 'Elevar la cabeza y los pies alivia la presión y favorece una postura más sana al dormir; pruébala en la sala de exhibición con el colchón que elijas.' },
         { question: '¿El ajuste es gratis?', answer: 'Sí, y no hay obligación de comprar.' },
       ],
-      cta: { title: 'Mapea tus puntos de presión, gratis', text: 'Cinco minutos en la cama de Dream Mapping en McAllen muestran qué necesita tu espalda de un colchón.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Mapea tus puntos de presión, gratis', text: 'Cinco minutos en la cama de Dream Mapping en Rockwall muestran qué necesita tu espalda de un colchón.', button: 'Reservar ajuste gratis' },
     },
   },
 };

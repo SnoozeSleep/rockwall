@@ -8,7 +8,7 @@ export const PAGE_SCHEMA: JsonLd[] = [
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Why choose Snooze Mattress + Wellness in McAllen?",
+        "name": "Why choose Snooze Mattress + Wellness in Rockwall?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Because you get the best mattress prices in town through our competitive sales and price matching, a one-of-a-kind Sleep Comfort Guarantee on your new mattress, and a family business that greets you with a smile in our Snooze Blues pajamas. We would be honored to serve you!"
@@ -72,7 +72,7 @@ export const PAGE_SCHEMA: JsonLd[] = [
       },
       {
         "@type": "Question",
-        "name": "Why choose Snooze Mattress + Wellness in McAllen, TX?",
+        "name": "Why choose Snooze Mattress + Wellness in Rockwall, TX?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Because you get the best mattress prices in town through our competitive sales and price matching, a one-of-a-kind Sleep Comfort Guarantee on your new mattress, and a family business that greets you with a smile in our Snooze Blues pajamas. We would be honored to serve you!"
@@ -88,13 +88,13 @@ export const PAGE_SCHEMA: JsonLd[] = [
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://mcallen.snoozemattresscompany.com"
+        "item": "https://rockwall.snoozemattresscompany.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "At-Home Sleep Test Kit",
-        "item": "https://mcallen.snoozemattresscompany.com/at-home-sleep-test-kit-by-sleepcorner"
+        "item": "https://rockwall.snoozemattresscompany.com/at-home-sleep-test-kit-by-sleepcorner"
       }
     ]
   }

@@ -1,7 +1,7 @@
 import type { ContentPage } from './types';
 import { LOCATION } from '@/lib/location';
 
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const service = (locale: 'en' | 'es') => ({
   '@context': 'https://schema.org',
   '@type': 'Service',
@@ -9,8 +9,8 @@ const service = (locale: 'en' | 'es') => ({
   name: 'Dream Mapping',
   serviceType: locale === 'es' ? 'Ajuste de colchón por mapeo de presión' : 'Mattress fitting by pressure mapping',
   description: locale === 'es'
-    ? 'Sesión gratuita de Dream Mapping en la tienda de McAllen: en unos 5 minutos, el mapeo de presión identifica el colchón que se ajusta a tu forma de dormir.'
-    : 'Free in-store Dream Mapping fitting at the McAllen store: in about 5 minutes, pressure mapping identifies the mattress that fits the way you sleep.',
+    ? 'Sesión gratuita de Dream Mapping en la tienda de Rockwall: en unos 5 minutos, el mapeo de presión identifica el colchón que se ajusta a tu forma de dormir.'
+    : 'Free in-store Dream Mapping fitting at the Rockwall store: in about 5 minutes, pressure mapping identifies the mattress that fits the way you sleep.',
   url: `${SITE_URL}${locale === 'es' ? '/es' : ''}/dream-mapping`,
   provider: { '@type': 'LocalBusiness', '@id': `${SITE_URL}/#store`, name: LOCATION.name },
   areaServed: LOCATION.areaServed.map((city) => ({ '@type': 'City', name: city })),
@@ -24,13 +24,13 @@ export const PAGE: ContentPage = {
   extraSchema: (locale) => [service(locale)],
   copy: {
     en: {
-      title: 'Dream Mapping Fitting in McAllen, TX | Snooze Mattress',
-      description: 'What Dream Mapping measures, how long it takes and how it finds your mattress: a free 5-minute fitting at Snooze Mattress + Wellness in McAllen, TX.',
+      title: 'Dream Mapping Fitting in Rockwall, TX | Snooze Mattress',
+      description: 'What Dream Mapping measures, how long it takes and how it finds your mattress: a free 5-minute fitting at Snooze Mattress + Wellness in Rockwall, TX.',
       crumb: 'Dream Mapping',
       eyebrow: 'Free in-store fitting',
-      h1: 'Dream Mapping: the 5-minute mattress fitting in McAllen',
+      h1: 'Dream Mapping: the 5-minute mattress fitting in Rockwall',
       intro: [
-        'Dream Mapping is how Snooze Mattress + Wellness takes the guesswork out of choosing a mattress. You lie down on a sensor bed in the McAllen showroom, the system reads your pressure points, and a Sleep Coach walks you straight to the mattresses that match your body. It is free, it takes about five minutes, and there is no obligation to buy.',
+        'Dream Mapping is how Snooze Mattress + Wellness takes the guesswork out of choosing a mattress. You lie down on a sensor bed in the Rockwall showroom, the system reads your pressure points, and a Sleep Coach walks you straight to the mattresses that match your body. It is free, it takes about five minutes, and there is no obligation to buy.',
         'This page explains what the map measures, what you see on the screen, how it differs from the online Sleep Fit Quiz, and what to expect when you visit.',
       ],
       sections: [
@@ -66,16 +66,16 @@ export const PAGE: ContentPage = {
         { question: 'What is the difference between Dream Mapping and the Sleep Fit Quiz?', answer: 'The quiz is a 60-second online questionnaire; Dream Mapping is the in-store pressure measurement on the sensor bed. The quiz is a first step, the map is the fitting.' },
         { question: 'Is there any pressure to buy?', answer: 'No. The Sleep Coaches are not on commission, and you can leave with your results and come back another day.' },
       ],
-      cta: { title: 'Book your free Dream Mapping fitting', text: 'Five minutes on the sensor bed in McAllen, and you will know which mattresses fit the way you sleep.', button: 'Book a free fitting' },
+      cta: { title: 'Book your free Dream Mapping fitting', text: 'Five minutes on the sensor bed in Rockwall, and you will know which mattresses fit the way you sleep.', button: 'Book a free fitting' },
     },
     es: {
-      title: 'Dream Mapping Gratis en McAllen, TX | Snooze Mattress',
-      description: 'Qué mide Dream Mapping, cuánto tarda y cómo encuentra tu colchón: un ajuste gratis de 5 minutos en Snooze Mattress + Wellness, McAllen, TX.',
+      title: 'Dream Mapping Gratis en Rockwall, TX | Snooze Mattress',
+      description: 'Qué mide Dream Mapping, cuánto tarda y cómo encuentra tu colchón: un ajuste gratis de 5 minutos en Snooze Mattress + Wellness, Rockwall, TX.',
       crumb: 'Dream Mapping',
       eyebrow: 'Ajuste gratis en tienda',
-      h1: 'Dream Mapping: el ajuste de colchón de 5 minutos en McAllen',
+      h1: 'Dream Mapping: el ajuste de colchón de 5 minutos en Rockwall',
       intro: [
-        'Dream Mapping es la manera en que Snooze Mattress + Wellness le quita las adivinanzas a la compra de un colchón. Te recuestas en una cama con sensores en la sala de exhibición de McAllen, el sistema lee tus puntos de presión y un Sleep Coach te lleva directo a los colchones que van con tu cuerpo. Es gratis, tarda unos cinco minutos y no hay obligación de comprar.',
+        'Dream Mapping es la manera en que Snooze Mattress + Wellness le quita las adivinanzas a la compra de un colchón. Te recuestas en una cama con sensores en la sala de exhibición de Rockwall, el sistema lee tus puntos de presión y un Sleep Coach te lleva directo a los colchones que van con tu cuerpo. Es gratis, tarda unos cinco minutos y no hay obligación de comprar.',
         'En esta página te explicamos qué mide el mapa, qué ves en la pantalla, en qué se diferencia del Sleep Fit Quiz en línea y qué esperar cuando nos visites.',
       ],
       sections: [
@@ -111,7 +111,7 @@ export const PAGE: ContentPage = {
         { question: '¿Cuál es la diferencia entre Dream Mapping y el Sleep Fit Quiz?', answer: 'El quiz es un cuestionario en línea de 60 segundos; Dream Mapping es la medición de presión en tienda sobre la cama con sensores. El quiz es un primer paso, el mapa es el ajuste.' },
         { question: '¿Hay presión para comprar?', answer: 'No. Los Sleep Coaches no trabajan por comisión, y puedes irte con tus resultados y volver otro día.' },
       ],
-      cta: { title: 'Reserva tu Dream Mapping gratis', text: 'Cinco minutos en la cama con sensores en McAllen y sabrás qué colchones van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Reserva tu Dream Mapping gratis', text: 'Cinco minutos en la cama con sensores en Rockwall y sabrás qué colchones van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
     },
   },
 };

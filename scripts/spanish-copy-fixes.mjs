@@ -5,7 +5,7 @@
  *   node scripts/spanish-copy-fixes.mjs        (npm run es:fixes)       --check reports without writing
  *
  *   - the financing band's duplicated sentence end ("… sin pagar todo por adelantado. sin pagar todo por adelantado.")
- *   - "crezca en el McAllen" -> "crezca en McAllen"
+ *   - "crezca en el Rockwall" -> "crezca en Rockwall"
  *   - the missing opening "¡" ("¡Obtén una Solución de Sueño Respaldada por la Ciencia!", "¡Nuestros Sleep Coaches
  *     están ansiosos …!" — that one also fixes the number agreement, "Nuestra" -> "Nuestros")
  *   - the menu / quiz name "Quiz Sleep Fit" -> "Sleep Fit Quiz" (brand name)
@@ -24,7 +24,7 @@ const walk = (d, out = []) => { for (const e of fs.readdirSync(d, { withFileType
 
 const RULES = [
   { name: 'duplicate "sin pagar todo por adelantado"', re: /(?:<|\\\\u003C)span style=\\{1,3}"color: var\(--white\); font-family: Montserrat\\{1,3}"> sin pagar todo por adelantado\.(?:<|\\\\u003C)\/span>/g, to: '' },
-  { name: '"crezca en el McAllen" -> "crezca en McAllen"', re: /crezca en el (?=(?:<|\\\\u003C)\/span>(?:<|\\\\u003C)strong>)/g, to: 'crezca en ' },
+  { name: '"crezca en el Rockwall" -> "crezca en Rockwall"', re: /crezca en el (?=(?:<|\\\\u003C)\/span>(?:<|\\\\u003C)strong>)/g, to: 'crezca en ' },
   { name: 'opening ¡ (science-backed sentence)', re: /(?<!¡)Obtén una (?=(?:<|\\\\u003C)\/span>)/g, to: '¡Obtén una ' },
   { name: 'opening ¡ + agreement (thank-you page)', re: /(?<!¡)Nuestra (?=(?:<|\\\\u003C)\/span>(?:<|\\\\u003C)strong>(?:<|\\\\u003C)span style=\\{1,3}"[^>]*>Sleep Coaches)/g, to: '¡Nuestros ' },
   { name: '"Quiz Sleep Fit" -> "Sleep Fit Quiz"', re: /Quiz Sleep Fit/g, to: 'Sleep Fit Quiz' },

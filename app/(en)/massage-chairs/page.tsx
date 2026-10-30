@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Massage Chairs in McAllen, TX — Infinity | Snooze Mattress",
-  "description": "Infinity massage chairs in McAllen, TX at Snooze Mattress + Wellness: advanced massage technology designed to help you relax and recover. Try one in store.",
+  "title": "Massage Chairs in Rockwall, TX — Infinity | Snooze Mattress",
+  "description": "Infinity massage chairs in Rockwall, TX at Snooze Mattress + Wellness: advanced massage technology that helps you relax and recover. Try one in store.",
   "alternates": {
     "canonical": "/massage-chairs",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Massage Chairs in McAllen, TX — Infinity | Snooze Mattress",
-    "description": "Infinity massage chairs in McAllen, TX at Snooze Mattress + Wellness: advanced massage technology designed to help you relax and recover. Try one in store.",
+    "title": "Massage Chairs in Rockwall, TX — Infinity | Snooze Mattress",
+    "description": "Infinity massage chairs in Rockwall, TX at Snooze Mattress + Wellness: advanced massage technology that helps you relax and recover. Try one in store.",
     "url": "/massage-chairs",
     "type": "website",
     "images": [

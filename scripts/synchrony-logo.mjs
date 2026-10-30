@@ -25,7 +25,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK = process.argv.includes('--check');
 const LOCAL = '/assets/logos/synchrony.svg';
 const OLD_URL = 'https://www.synchrony.com/syc/img/2023_synchrony_basic_logo.svg';
-const ALT = { en: 'Synchrony financing at Snooze Mattress + Wellness McAllen', es: 'Financiamiento Synchrony en Snooze Mattress + Wellness McAllen' };
+const ALT = { en: 'Synchrony financing at Snooze Mattress + Wellness Rockwall', es: 'Financiamiento Synchrony en Snooze Mattress + Wellness Rockwall' };
 const OLD_ALT = { en: ['Synchrony logo'], es: ['Logotipo de Synchrony'] };
 // the desktop and the phone copy of the card: the Synchrony image, the heading it follows, the Wells Fargo image of the same copy (template)
 const COPIES = [

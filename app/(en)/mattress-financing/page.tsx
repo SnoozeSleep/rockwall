@@ -5,8 +5,8 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Mattress Financing in McAllen, TX | Snooze Mattress",
-  "description": "Special financing on mattresses in McAllen, TX. With approved credit; terms vary by promotion. See store for details or book a Dream Mapping visit.",
+  "title": "Mattress Financing in Rockwall, TX | Snooze Mattress",
+  "description": "Special financing on mattresses in Rockwall, TX. With approved credit; terms vary by promotion. See store for details or book a Dream Mapping visit.",
   "alternates": {
     "canonical": "/mattress-financing",
     "languages": {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Mattress Financing in McAllen, TX | Snooze Mattress",
-    "description": "Special financing on mattresses in McAllen, TX. With approved credit; terms vary by promotion. See store for details or book a Dream Mapping visit.",
+    "title": "Mattress Financing in Rockwall, TX | Snooze Mattress",
+    "description": "Special financing on mattresses in Rockwall, TX. With approved credit; terms vary by promotion. See store for details or book a Dream Mapping visit.",
     "url": "/mattress-financing",
     "type": "website",
     "images": [

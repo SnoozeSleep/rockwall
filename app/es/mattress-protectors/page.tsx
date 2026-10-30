@@ -6,8 +6,8 @@ import { PAGE_SCHEMA } from './schema';
 import { AccessoryGuide } from '@/components/AccessoryGuide';
 
 export const metadata: Metadata = {
-  "title": "Protectores de Colchón en McAllen, TX | Snooze Mattress",
-  "description": "Protectores de colchón en McAllen, TX de Snooze Mattress + Wellness: protección transpirable e impermeable contra derrames y alérgenos para tu inversión.",
+  "title": "Protectores de Colchón en Rockwall, TX | Snooze Mattress",
+  "description": "Protectores de colchón en Rockwall, TX de Snooze Mattress + Wellness: protección transpirable e impermeable contra derrames y alérgenos para tu inversión.",
   "alternates": {
     "canonical": "/es/mattress-protectors",
     "languages": {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Protectores de Colchón en McAllen, TX | Snooze Mattress",
-    "description": "Protectores de colchón en McAllen, TX de Snooze Mattress + Wellness: protección transpirable e impermeable contra derrames y alérgenos para tu inversión.",
+    "title": "Protectores de Colchón en Rockwall, TX | Snooze Mattress",
+    "description": "Protectores de colchón en Rockwall, TX de Snooze Mattress + Wellness: protección transpirable e impermeable contra derrames y alérgenos para tu inversión.",
     "url": "/es/mattress-protectors",
     "type": "website",
     "images": [

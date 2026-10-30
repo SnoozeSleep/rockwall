@@ -6,8 +6,8 @@
  *      buttons that open the contact form link to): the old step URL becomes /contact-us (/es/contact-us on the Spanish
  *      pages, which list their own /es URLs); also any static link to it;
  *   2. the contact page's script ids follow the route (they are derived from it);
- *   3. the contact page's H1 names the store: "Contact Snooze Mattress in McAllen" / "Contacta a Snooze Mattress en
- *      McAllen" (the desktop heading — a p[role=heading] since the one-H1 pass — and the phone h1, in the markup and in
+ *   3. the contact page's H1 names the store: "Contact Snooze Mattress in Rockwall" / "Contacta a Snooze Mattress en
+ *      Rockwall" (the desktop heading — a p[role=heading] since the one-H1 pass — and the phone h1, in the markup and in
  *      the payload's heading strings; nothing else on the page changes);
  *   4. the payload's page title / description (re-applied to <head> by the runtime after hydration) = the SEO title
  *      and description.
@@ -25,8 +25,8 @@ const escapeJsonForScript = (json) => json.split('<').join(BS + 'u003C').split(S
 const OLD = '/' + 'optin' + '-page'; // the builder's opt-in URL (spelled out once here; vercel.json redirects it)
 const NEW = '/contact-us';
 const H1 = {
-  en: { from: 'Contact Us', to: 'Contact Snooze Mattress in McAllen' },
-  es: { from: 'Contáctanos', to: 'Contacta a Snooze Mattress en McAllen' },
+  en: { from: 'Contact Us', to: 'Contact Snooze Mattress in Rockwall' },
+  es: { from: 'Contáctanos', to: 'Contacta a Snooze Mattress en Rockwall' },
 };
 /* 4. the page's own head values in the payload: after hydration the builder runtime writes its page title, meta
    description and og:title back into <head> from the payload (pageData meta, its social-share block and its schema
@@ -34,8 +34,8 @@ const H1 = {
    title and description (same text as scripts/seo-metadata.mjs META['/contact-us']: keep the two in sync); the old
    strings are left in place, unreferenced (shared payload strings are never overwritten). */
 const META = {
-  en: { title: 'Contact Snooze Mattress in McAllen, TX | Snooze Mattress', description: 'Contact Snooze Mattress + Wellness in McAllen: call (956) 586-5646, visit 7913 N 10th St, Suite 130 or send a message to book a free Dream Mapping fitting.', oldTitle: 'Contact Us', oldDescription: 'Have questions? Reach out and our team will get back to you shortly.' },
-  es: { title: 'Contacta a Snooze Mattress en McAllen, TX | Snooze Mattress', description: 'Contacta a Snooze Mattress + Wellness en McAllen: llama al (956) 586-5646, visita 7913 N 10th St, Suite 130 o escríbenos y agenda tu Dream Mapping gratis.', oldTitle: 'Contáctanos', oldDescription: '¿Tienes preguntas? Escríbenos y nuestro equipo te responderá muy pronto.' },
+  en: { title: 'Contact Snooze Mattress in Rockwall, TX | Snooze Mattress', description: 'Contact Snooze Mattress + Wellness in Rockwall: call (469) 769-1300, visit 919 E Interstate 30, Suite 101 or send a message to book a free fitting.', oldTitle: 'Contact Us', oldDescription: 'Have questions? Reach out and our team will get back to you shortly.' },
+  es: { title: 'Contacta a Snooze Mattress en Rockwall, TX | Snooze Mattress', description: 'Contacta a Snooze Mattress + Wellness en Rockwall: llama al (469) 769-1300, visita 919 E Interstate 30, Suite 101 o escríbenos y agenda tu ajuste gratis.', oldTitle: 'Contáctanos', oldDescription: '¿Tienes preguntas? Escríbenos y nuestro equipo te responderá muy pronto.' },
 };
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

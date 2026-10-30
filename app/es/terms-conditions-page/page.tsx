@@ -6,7 +6,7 @@ import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
   "title": "Términos y Condiciones | Snooze Mattress",
-  "description": "Los términos y condiciones para usar el sitio web de Snooze Mattress + Wellness – McAllen. Al acceder o usar el sitio web, aceptas estos términos.",
+  "description": "Los términos y condiciones para usar el sitio web de Snooze Mattress + Wellness – Rockwall. Al acceder o usar el sitio web, aceptas estos términos.",
   "alternates": {
     "canonical": "/es/terms-conditions-page",
     "languages": {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   "openGraph": {
     "title": "Términos y Condiciones | Snooze Mattress",
-    "description": "Los términos y condiciones para usar el sitio web de Snooze Mattress + Wellness – McAllen. Al acceder o usar el sitio web, aceptas estos términos.",
+    "description": "Los términos y condiciones para usar el sitio web de Snooze Mattress + Wellness – Rockwall. Al acceder o usar el sitio web, aceptas estos términos.",
     "url": "/es/terms-conditions-page",
     "type": "website",
     "images": [

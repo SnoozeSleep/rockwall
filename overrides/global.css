@@ -125,7 +125,7 @@ html[lang="es"] .hl_page-preview--content .cheading-9UhGiuQIC6 h2 { font-size: c
 html[lang="es"] #heading-JQfUWePMYv h2 { max-width: none; font-size: min(46px, 5.6cqw) !important; } /* Spanish price-match headline (was h1) */
 
 
-/* ---- Service-area band (components/AreaLinks.tsx): "Shopping from Edinburg, Mission or Pharr?" at the end of the home
+/* ---- Service-area band (the former components/AreaLinks.tsx service-area band; the classes are shared by components/ContactDetails.tsx) at the end of the home
    page, linking the three area pages (SEO audit build pass, C1). Same palette as the offer band, on white. ---- */
 .snz-areas { background: #fff; color: #1e223c; padding: 44px 20px; text-align: center; border-top: 1px solid rgba(0, 20, 137, 0.1); }
 .snz-areas__inner { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -376,3 +376,16 @@ html[lang="es"] #heading-JQfUWePMYv h2 { max-width: none; font-size: min(46px, 5
    card's main line (tel: link), in the card-title navy, orange on hover. ---- */
 .snz-contact__phone { font-size: 20px; font-weight: 800; color: #001489; text-decoration: none; }
 .snz-contact__phone:hover, .snz-contact__phone:focus-visible { color: #F58433; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---- Reviews section for a new location (scripts/reviews-cta.mjs, Rockwall, October 31, 2026): the "Leave us a Google
+   review" call to action stands where the previous location's reviews widget was; its button is hidden until the store's Google
+   Business Profile URL is supplied. The "Google Verified Reviews" badge image in the same section (alt emptied by the
+   script) is hidden: the store has no reviews yet. ------------------------------------------------------------------ */
+.snz-review-cta { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0 auto; max-width: 640px; padding: 28px 22px; border-radius: 16px; background: #fff; border: 1px solid rgba(0, 20, 137, 0.09); box-shadow: 0 10px 30px -22px rgba(0, 20, 137, 0.35); text-align: center; font-family: var(--font-poppins-stack); }
+.snz-review-cta__text { margin: 0; font-size: 16px; line-height: 1.55; color: #1e223c; }
+.snz-review-cta__btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px; background: #f58433; color: #fff !important; font-weight: 700; font-size: 15px; text-decoration: none !important; transition: background 200ms, transform 200ms; }
+.snz-review-cta__btn:hover { background: #d96a1a; transform: translateY(-1px); }
+.snz-review-cta__btn[hidden] { display: none; }
+img[src*="7eeb64ed-8497-4240-a956-802db60e201b"], img[src*="bae599bb-e93f-4cd3-95a1-31b6fdc0acef"] { display: none !important; }
+/* the Dream Mapping station photo standing in for the storefront photo ([ROCKWALL_STOREFRONT_PHOTO]) keeps its own proportions */
+img[src*="6a7577049a9c7792ea57899a"] { aspect-ratio: 1000 / 667 !important; }

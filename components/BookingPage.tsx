@@ -7,9 +7,9 @@ import type { Locale } from '@/lib/i18n';
 import styles from './BookingPage.module.css';
 
 /* Service schema for the Dream Mapping fitting (SEO audit, October 2026 — section 5d): free, about 5 minutes,
-   in the McAllen store — the three facts the audit supplied. Provider = the store's LocalBusiness record
+   in the Rockwall store — the three facts the audit supplied. Provider = the store's LocalBusiness record
    (components/LocalBusinessJsonLd.tsx, @id …/#store), rendered by the footer on this page too. */
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const serviceSchema = (locale: Locale) => ({
   '@context': 'https://schema.org',
   '@type': 'Service',
@@ -17,8 +17,8 @@ const serviceSchema = (locale: Locale) => ({
   name: 'Dream Mapping',
   serviceType: locale === 'es' ? 'Ajuste de colchón por mapeo de presión' : 'Mattress fitting by pressure mapping',
   description: locale === 'es'
-    ? 'Sesión gratuita de Dream Mapping en la tienda de McAllen: en unos 5 minutos, el mapeo de presión identifica el colchón que se ajusta a tu forma de dormir.'
-    : 'Free in-store Dream Mapping fitting at the McAllen store: in about 5 minutes, pressure mapping identifies the mattress that fits the way you sleep.',
+    ? 'Sesión gratuita de Dream Mapping en la tienda de Rockwall: en unos 5 minutos, el mapeo de presión identifica el colchón que se ajusta a tu forma de dormir.'
+    : 'Free in-store Dream Mapping fitting at the Rockwall store: in about 5 minutes, pressure mapping identifies the mattress that fits the way you sleep.',
   url: `${SITE_URL}${locale === 'es' ? '/es' : ''}/booking`,
   provider: { '@type': 'LocalBusiness', '@id': `${SITE_URL}/#store`, name: LOCATION.name },
   areaServed: LOCATION.areaServed.map((city) => ({ '@type': 'City', name: city })),
@@ -73,7 +73,7 @@ const COPY = {
 /* one icon per step: the sensor bed, the five minutes, the Sleep Coach, free with no obligation, couples */
 const VISIT_ICONS: IconName[] = ['sensor-bed', 'clock', 'user', 'badge-check', 'people'];
 
-/* McAllen Dream Mapping calendar (the client's embed: id = `<calendarId>_<timestamp>`) */
+/* Rockwall Dream Mapping calendar (the client's embed: id = `<calendarId>_<timestamp>`) */
 export const BOOKING_CALENDAR_ID = 'lrAns7Z8j3vEJW3DC0Yr';
 const BOOKING_EMBED_ID = `${BOOKING_CALENDAR_ID}_1788459899479`;
 

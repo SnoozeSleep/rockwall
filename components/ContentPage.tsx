@@ -36,7 +36,7 @@ function withDreamMappingLink(c: PageCopy, slug: string, locale: Locale): PageCo
 /* Renders a hand-written content page (lib/pages/*) in one locale: breadcrumb, H1, copy, optional table, FAQ
    accordion (the blog's), CTA to /booking, plus FAQPage + BreadcrumbList JSON-LD (and any extra schema the page
    defines). Server-rendered; the FAQ accordion is the same client component the blog uses. */
-const SITE_URL = 'https://mcallen.snoozemattresscompany.com';
+const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 
 /* A bullet list in the style its data asks for (lib/pages/types.ts listStyle; October 27, 2026): icon cards for
    benefits and features (an item written "Label: text" gets the label as its title), a numbered timeline for steps,

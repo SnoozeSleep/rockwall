@@ -27,7 +27,7 @@ import { listContentFiles, readPage, writePage, pageOf, strAt, isDict, esc } fro
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK = process.argv.includes('--check');
-const CITY = (fs.readFileSync(path.join(ROOT, 'lib/location.ts'), 'utf8').match(/\bcity:\s*'([^']+)'/) || [, 'McAllen'])[1];
+const CITY = (fs.readFileSync(path.join(ROOT, 'lib/location.ts'), 'utf8').match(/\bcity:\s*'([^']+)'/) || [, 'Rockwall'])[1];
 
 const OLD_LOGO_ID = '6a7f5039255b571c8e272951';
 /* the strip already ended with an older Brooklyn Bedding logo from the original export; it goes, so the brand shows once, in Englander's slot */

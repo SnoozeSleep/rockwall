@@ -13,8 +13,6 @@
     { "source": "/es/main-page", "destination": "/es", "permanent": true },
     { "source": "/post/pressure-map-for-sleep", "destination": "/blog/pressure-mapping-for-sleep", "permanent": true },
     { "source": "/es/post/pressure-map-for-sleep", "destination": "/es/blog/pressure-mapping-for-sleep", "permanent": true },
-    { "source": "/mattress-financing-mcallen-tx", "destination": "/mattress-financing", "permanent": true },
-    { "source": "/es/mattress-financing-mcallen-tx", "destination": "/es/mattress-financing", "permanent": true },
     { "source": "/massage-chairs-402809", "destination": "/massage-chairs", "permanent": true },
     { "source": "/es/massage-chairs-402809", "destination": "/es/massage-chairs", "permanent": true },
     { "source": "/review", "destination": "/", "permanent": true },

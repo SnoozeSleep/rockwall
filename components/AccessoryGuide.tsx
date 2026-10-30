@@ -16,7 +16,7 @@ const ADDR = `${L.street}, ${L.city}, ${L.region} ${L.postalCode}`;
 const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
   pillows: {
     en: {
-      title: 'How to choose a pillow in McAllen',
+      title: 'How to choose a pillow in Rockwall',
       blocks: [
         { p: 'The right pillow does one job: it keeps your head and neck in line with the rest of your spine while the mattress does the same for your body. Which pillow does that depends mostly on how you sleep, so start with your sleep position and then pick the material.' },
         { h3: 'By sleep position' },
@@ -28,18 +28,18 @@ const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
         { h3: 'By material' },
         { ul: [
           'Memory foam contours to your unique shape and holds it, a good match for sleepers who want steady support in one position.',
-          'Cooling gel-infused designs are made for warm McAllen nights and pull heat away from the head.',
+          'Cooling gel-infused designs are made for warm Texas summer nights and pull heat away from the head.',
           'Natural latex is the option for eco-conscious sleepers who like a springier, more responsive feel.',
           'Adjustable-fill pillows let you add or remove filling until the height is exactly right, useful if you switch positions during the night.',
         ] },
         { h2: 'Try it at Snooze Mattress + Wellness' },
-        { p: 'Pillows are personal, so the McAllen showroom lets you try them the way you will use them: lying down, on a mattress, in your usual position. If you come in for a free Dream Mapping fitting, the Sleep Coach already knows your sleep position and pressure points and can point you to the pillow that fits them. A pillow that cradles your head and supports your neck is the simplest upgrade to a night’s sleep, and the first thing to check if you are not waking up refreshed.' },
+        { p: 'Pillows are personal, so the Rockwall showroom lets you try them the way you will use them: lying down, on a mattress, in your usual position. If you come in for a free Dream Mapping fitting, the Sleep Coach already knows your sleep position and pressure points and can point you to the pillow that fits them. A pillow that cradles your head and supports your neck is the simplest upgrade to a night’s sleep, and the first thing to check if you are not waking up refreshed.' },
         { p: `Pillows, protectors and sheets are on the same floor as the mattresses at ${ADDR}, ${L.hours.en[0]}, ${L.hours.en[1]}.` },
       ],
       cta: 'Book a free Dream Mapping fitting',
     },
     es: {
-      title: 'Cómo elegir una almohada en McAllen',
+      title: 'Cómo elegir una almohada en Rockwall',
       blocks: [
         { p: 'La almohada correcta tiene una sola tarea: mantener tu cabeza y tu cuello alineados con el resto de la columna mientras el colchón hace lo mismo con tu cuerpo. Cuál almohada lo logra depende sobre todo de cómo duermes, así que empieza por tu posición al dormir y después elige el material.' },
         { h3: 'Según tu posición al dormir' },
@@ -51,12 +51,12 @@ const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
         { h3: 'Según el material' },
         { ul: [
           'El memory foam se amolda a tu forma y la mantiene, ideal para quienes quieren un soporte constante en una sola posición.',
-          'Los diseños con gel refrescante están hechos para las noches cálidas de McAllen y alejan el calor de la cabeza.',
+          'Los diseños con gel refrescante están hechos para las noches cálidas del verano en Texas y alejan el calor de la cabeza.',
           'El látex natural es la opción para quienes buscan algo más ecológico y una sensación más elástica y con rebote.',
           'Las almohadas de relleno ajustable te dejan agregar o quitar relleno hasta dar con la altura exacta, útiles si cambias de posición durante la noche.',
         ] },
         { h2: 'Pruébala en Snooze Mattress + Wellness' },
-        { p: 'Las almohadas son algo personal, por eso en la sala de exhibición de McAllen puedes probarlas como las vas a usar: acostado, sobre un colchón, en tu posición habitual. Si vienes a una sesión gratis de Dream Mapping, el Sleep Coach ya conoce tu posición al dormir y tus puntos de presión y puede indicarte la almohada que va con ellos. Una almohada que acune tu cabeza y sostenga tu cuello es la mejora más sencilla para una noche de sueño, y lo primero que hay que revisar si no despiertas descansado.' },
+        { p: 'Las almohadas son algo personal, por eso en la sala de exhibición de Rockwall puedes probarlas como las vas a usar: acostado, sobre un colchón, en tu posición habitual. Si vienes a una sesión gratis de Dream Mapping, el Sleep Coach ya conoce tu posición al dormir y tus puntos de presión y puede indicarte la almohada que va con ellos. Una almohada que acune tu cabeza y sostenga tu cuello es la mejora más sencilla para una noche de sueño, y lo primero que hay que revisar si no despiertas descansado.' },
         { p: `Almohadas, protectores y sábanas están en el mismo piso que los colchones en ${ADDR}, ${L.hours.es[0]}, ${L.hours.es[1]}.` },
       ],
       cta: 'Reserva tu Dream Mapping gratis',
@@ -68,11 +68,11 @@ const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
       blocks: [
         { p: 'You spend about a third of your life on your mattress, and a protector is what keeps spills, stains, allergens and everyday wear from reaching it. It is the simplest way to make a quality mattress last, and it should not change the comfort and feel you chose the mattress for.' },
         { h3: 'What to look for' },
-        { p: 'The protectors on the McAllen floor are chosen for five things, and a good one has all of them:' },
+        { p: 'The protectors on the Rockwall floor are chosen for five things, and a good one has all of them:' },
         { ul: [
           'A waterproof barrier that blocks spills and accidents without the crinkle of older plastic-backed covers.',
           'Breathable fabric that lets air move, so the protector does not make the bed sleep warmer.',
-          'Cooling technology on top of that breathability, made for hot McAllen nights.',
+          'Cooling technology on top of that breathability, made for hot Texas summer nights.',
           'Hypoallergenic protection against dust mites, allergens and bacteria, which matters for allergy sufferers and for children’s beds.',
           'A quiet, stretch-fit design that fits memory foam, hybrid and innerspring mattresses without changing how the mattress feels.',
         ] },
@@ -90,7 +90,7 @@ const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
         { ul: [
           'Una barrera impermeable que detenga derrames y accidentes sin el ruido de las fundas antiguas con respaldo de plástico.',
           'Una tela transpirable que deje circular el aire, para que el protector no haga que la cama dé más calor.',
-          'Tecnología de enfriamiento además de esa transpirabilidad, pensada para las noches calurosas de McAllen.',
+          'Tecnología de enfriamiento además de esa transpirabilidad, pensada para las noches calurosas del verano en Texas.',
           'Protección hipoalergénica contra ácaros, alérgenos y bacterias, importante para quienes sufren alergias y para las camas de los niños.',
           'Un diseño elástico y silencioso que se ajusta a colchones de memory foam, híbridos y de resortes sin cambiar cómo se siente el colchón.',
         ] },
@@ -105,19 +105,19 @@ const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
     en: {
       title: 'How to choose sheets that sleep cool',
       blocks: [
-        { p: 'Thread count is the number everyone quotes, but it is not what decides how sheets feel on a warm night. The fabric and its features do: how it breathes, whether it wicks moisture, and whether it fits the mattress you actually own. Here is how the premium sheets at Snooze Mattress + Wellness in McAllen break down.' },
+        { p: 'Thread count is the number everyone quotes, but it is not what decides how sheets feel on a warm night. The fabric and its features do: how it breathes, whether it wicks moisture, and whether it fits the mattress you actually own. Here is how the premium sheets at Snooze Mattress + Wellness in Rockwall break down.' },
         { h3: 'By fabric' },
-        { p: 'Four fabric families are on the McAllen floor. Pick by how you sleep, not by the number on the package:' },
+        { p: 'Four fabric families are on the Rockwall floor. Pick by how you sleep, not by the number on the package:' },
         { ul: [
           'Cooling performance fabrics are engineered for breathability, the first choice for hot sleepers and summer nights.',
           'Moisture-wicking blends pull sweat away from the skin and keep you dry the whole night.',
           'High-quality cotton gives the timeless softness and durability of a classic sheet.',
-          'Temperature-regulating materials even out warm and cool stretches through the night, a good match for McAllen heat.',
+          'Temperature-regulating materials even out warm and cool stretches through the night, a good match for the Texas summer heat.',
         ] },
         { h3: 'Fit matters as much as fabric' },
         { p: 'Deep-pocket sheets are made for today’s taller mattresses: memory foam, hybrids and beds on adjustable bases, where a standard fitted sheet pulls off the corners as soon as the base moves. Check the depth of your mattress before you buy, and if you sleep on a split king, remember that each side takes a twin XL fitted sheet.' },
         { h2: 'Finish the bed in one visit' },
-        { p: 'Sheets, pillows and protectors are on the McAllen showroom floor next to the mattresses, so you can feel the fabrics, check the fit against the mattress you are choosing and leave with the whole bed. If you come in for a free Dream Mapping fitting, ask the Sleep Coach which fabric suits the way you sleep: a hot sleeper and a cold one on the same mattress will usually leave with different sheets.' },
+        { p: 'Sheets, pillows and protectors are on the Rockwall showroom floor next to the mattresses, so you can feel the fabrics, check the fit against the mattress you are choosing and leave with the whole bed. If you come in for a free Dream Mapping fitting, ask the Sleep Coach which fabric suits the way you sleep: a hot sleeper and a cold one on the same mattress will usually leave with different sheets.' },
         { p: `Visit ${ADDR}, ${L.hours.en[0]}, ${L.hours.en[1]}.` },
       ],
       cta: 'Book a free Dream Mapping fitting',
@@ -125,18 +125,18 @@ const GUIDES: Record<GuidePage, Record<Locale, Guide>> = {
     es: {
       title: 'Cómo elegir sábanas que duermen frescas',
       blocks: [
-        { p: 'El número de hilos es la cifra que todos mencionan, pero no es lo que decide cómo se sienten las sábanas en una noche calurosa. Lo deciden la tela y sus características: cómo respira, si aleja la humedad y si le queda al colchón que realmente tienes. Así se dividen las sábanas premium de Snooze Mattress + Wellness en McAllen.' },
+        { p: 'El número de hilos es la cifra que todos mencionan, pero no es lo que decide cómo se sienten las sábanas en una noche calurosa. Lo deciden la tela y sus características: cómo respira, si aleja la humedad y si le queda al colchón que realmente tienes. Así se dividen las sábanas premium de Snooze Mattress + Wellness en Rockwall.' },
         { h3: 'Según la tela' },
         { ul: [
           'Las telas frescas de alto rendimiento están diseñadas para respirar, la primera opción para quienes duermen con calor y para las noches de verano.',
           'Las mezclas que alejan la humedad retiran el sudor de la piel y te mantienen seco toda la noche.',
           'El algodón de alta calidad da la suavidad y la durabilidad clásicas de una buena sábana.',
-          'Los materiales que regulan la temperatura equilibran los momentos de calor y de frío durante la noche, ideales para el calor de McAllen.',
+          'Los materiales que regulan la temperatura equilibran los momentos de calor y de frío durante la noche, ideales para el calor del verano en Texas.',
         ] },
         { h3: 'El ajuste importa tanto como la tela' },
         { p: 'Las sábanas de bolsillo profundo están hechas para los colchones altos de hoy: memory foam, híbridos y camas sobre bases ajustables, donde una sábana ajustable estándar se sale de las esquinas en cuanto la base se mueve. Revisa la altura de tu colchón antes de comprar, y si duermes en un split king, recuerda que cada lado usa una sábana ajustable twin XL.' },
         { h2: 'Completa la cama en una sola visita' },
-        { p: 'Sábanas, almohadas y protectores están en el piso de la sala de exhibición de McAllen junto a los colchones, así que puedes tocar las telas, comprobar el ajuste con el colchón que estás eligiendo y llevarte la cama completa. Si vienes a una sesión gratis de Dream Mapping, pregúntale al Sleep Coach qué tela va con tu forma de dormir: una persona calurosa y una friolenta en el mismo colchón casi siempre se llevan sábanas distintas.' },
+        { p: 'Sábanas, almohadas y protectores están en el piso de la sala de exhibición de Rockwall junto a los colchones, así que puedes tocar las telas, comprobar el ajuste con el colchón que estás eligiendo y llevarte la cama completa. Si vienes a una sesión gratis de Dream Mapping, pregúntale al Sleep Coach qué tela va con tu forma de dormir: una persona calurosa y una friolenta en el mismo colchón casi siempre se llevan sábanas distintas.' },
         { p: `Visítanos en ${ADDR}, ${L.hours.es[0]}, ${L.hours.es[1]}.` },
       ],
       cta: 'Reserva tu Dream Mapping gratis',

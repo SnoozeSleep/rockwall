@@ -4,11 +4,10 @@ import PageClient from './client';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 import { SizeTypeGrid } from '@/components/SizeTypeGrid';
-import { AreaLinks } from '@/components/AreaLinks';
 
 export const metadata: Metadata = {
-  "title": "McAllen Mattress Store | Dream Mapping | Snooze Mattress",
-  "description": "McAllen, TX mattress store with a free Dream Mapping fitting, top brands and financing options at 7913 N 10th St, Suite 130. Open Sundays 12–6.",
+  "title": "Mattress Store in Rockwall, TX | Snooze Mattress",
+  "description": "Mattress store in Rockwall, TX with a free Dream Mapping fitting, top brands and financing options at 919 E Interstate 30, Suite 101. Open Sundays 10–6.",
   "authors": [
     {
       "name": "Snooze Mattress + Wellness"
@@ -24,8 +23,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "McAllen Mattress Store | Dream Mapping | Snooze Mattress",
-    "description": "McAllen, TX mattress store with a free Dream Mapping fitting, top brands and financing options at 7913 N 10th St, Suite 130. Open Sundays 12–6.",
+    "title": "Mattress Store in Rockwall, TX | Snooze Mattress",
+    "description": "Mattress store in Rockwall, TX with a free Dream Mapping fitting, top brands and financing options at 919 E Interstate 30, Suite 101. Open Sundays 10–6.",
     "url": "/",
     "type": "website",
     "images": [
@@ -54,9 +53,7 @@ export default function Page() {
       <PageSchema items={PAGE_SCHEMA} />
       <PageClient />
       {/* "Mattresses by size & type" — the six size/type pages as icon cards (October 27, 2026) */}
-      <SizeTypeGrid locale="en" />
-      {/* "Shopping from Edinburg, Mission or Pharr?" — links to the service-area pages (SEO audit build pass, C1) */}
-      <AreaLinks locale="en" />
+      <SizeTypeGrid locale="en" />
     </>
   );
 }

@@ -6,8 +6,8 @@ import { PAGE_SCHEMA } from './schema';
 import { AccessoryGuide } from '@/components/AccessoryGuide';
 
 export const metadata: Metadata = {
-  "title": "Pillows in McAllen, TX for How You Sleep | Snooze Mattress",
-  "description": "Pillows in McAllen, TX fitted to how you sleep: side, back and stomach sleepers. Premium pillows at Snooze Mattress + Wellness for your sleep style.",
+  "title": "Pillows in Rockwall, TX for How You Sleep | Snooze Mattress",
+  "description": "Pillows in Rockwall, TX fitted to how you sleep: side, back and stomach sleepers. Premium pillows at Snooze Mattress + Wellness for your sleep style.",
   "alternates": {
     "canonical": "/pillows",
     "languages": {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Pillows in McAllen, TX for How You Sleep | Snooze Mattress",
-    "description": "Pillows in McAllen, TX fitted to how you sleep: side, back and stomach sleepers. Premium pillows at Snooze Mattress + Wellness for your sleep style.",
+    "title": "Pillows in Rockwall, TX for How You Sleep | Snooze Mattress",
+    "description": "Pillows in Rockwall, TX fitted to how you sleep: side, back and stomach sleepers. Premium pillows at Snooze Mattress + Wellness for your sleep style.",
     "url": "/pillows",
     "type": "website",
     "images": [

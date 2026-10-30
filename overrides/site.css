@@ -159,7 +159,7 @@
   html[lang="es"] #heading-JQfUWePMYv h1 { max-width: none; font-size: min(46px, 5.6cqw) !important; } /* sized to its own column so the 30-character second line always fits */
 }
 
-/* Spanish home hero headline on tablet/desktop: three lines like the English one ("McAllen, Consigue un /
+/* Spanish home hero headline on tablet/desktop: three lines like the English one ("Rockwall, Consigue un /
    Ajuste a tu Medida para / Tu Colchón Perfecto"); the longer Spanish words need a slightly smaller size. Phones untouched. */
 @media (min-width: 768px) {
   html[lang="es"] #section-aEXJsrtqRn .c-heading :is(h1, .snz-h1-alt) { font-size: min(52px, 4.1vw) !important; }
@@ -207,7 +207,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 96px; }
    content) read as a stray semi-circle on the new background. Off at every width; the section image is untouched. */
 .hl_page-preview--content .steps-bg-faded .pm-orb { display: none !important; }
 
-/* McAllen desktop hero photos (overrides.json -> heroBackgrounds; Home, About Us, Financing): the builder emits
+/* Rockwall desktop hero photos (overrides.json -> heroBackgrounds; Home, About Us, Financing): the builder emits
    `background: url(...)` (size cover, centred) but leaves the default repeat; pinned explicitly. These sections are
    desktop-only, the phone heroes are separate sections and untouched. */
 @media (min-width: 768px) {
@@ -216,8 +216,8 @@ html { scroll-behavior: smooth; scroll-padding-top: 96px; }
   }
 }
 
-/* Home hero headline, three lines on tablet/desktop in both languages: "McAllen, Get / Custom-Fit for / Your Perfect
-   Mattress" ("McAllen, Consigue un / Ajuste a tu Medida para / Tu Colchón Perfecto"). The shorter city name let the
+/* Home hero headline, three lines on tablet/desktop in both languages: "Rockwall, Get / Custom-Fit for / Your Perfect
+   Mattress" ("Rockwall, Consigue un / Ajuste a tu Medida para / Tu Colchón Perfecto"). The shorter city name let the
    first line run on and the browser then broke inside "Custom-Fit" at the hyphen. The break is forced after the first
    span; the highlighted phrase never wraps at its hyphen at any width. Phones keep their own flow. */
 .hl_page-preview--content .cheading-yMj0fYz3M- :is(h1, .snz-h1-alt) > span:nth-child(2),
@@ -228,7 +228,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 96px; }
      that size, so the type scales with the viewport and reaches 65px at 1275px (the Spanish rule above keeps its own size) */
   html[lang="en"] .hl_page-preview--content .cheading-yMj0fYz3M- :is(h1, .snz-h1-alt) { font-size: min(65px, 5.1vw) !important; }
 }
-/* Phone copy of the same hero (heading-g47b3UHIU-): the same three lines, "McAllen, Get / Custom-Fit for / Your Perfect
+/* Phone copy of the same hero (heading-g47b3UHIU-): the same three lines, "Rockwall, Get / Custom-Fit for / Your Perfect
    Mattress" (the city name is added by scripts/relocate.mjs); the size scales so the last line fits a 375px screen. */
 @media (max-width: 767px) {
   html[lang="en"] .hl_page-preview--content .cheading-g47b3UHIU- h1 { font-size: min(32px, 7.8vw) !important; }

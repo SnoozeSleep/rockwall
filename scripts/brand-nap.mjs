@@ -1,8 +1,8 @@
 /*
  * Business name and NAP normalisation (SEO audit, October 2026). The client's rules: the business is
  * "Snooze Mattress + Wellness" everywhere ("Snooze Mattress Company", "Snooze Mattress & Wellness" and
- * "Snooze Mattress McAllen" were all in use; plain "Snooze" stays as shorthand), and the NAP reads exactly
- * "7913 N 10th St, Suite 130, McAllen, TX 78504 · (956) 586-5646 · Mon–Sat 10 AM–7 PM, Sun 12–6 PM".
+ * "Snooze Mattress Rockwall" were all in use; plain "Snooze" stays as shorthand), and the NAP reads exactly
+ * "919 E Interstate 30, Suite 101, Rockwall, TX 75032 · (469) 769-1300 · Mon–Sat 10 AM–7 PM, Sun 10 AM–6 PM".
  *
  * Applies to the generated pages (markup + Nuxt payload, so hydration keeps the text), the generated page
  * metadata, the hand-written UI strings (lib/i18n.ts, lib/blog-posts.ts, components), the quiz script, the
@@ -26,17 +26,15 @@ const SP = '(?:\\s|&nbsp;|\\u00a0|\\\\u00a0)*';
 const RULES = [
   { name: 'Snooze Mattress Company / Co → + Wellness (any case)', re: /Snooze Mattress Co(?:mpany)?(?![A-Za-z])/gi, to: NAME },
   { name: 'Snooze Mattress & Wellness → + Wellness', re: /Snooze Mattress (?:&amp;|&) Wellness/g, to: NAME },
-  { name: 'Snooze Mattress McAllen → + Wellness', re: /Snooze Mattress McAllen/g, to: NAME },
-  { name: 'street: North 10th Street → N 10th St', re: /7913 North 10th Street, Suite 130/g, to: '7913 N 10th St, Suite 130' },
-  { name: 'street in map queries', re: /7913\+North\+10th\+Street,\+Suite\+130/g, to: '7913+N+10th+St,+Suite+130' },
+  { name: 'Snooze Mattress Rockwall → + Wellness', re: /Snooze Mattress Rockwall/g, to: NAME },
   { name: 'hours EN Mon–Sat', re: new RegExp(`Mon${SP}[–-]${SP}Sat${SP}10${SP}AM${SP}[–-]${SP}7${SP}PM`, 'g'), to: 'Mon–Sat 10 AM–7 PM' },
-  { name: 'hours EN Sun', re: new RegExp(`Sunday${SP}12${SP}[–-]${SP}6${SP}PM`, 'g'), to: 'Sun 12–6 PM' },
+  { name: 'hours EN Sun', re: new RegExp(`Sunday${SP}12${SP}[–-]${SP}6${SP}PM`, 'g'), to: 'Sun 10 AM–6 PM' },
   { name: 'hours ES Lun–Sáb', re: new RegExp(`Lun${SP}[–-]${SP}S[áa]b${SP}10${SP}AM${SP}[–-]${SP}7${SP}PM`, 'g'), to: 'Lun–Sáb 10 AM–7 PM' },
-  { name: 'hours ES Dom', re: new RegExp(`Domingo${SP}12${SP}[–-]${SP}6${SP}PM`, 'g'), to: 'Dom 12–6 PM' },
+  { name: 'hours ES Dom', re: new RegExp(`Domingo${SP}12${SP}[–-]${SP}6${SP}PM`, 'g'), to: 'Dom 10 AM–6 PM' },
   // Google Maps (SEO audit section 6b): the map embed and the directions link query the business name + the exact NAP,
   // so both resolve to the store's own listing (same URLs as lib/location.ts mapLink / mapEmbed)
-  { name: 'map embed → business-name query', re: /https:\/\/maps\.google\.com\/maps\?q=7913\+N\+10th\+St,\+Suite\+130,\+McAllen,\+TX\+78504(&amp;|&)z=15(?:&amp;|&)output=embed/g, to: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+7913+N+10th+St%2C+Suite+130%2C+McAllen%2C+TX+78504$1output=embed' },
-  { name: 'map link → business-name query', re: /https:\/\/maps\.google\.com\/\?q=7913\+N\+10th\+St,\+Suite\+130,\+McAllen,\+TX\+78504/g, to: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+7913+N+10th+St%2C+Suite+130%2C+McAllen%2C+TX+78504' },
+  { name: 'map embed → business-name query', re: /https:\/\/maps\.google\.com\/maps\?q=919\+E\+Interstate\+30,\+Suite\+101,\+Rockwall,\+TX\+75032(&amp;|&)z=15(?:&amp;|&)output=embed/g, to: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+919+E+Interstate+30%2C+Suite+101%2C+Rockwall%2C+TX+75032$1output=embed' },
+  { name: 'map link → business-name query', re: /https:\/\/maps\.google\.com\/\?q=919\+E\+Interstate\+30,\+Suite\+101,\+Rockwall,\+TX\+75032/g, to: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+919+E+Interstate+30%2C+Suite+101%2C+Rockwall%2C+TX+75032' },
 ];
 
 const walk = (d, out = []) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p, out); else out.push(p); } return out; };
