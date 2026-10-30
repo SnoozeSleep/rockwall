@@ -397,3 +397,7 @@ img[src*="6a7577049a9c7792ea57899a"] { aspect-ratio: 1000 / 667 !important; }
 .snz-form-pending__links { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.6; overflow-wrap: anywhere; }
 .snz-form-pending__links a { color: #001489 !important; text-decoration: none !important; }
 .snz-form-pending__links a:hover { color: #f58433 !important; }
+/* the station photo that replaced the home page's named-staff photo (scripts/relocate.mjs) keeps its own proportions */
+img[src*="8c1d8f3c-37bd-452b-89b8-cae044e4cf74"] { aspect-ratio: 1000 / 525 !important; }
+/* the fitting photo that replaced the About page's Rockwall customer photo keeps the builder's circular frame: cropped, not stretched */
+.img-circle[src*="695fbfed-24ba-4132-b604-2e6042bbb83f"] { object-fit: cover; }

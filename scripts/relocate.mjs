@@ -216,6 +216,18 @@ export const RULES_MCALLEN_TO_ROCKWALL = [
   lit('Tienda Snooze Mattress + Wellness en McAllen', R.storefrontAltEs),
   // the location card's <img> carries the photo's intrinsic size (the CSS aspect rule in overrides/global.css covers the hydrated copy)
   [/(<img src=\\"\/assets\/filesafe\/BljrSmLCnm4gF9LpsTRZ\/media\/6a7577049a9c7792ea57899a\.png\.webp\\"[^>]*?)width=\\"1600\\" height=\\"1200\\"/g, '$1width=\\"1000\\" height=\\"667\\"'],
+  // the home page's About section photo named two McAllen Sleep Coaches on the picture itself (staff names must not carry
+  // over): the site's "Sleep Coach with customers at the Pressure Mapping station" photo takes its place, with that alt
+  lit('BljrSmLCnm4gF9LpsTRZ/media/6a7578249a9c7792ea5a8b22.jpg.webp', 'ARD47WoZpqaZSQ9MSxLD/media/8c1d8f3c-37bd-452b-89b8-cae044e4cf74.jpeg'),
+  lit('Two Snooze Sleep Coaches at the Dream Mapping station', 'Sleep Coach with customers at the Pressure Mapping station'),
+  lit('Dos Sleep Coaches de Snooze en la estación de Dream Mapping', 'Sleep Coach con clientes en la estación de Pressure Mapping'),
+  [/(<img src=\\"\/assets\/lcimg\/image\/f_webp\/q_80\/r_1200\/u\/filesafe\/ARD47WoZpqaZSQ9MSxLD\/media\/8c1d8f3c-37bd-452b-89b8-cae044e4cf74\.jpeg\\"[^>]*?)width=\\"800\\" height=\\"1066\\"/g, '$1width=\\"1000\\" height=\\"525\\"'],
+  // the About page's "I said yes to better rest" photo is a McAllen customer with a McAllen Sleep Coach (his name on the shirt):
+  // the site's "Sleep Coaches fitting a customer on a mattress" photo takes its place in the same circular frame
+  // (overrides/global.css crops it to the circle), with that photo's alt text
+  lit('qR8peonBlnjGI3ZuLHQP/media/38eee3d4-abcb-49e3-94e6-cd7ebd89d910.png', 'ARD47WoZpqaZSQ9MSxLD/media/695fbfed-24ba-4132-b604-2e6042bbb83f.jpeg'),
+  lit("Snooze Sleep Coaches with a customer holding an 'I said yes to better rest' sign", 'Snooze Sleep Coaches fitting a customer on a mattress'),
+  lit("Sleep Coaches de Snooze con una clienta que sostiene un letrero 'I said yes to better rest'", 'Sleep Coaches de Snooze ajustando a una clienta sobre un colchón'),
   lit('ARD47WoZpqaZSQ9MSxLD/media/699c969010bc9c1e4d659063.png', R.heroFallback), // home desktop hero
   lit('ARD47WoZpqaZSQ9MSxLD/media/69a601e75a52f4e92a27dcf5.png', R.heroFallback), // About Us desktop hero
   lit('ARD47WoZpqaZSQ9MSxLD/media/69a1cbdf917b4b217201b5ff.png', R.heroFallback), // Financing desktop hero

@@ -14,6 +14,5 @@ export const IMG = {
   sleeper: { src: `${A}/1871b85e-a9ee-4965-9e56-f7b289ce90fa.jpeg.webp`, width: 1920, height: 720 },
   specialists: { src: `${L}/ARD47WoZpqaZSQ9MSxLD/media/695fbfed-24ba-4132-b604-2e6042bbb83f.jpeg`, width: 1000, height: 525 },
   mappingVisit: { src: '/assets/filesafe/SUCPzRcq7b6NGJH7gv9A/media/679361e8c21e373058b2232d.jpeg.webp', width: 1000, height: 525 },
-  coaches: { src: `${L}/BljrSmLCnm4gF9LpsTRZ/media/6a7578249a9c7792ea5a8b22.jpg.webp`, width: 800, height: 1066 },
   bedroom: { src: `${L}/ARD47WoZpqaZSQ9MSxLD/media/697a3f631d0982c17e87ab11.png`, width: 1200, height: 1405 },
 };

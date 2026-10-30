@@ -22,7 +22,7 @@ const CHECK = process.argv.includes('--check');
 const CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, 'lib/integrations.json'), 'utf8'));
 const FORM_ID = String(CONFIG.formId || '').trim();
 const TEMPLATE = fs.readFileSync(path.join(ROOT, 'overrides/widgets/form.html'), 'utf8').trim();
-const OLD_FORM_IDS = ['0BTnYKylVR6OcWJug3r8', 'cUKX8RzffonzLORrzIhS']; // the previous locations' forms (McAllen, and the Brownsville clone it came from)
+const OLD_FORM_IDS = ['0BTnYKylVR6OcWJug3r8', '0BTnYKylVR6OcWJug3r8']; // the previous locations' forms (Rockwall, and the Rockwall clone it came from)
 const PLACEHOLDER = 'ROCKWALL_FORM_ID';
 const BS = String.fromCharCode(92);
 const escapeJsonForScript = (json) => json.split('<').join(BS + 'u003C').split(String.fromCharCode(0x2028)).join(BS + 'u2028').split(String.fromCharCode(0x2029)).join(BS + 'u2029');
@@ -59,7 +59,7 @@ let changed = 0, embeds = 0, cards = 0;
 for (const f of files) {
   const rel = path.relative(ROOT, f).split(path.sep).join('/'); const locale = /^app\/es\//.test(rel) ? 'es' : 'en';
   const src = fs.readFileSync(f, 'utf8');
-  if (!/widget\/form\/|snz-form-pending|ROCKWALL_FORM_ID|0BTnYKylVR6OcWJug3r8|cUKX8RzffonzLORrzIhS/.test(src)) continue;
+  if (!/widget\/form\/|snz-form-pending|ROCKWALL_FORM_ID|0BTnYKylVR6OcWJug3r8|0BTnYKylVR6OcWJug3r8/.test(src)) continue;
   const bodyM = src.match(/export const BODY_HTML = ("[\s\S]*");\s*$/); if (!bodyM) continue;
   let body = JSON.parse(bodyM[1]); const before = body;
   const pm = body.match(/(<script[^>]*id="__NUXT_DATA__"[^>]*>)([\s\S]*?)(<\/script>)/);
@@ -68,7 +68,7 @@ for (const f of files) {
   let newPayload = pm ? pm[0] : '';
   if (pm) {
     const nodes = JSON.parse(pm[2]); let touched = false;
-    for (let i = 0; i < nodes.length; i++) if (typeof nodes[i] === 'string' && /widget\/form\/|snz-form-pending|ROCKWALL_FORM_ID|0BTnYKylVR6OcWJug3r8|cUKX8RzffonzLORrzIhS/.test(nodes[i])) { const v = place(nodes[i], locale); if (v !== nodes[i]) { nodes[i] = v; touched = true; } }
+    for (let i = 0; i < nodes.length; i++) if (typeof nodes[i] === 'string' && /widget\/form\/|snz-form-pending|ROCKWALL_FORM_ID|0BTnYKylVR6OcWJug3r8|0BTnYKylVR6OcWJug3r8/.test(nodes[i])) { const v = place(nodes[i], locale); if (v !== nodes[i]) { nodes[i] = v; touched = true; } }
     if (touched) newPayload = pm[1] + escapeJsonForScript(JSON.stringify(nodes)) + pm[3];
   }
   body = pm ? newMarkup.replace('\u0000PAYLOAD\u0000', () => newPayload) : newMarkup;
