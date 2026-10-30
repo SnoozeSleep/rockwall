@@ -45,8 +45,18 @@ export function blogIndexMetadata(locale: Locale): Metadata {
 export function BlogIndexPage({ locale }: { locale: Locale }) {
   const t = ui(locale).blog;
   const posts = [...postsFor(locale)].sort((a, b) => (a.datePublished < b.datePublished ? 1 : -1));
+  /* BreadcrumbList Home › Sleep Blog, like every other indexable page (Rockwall clone brief, October 31, 2026: sitewide) */
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t.home, item: `${SITE_URL}${localizeHref('/', locale)}` },
+      { '@type': 'ListItem', position: 2, name: t.blogCrumb, item: `${SITE_URL}${localizeHref('/blog', locale)}` },
+    ],
+  };
   return (
     <BlogShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb).replace(/</g, '\\u003c') }} />
       <header className={styles.indexHero}>
         <div className={styles.container}>
           <p className={styles.eyebrow}>{t.eyebrow}</p>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import type { Locale } from '@/lib/i18n';
+import { PageSchema } from './PageSchema';
 import './sleep-quiz/sleep-fit-quiz.css';
 
 /* The Snooze Sleep Fit Quiz as a site page (/sleep-quiz, /es/sleep-quiz), hand-written like the booking page
@@ -49,10 +50,21 @@ export function sleepQuizMetadata(locale: Locale): Metadata {
   };
 }
 
+/* BreadcrumbList Home › Sleep Fit Quiz, like every other indexable page (Rockwall clone brief, October 31, 2026: sitewide) */
+const breadcrumbSchema = (locale: Locale) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: locale === 'es' ? 'Inicio' : 'Home', item: locale === 'es' ? `${SITE_URL}/es` : SITE_URL },
+    { '@type': 'ListItem', position: 2, name: 'Sleep Fit Quiz', item: `${SITE_URL}${locale === 'es' ? '/es' : ''}/sleep-quiz` },
+  ],
+});
+
 export function SleepQuiz({ locale = 'en' }: { locale?: Locale }) {
   const m = META[locale] || META.en;
   return (
     <>
+      <PageSchema items={[breadcrumbSchema(locale)]} />
       <div className="snz-quiz" id="snz-quiz" data-lang={locale}>
         <div className="sfq" id="sfq" data-animate="fade-up">
           <div id="progressWrap" hidden>

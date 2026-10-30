@@ -26,6 +26,16 @@ const serviceSchema = (locale: Locale) => ({
   hoursAvailable: LOCATION.openingHours.map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: h.days.map((d) => `https://schema.org/${d}`), opens: h.opens, closes: h.closes })),
 });
 
+/* BreadcrumbList Home › Booking, like every other indexable page (Rockwall clone brief, October 31, 2026: sitewide) */
+const breadcrumbSchema = (locale: Locale) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: locale === 'es' ? 'Inicio' : 'Home', item: locale === 'es' ? `${SITE_URL}/es` : SITE_URL },
+    { '@type': 'ListItem', position: 2, name: locale === 'es' ? 'Reserva tu cita de Dream Mapping' : 'Book a Dream Mapping Appointment', item: `${SITE_URL}${locale === 'es' ? '/es' : ''}/booking` },
+  ],
+});
+
 /* The Dream Mapping booking page, hand-written (not generated from the GoHighLevel export).
    The calendar is the client's exact embed placed directly in the page body: no wrapper, no container, no card.
    form_embed.js loads after the iframe exists and resizes the iframe to the widget's content at every step; the page
@@ -50,6 +60,7 @@ const COPY = {
     ],
     pickTime: 'Pick a Time Above',
     questions: (phone: string) => `Questions? Call ${phone}`,
+    noJsBook: 'Open the booking calendar',
   },
   es: {
     title: '¡Da el Primer Paso Hacia un',
@@ -68,6 +79,7 @@ const COPY = {
     ],
     pickTime: 'Elige un horario arriba',
     questions: (phone: string) => `¿Preguntas? Llama al ${phone}`,
+    noJsBook: 'Abrir el calendario de citas',
   },
 };
 /* one icon per step: the sensor bed, the five minutes, the Sleep Coach, free with no obligation, couples */
@@ -115,7 +127,7 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
   const t = COPY[locale] || COPY.en;
   return (
     <>
-      <PageSchema items={[serviceSchema(locale)]} />
+      <PageSchema items={[serviceSchema(locale), breadcrumbSchema(locale)]} />
       {/* one main landmark; the hero is a div so the site header stays the page's only banner */}
       <main className={styles.main}>
       <div className={styles.hero}>
@@ -143,6 +155,14 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
         data-snz-resizer="form_embed"
       />
       <script dangerouslySetInnerHTML={{ __html: CALENDAR_HEIGHT_GUARD }} />
+      {/* without JavaScript nothing sizes the embed and the widget inside it cannot run: a link opens the booking widget
+          on its own page, and the phone number is the fallback that always works */}
+      <noscript>
+        <div className={styles.noJs}>
+          <a className={styles.visitBtn} href={`https://link.snoozesleep.com/widget/booking/${BOOKING_CALENDAR_ID}`} target="_blank" rel="noopener noreferrer">{t.noJsBook}</a>
+          <a className={styles.visitCall} href={SITE.phoneHref}><Icon name="phone" /> {t.questions(SITE.phone)}</a>
+        </div>
+      </noscript>
 
       <section className={styles.visit} aria-labelledby="visit-title">
         <div className={styles.visitInner}>

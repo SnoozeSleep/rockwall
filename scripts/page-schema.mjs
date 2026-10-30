@@ -3,7 +3,7 @@
  * For every generated route (app/**／content.ts + page.tsx, English and Spanish):
  *   - FAQPage from the page's own FAQ accordion (overrides/faq-accordion.html markup: .snz-faq__item -> question in
  *     .snz-faq__btn, answer in .snz-faq__a), questions deduplicated (the builder exports every section twice);
- *   - BreadcrumbList (Home › page) on the product pages;
+ *   - BreadcrumbList (Home › page) on every generated page but the home page and the noindex thank-you pages;
  *   - the builder's own "schemaMarkup" is removed from the page payload: the GoHighLevel runtime used to inject it
  *     into <head> after hydration (a second FurnitureStore block with an incomplete address, next to the site's own
  *     LocalBusiness block rendered by the footer), so every page now carries exactly one LocalBusiness.
@@ -35,6 +35,15 @@ const PRODUCT_NAMES = {
   '/sleep-recliner': { en: 'Sleep Recliner', es: 'Sillón Reclinable' },
   '/at-home-sleep-test-kit-by-sleepcorner': { en: 'At-Home Sleep Test Kit', es: 'Kit de Prueba de Sueño en Casa' },
 };
+/* the other indexable generated pages -> breadcrumb name (the header / footer labels, lib/i18n.ts), so every page but the
+   home page and the noindex thank-you pages carries a BreadcrumbList (Rockwall clone brief, October 31, 2026: sitewide) */
+const PAGE_NAMES = {
+  '/about-us': { en: 'About Us', es: 'Nosotros' },
+  '/mattress-financing': { en: 'Financing', es: 'Financiamiento' },
+  '/mattress-sales': { en: 'Sales', es: 'Ofertas' },
+  '/privacy-policy-page': { en: 'Privacy Policy', es: 'Política de Privacidad' },
+  '/terms-conditions-page': { en: 'Terms & Conditions', es: 'Términos y Condiciones' },
+};
 const HOME = { en: 'Home', es: 'Inicio' };
 /* the contact page (/contact-us, October 29, 2026): ContactPage about the store (the site-wide LocalBusiness record,
    @id …/#store, rendered by the footer and unchanged) + BreadcrumbList Home › Contact Us; name = the page's H1 */
@@ -60,9 +69,10 @@ for (const dir of pages) {
   });
   const items = [];
   if (faqs.length) items.push({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
-  if (PRODUCT_NAMES[base]) items.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  const crumb = PRODUCT_NAMES[base] || PAGE_NAMES[base];
+  if (crumb) items.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
     { '@type': 'ListItem', position: 1, name: HOME[locale], item: locale === 'es' ? `${SITE_URL}/es` : SITE_URL },
-    { '@type': 'ListItem', position: 2, name: PRODUCT_NAMES[base][locale], item: `${SITE_URL}${route}` },
+    { '@type': 'ListItem', position: 2, name: crumb[locale], item: `${SITE_URL}${route}` },
   ] });
   if (CONTACT[base]) {
     items.push({ '@context': 'https://schema.org', '@type': 'ContactPage', '@id': `${SITE_URL}${route}#webpage`, url: `${SITE_URL}${route}`, name: CONTACT[base][locale].name, inLanguage: locale === 'es' ? 'es-US' : 'en-US', about: { '@id': `${SITE_URL}/#store` }, mainEntity: { '@id': `${SITE_URL}/#store` } });
@@ -88,9 +98,9 @@ for (const dir of pages) {
     else page = page.replace('      <PageClient />', '      {/* page-level JSON-LD (scripts/page-schema.mjs) */}\n      <PageSchema items={PAGE_SCHEMA} />\n      <PageClient />');
     if (!page.includes('<PageSchema items={PAGE_SCHEMA} />')) throw new Error(`${rel(pageFile)}: could not place <PageSchema>`);
   }
-  const line = `${route.padEnd(44)} FAQ ${String(faqs.length).padStart(2)}  breadcrumb ${PRODUCT_NAMES[base] || CONTACT[base] ? 'yes' : 'no '}  builder block ${payloadChanged ? 'removed' : 'absent '}`;
+  const line = `${route.padEnd(44)} FAQ ${String(faqs.length).padStart(2)}  breadcrumb ${crumb || CONTACT[base] ? 'yes' : 'no '}  builder block ${payloadChanged ? 'removed' : 'absent '}`;
   console.log(line);
-  totals.pages++; totals.faq += faqs.length; if (PRODUCT_NAMES[base] || CONTACT[base]) totals.crumbs++;
+  totals.pages++; totals.faq += faqs.length; if (crumb || CONTACT[base]) totals.crumbs++;
   if (CHECK) continue;
   if (!fs.existsSync(schemaFile) || fs.readFileSync(schemaFile, 'utf8') !== schemaTs) fs.writeFileSync(schemaFile, schemaTs);
   if (page !== pageBefore) fs.writeFileSync(pageFile, page);

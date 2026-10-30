@@ -79,5 +79,23 @@ export const PAGE_SCHEMA: JsonLd[] = [
         }
       }
     ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://rockwall.snoozemattresscompany.com/es"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Ofertas",
+        "item": "https://rockwall.snoozemattresscompany.com/es/mattress-sales"
+      }
+    ]
   }
 ];

@@ -120,3 +120,6 @@
   .step + .step::after { content: ''; position: absolute; left: 39px; top: -17px; width: 2px; height: 17px; background: #f58433; }
 }
 @media (max-width: 480px) { .visit { padding-left: 16px; padding-right: 16px; } .stepText { font-size: 15px; } }
+
+/* no-JavaScript fallback under the calendar (BookingPage.tsx <noscript>): the booking widget link and the phone number */
+.noJs { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 22px; max-width: 1080px; margin: 0 auto 36px; padding: 0 16px; }

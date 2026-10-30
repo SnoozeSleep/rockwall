@@ -95,5 +95,23 @@ export const PAGE_SCHEMA: JsonLd[] = [
         }
       }
     ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rockwall.snoozemattresscompany.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financing",
+        "item": "https://rockwall.snoozemattresscompany.com/mattress-financing"
+      }
+    ]
   }
 ];
