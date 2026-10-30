@@ -21,13 +21,13 @@ export const QUIZ_SCRIPT = '/sleep-fit-quiz.js?v=3';
 
 const META: Record<Locale, { title: string; description: string; ogLocale: string; noscript: string }> = {
   en: {
-    title: 'Sleep Fit Quiz | Snooze Mattress in Rockwall',
+    title: 'Sleep Fit Quiz in Rockwall, TX | Snooze Mattress',
     description: 'Answer 5 quick questions about how you sleep and find the comfort level, support level and mattress features your body needs. Free, in 60 seconds.',
     ogLocale: 'en_US',
     noscript: 'The Sleep Fit Quiz needs JavaScript. Call (469) 769-1300 or visit Snooze Mattress + Wellness at 919 E Interstate 30, Suite 101, Rockwall, TX 75032 and we will find your fit in person.',
   },
   es: {
-    title: 'Sleep Fit Quiz | Snooze Mattress en Rockwall',
+    title: 'Sleep Fit Quiz en Rockwall, TX | Snooze Mattress',
     description: 'Responde 5 preguntas rápidas sobre cómo duermes y descubre la comodidad, el soporte y las características de colchón que necesitas. Gratis, 60 segundos.',
     ogLocale: 'es_US',
     noscript: 'El Sleep Fit Quiz necesita JavaScript. Llama al (469) 769-1300 o visita Snooze Mattress + Wellness en 919 E Interstate 30, Suite 101, Rockwall, TX 75032 y encontraremos tu ajuste en persona.',

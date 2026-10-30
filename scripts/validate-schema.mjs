@@ -3,7 +3,7 @@
  * (or every live page with --live) it parses each <script type="application/ld+json">, flattens @graph, and checks:
  *   - JSON parses; every object has a known schema.org @type;
  *   - exactly ONE LocalBusiness (FurnitureStore) per page, with name, full postal address, telephone, url, image,
- *     geo, opening hours, priceRange and sameAs;
+ *     opening hours, priceRange and sameAs (geo once the Rockwall coordinates are supplied: NEEDS CLIENT INPUT);
  *   - FAQPage: ≥1 Question with name + acceptedAnswer.text; BreadcrumbList: ListItems 1..n with name + item;
  *   - ContactPage: name, url, mainEntity; BlogPosting: headline, image, datePublished, author.name, publisher.name + logo; Service: name, provider,
  *     areaServed, offers;
@@ -40,7 +40,7 @@ for (const f of htmlFiles) {
   for (const o of objs) for (const t of typesOf(o)) { if (FORBIDDEN.has(t)) errs.push(`forbidden type ${t}`); else if (!TYPES.has(t)) errs.push(`unknown @type ${t}`); }
   const biz = tops.filter((o) => typesOf(o).some((t) => BUSINESS.has(t)));
   if (biz.length !== 1) errs.push(`${biz.length} LocalBusiness blocks (expected 1)`);
-  for (const b of biz) need(b, ['name', 'address.streetAddress', 'address.addressLocality', 'address.addressRegion', 'address.postalCode', 'address.addressCountry', 'telephone', 'url', 'image', 'geo.latitude', 'geo.longitude', 'openingHoursSpecification', 'priceRange', 'sameAs', 'areaServed'], errs, 'LocalBusiness');
+  for (const b of biz) need(b, ['name', 'address.streetAddress', 'address.addressLocality', 'address.addressRegion', 'address.postalCode', 'address.addressCountry', 'telephone', 'url', 'image', 'openingHoursSpecification', 'priceRange', 'sameAs', 'areaServed'], errs, 'LocalBusiness');
   for (const o of tops.filter((o) => typesOf(o).includes('FAQPage'))) { if (!Array.isArray(o.mainEntity) || !o.mainEntity.length) errs.push('FAQPage: empty mainEntity'); else o.mainEntity.forEach((q, i) => need(q, ['name', 'acceptedAnswer.text'], errs, `FAQ #${i + 1}`)); }
   for (const o of tops.filter((o) => typesOf(o).includes('BreadcrumbList'))) { const l = o.itemListElement || []; if (!l.length) errs.push('BreadcrumbList: empty'); l.forEach((it, i) => { if (it.position !== i + 1) errs.push(`Breadcrumb position ${it.position} ≠ ${i + 1}`); need(it, ['name', 'item'], errs, `Breadcrumb #${i + 1}`); }); }
   for (const o of tops.filter((o) => typesOf(o).some((t) => t === 'BlogPosting' || t === 'Article'))) need(o, ['headline', 'image', 'datePublished', 'author.name', 'publisher.name', 'publisher.logo', 'mainEntityOfPage'], errs, 'BlogPosting');

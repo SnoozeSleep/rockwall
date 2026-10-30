@@ -3,6 +3,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
+    { "source": "/:path*", "has": [{ "type": "host", "value": "(?<host>.*)\\.vercel\\.app" }], "destination": "https://rockwall.snoozemattresscompany.com/:path*", "permanent": true },
     { "source": "/terms-conditions", "destination": "/terms-conditions-page", "permanent": true },
     { "source": "/es/terms-conditions", "destination": "/es/terms-conditions-page", "permanent": true },
     { "source": "/privacy-policy-page-1", "destination": "/privacy-policy-page", "permanent": true },
