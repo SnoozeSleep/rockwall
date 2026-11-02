@@ -55,6 +55,8 @@ export default function Page() {
       <PageClient />
       {/* "Mattresses by size & type" — the six size/type pages as icon cards (October 27, 2026) */}
       <SizeTypeGrid locale="en" />
+      {/* "Shopping from Rowlett, Heath or Royse City?" — links to the service-area pages (components/AreaLinks.tsx) */}
+      <AreaLinks locale="en" />
     </>
   );
 }
