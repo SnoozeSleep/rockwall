@@ -66,7 +66,7 @@ export const PAGE: ContentPage = {
         { question: 'What is the difference between Dream Mapping and the Sleep Fit Quiz?', answer: 'The quiz is a 60-second online questionnaire; Dream Mapping is the in-store pressure measurement on the sensor bed. The quiz is a first step, the map is the fitting.' },
         { question: 'Is there any pressure to buy?', answer: 'No. The Sleep Coaches are not on commission, and you can leave with your results and come back another day.' },
       ],
-      cta: { title: 'Book your free Dream Mapping fitting', text: 'Five minutes on the sensor bed in Rockwall, and you will know which mattresses fit the way you sleep.', button: 'Book a free fitting' },
+      cta: { title: 'Book your free Dream Mapping fitting', text: 'Five minutes on the sensor bed in Rockwall, and you will know which mattresses fit the way you sleep.', button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Dream Mapping Gratis en Rockwall, TX | Snooze Mattress',
@@ -111,7 +111,7 @@ export const PAGE: ContentPage = {
         { question: '¿Cuál es la diferencia entre Dream Mapping y el Sleep Fit Quiz?', answer: 'El quiz es un cuestionario en línea de 60 segundos; Dream Mapping es la medición de presión en tienda sobre la cama con sensores. El quiz es un primer paso, el mapa es el ajuste.' },
         { question: '¿Hay presión para comprar?', answer: 'No. Los Sleep Coaches no trabajan por comisión, y puedes irte con tus resultados y volver otro día.' },
       ],
-      cta: { title: 'Reserva tu Dream Mapping gratis', text: 'Cinco minutos en la cama con sensores en Rockwall y sabrás qué colchones van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Reserva tu Dream Mapping gratis', text: 'Cinco minutos en la cama con sensores en Rockwall y sabrás qué colchones van con tu forma de dormir.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

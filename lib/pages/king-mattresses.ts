@@ -43,7 +43,7 @@ export const PAGE: ContentPage = {
         { question: 'Can two people with different needs share a king?', answer: 'Yes. Dream Mapping maps each of you individually, and a split king lets each side be fitted separately.' },
         { question: 'Do you deliver and set up king mattresses?', answer: 'Yes. Delivery and setup are free on orders over $999, and we can haul away your old mattress.' },
       ],
-      cta: { title: 'Try king mattresses in Rockwall', text: 'A free Dream Mapping fitting for both of you shows which king or split king fits the way each of you sleeps.', button: 'Book a free fitting' },
+      cta: { title: 'Try king mattresses in Rockwall', text: 'A free Dream Mapping fitting for both of you shows which king or split king fits the way each of you sleeps.', button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Colchones King en Rockwall, TX | Snooze Mattress',
@@ -82,7 +82,7 @@ export const PAGE: ContentPage = {
         { question: '¿Dos personas con necesidades distintas pueden compartir un king?', answer: 'Sí. Dream Mapping mapea a cada uno por separado, y un split king permite ajustar cada lado aparte.' },
         { question: '¿Entregan e instalan colchones king?', answer: 'Sí. La entrega e instalación son gratis en compras mayores de $999, y podemos llevarnos tu colchón viejo.' },
       ],
-      cta: { title: 'Prueba colchones king en Rockwall', text: 'Una sesión gratis de Dream Mapping para los dos muestra qué king o split king va con la forma de dormir de cada uno.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Prueba colchones king en Rockwall', text: 'Una sesión gratis de Dream Mapping para los dos muestra qué king o split king va con la forma de dormir de cada uno.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

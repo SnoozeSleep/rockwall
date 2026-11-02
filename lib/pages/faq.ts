@@ -84,7 +84,7 @@ export const PAGE: ContentPage = {
       faqTitle: 'All questions',
       faqs: flat(EN),
       faqGroups: EN,
-      cta: { title: 'Still have a question?', text: `Call ${L.phone} or come by ${L.street}, ${L.city}; a Sleep Coach will answer it in person, and a free Dream Mapping fitting takes about five minutes.`, button: 'Book a free fitting' },
+      cta: { title: 'Still have a question?', text: `Call ${L.phone} or come by ${L.street}, ${L.city}; a Sleep Coach will answer it in person, and a free Dream Mapping fitting takes about five minutes.`, button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Preguntas Frecuentes de Rockwall | Snooze Mattress',
@@ -97,7 +97,7 @@ export const PAGE: ContentPage = {
       faqTitle: 'Todas las preguntas',
       faqs: flat(ES),
       faqGroups: ES,
-      cta: { title: '¿Te queda alguna duda?', text: `Llama al ${L.phone} o pasa por ${L.street}, ${L.city}; un Sleep Coach te la responde en persona, y una sesión gratis de Dream Mapping tarda unos cinco minutos.`, button: 'Reservar ajuste gratis' },
+      cta: { title: '¿Te queda alguna duda?', text: `Llama al ${L.phone} o pasa por ${L.street}, ${L.city}; un Sleep Coach te la responde en persona, y una sesión gratis de Dream Mapping tarda unos cinco minutos.`, button: 'Hazte tu Dream Mapping' },
     },
   },
 };

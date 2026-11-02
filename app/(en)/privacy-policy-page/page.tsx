@@ -5,7 +5,7 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Privacy Policy | Snooze Mattress",
+  "title": "Privacy Policy: Rockwall, TX | Snooze Mattress",
   "description": "How Snooze Mattress + Wellness – Rockwall collects, uses and shares your personal information when you visit our website, contact us or use our services.",
   "alternates": {
     "canonical": "/privacy-policy-page",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Privacy Policy | Snooze Mattress",
+    "title": "Privacy Policy: Rockwall, TX | Snooze Mattress",
     "description": "How Snooze Mattress + Wellness – Rockwall collects, uses and shares your personal information when you visit our website, contact us or use our services.",
     "url": "/privacy-policy-page",
     "type": "website",

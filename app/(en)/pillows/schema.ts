@@ -43,7 +43,7 @@ export const PAGE_SCHEMA: JsonLd[] = [
         "name": "Is there any pressure to buy?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. Our Dream Mapping technology takes all of the guesswork out of finding the perfect mattress for you: after you have completed the Dream Map, the technology essentially eliminates around 85% of our products, so you get a true custom-fit mattress for your body."
+          "text": "No. Our Dream Mapping technology takes all of the guesswork out of finding the perfect mattress for you: after you have completed the Dream Map, the technology narrows our products to the ones that fit, so you get a true custom-fit mattress for your body."
         }
       },
       {

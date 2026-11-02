@@ -9,7 +9,7 @@ export const PAGE: ContentPage = {
   kind: 'guide',
   copy: {
     en: {
-      title: 'How to Choose a Mattress: Sizes & Comfort | Snooze Mattress',
+      title: 'How to Choose a Mattress in Rockwall, TX | Snooze Mattress',
       description: 'How to choose a mattress in Rockwall: standard sizes, the five comfort levels, sleep position, what to try in the showroom, and free Dream Mapping.',
       crumb: 'How to Choose a Mattress',
       eyebrow: 'Buying guide',
@@ -63,10 +63,10 @@ export const PAGE: ContentPage = {
         { question: 'Can I try before I buy?', answer: 'Yes. Every brand on this page is on the Rockwall showroom floor, and the Dream Mapping fitting narrows them to the ones that fit how you sleep.' },
         { question: 'Is the fitting really free?', answer: 'Yes, about five minutes on the sensor bed, with no obligation to buy.' },
       ],
-      cta: { title: 'Skip the guesswork', text: 'Book a free Dream Mapping fitting in Rockwall and let the pressure map choose the comfort level for you.', button: 'Book a free fitting' },
+      cta: { title: 'Skip the guesswork', text: 'Book a free Dream Mapping fitting in Rockwall and let the pressure map choose the comfort level for you.', button: 'Get Dream Mapped' },
     },
     es: {
-      title: 'Cómo Elegir un Colchón: Tamaños y Confort | Snooze Mattress',
+      title: 'Cómo Elegir un Colchón en Rockwall, TX | Snooze Mattress',
       description: 'Cómo elegir colchón en Rockwall: tamaños estándar, los cinco niveles de comodidad, la posición al dormir y el ajuste gratis de Dream Mapping.',
       crumb: 'Cómo Elegir un Colchón',
       eyebrow: 'Guía de compra',
@@ -120,7 +120,7 @@ export const PAGE: ContentPage = {
         { question: '¿Puedo probar antes de comprar?', answer: 'Sí. Todas las marcas de esta página están en la sala de exhibición de Rockwall, y la sesión de Dream Mapping las reduce a las que van con tu forma de dormir.' },
         { question: '¿El ajuste es realmente gratis?', answer: 'Sí, unos cinco minutos en la cama con sensores, sin obligación de comprar.' },
       ],
-      cta: { title: 'Déjate de adivinar', text: 'Reserva una sesión gratis de Dream Mapping en Rockwall y deja que el mapa de presión elija el nivel de comodidad por ti.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Déjate de adivinar', text: 'Reserva una sesión gratis de Dream Mapping en Rockwall y deja que el mapa de presión elija el nivel de comodidad por ti.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

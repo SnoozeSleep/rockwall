@@ -44,10 +44,10 @@ export const PAGE: ContentPage = {
         { question: 'Does an adjustable base help with back pain?', answer: 'Raising the head and feet relieves pressure and supports a healthier sleep posture; try one on the showroom floor with your mattress choice.' },
         { question: 'Is the fitting free?', answer: 'Yes, and there is no obligation to buy.' },
       ],
-      cta: { title: 'Map your pressure points, free', text: 'Five minutes on the Dream Mapping bed in Rockwall shows what your back needs from a mattress.', button: 'Book a free fitting' },
+      cta: { title: 'Map your pressure points, free', text: 'Five minutes on the Dream Mapping bed in Rockwall shows what your back needs from a mattress.', button: 'Get Dream Mapped' },
     },
     es: {
-      title: 'Colchones para Dolor de Espalda y de Lado | Snooze Mattress',
+      title: 'Colchón para Dolor de Espalda en Rockwall | Snooze Mattress',
       description: 'Colchones para dolor de espalda y dormir de lado en Rockwall, TX: un escaneo gratis de Dream Mapping encuentra tus puntos de presión y el soporte.',
       crumb: 'Dolor de Espalda y Dormir de Lado',
       eyebrow: 'Colchones por necesidad',
@@ -84,7 +84,7 @@ export const PAGE: ContentPage = {
         { question: '¿Una base ajustable ayuda con el dolor de espalda?', answer: 'Elevar la cabeza y los pies alivia la presión y favorece una postura más sana al dormir; pruébala en la sala de exhibición con el colchón que elijas.' },
         { question: '¿El ajuste es gratis?', answer: 'Sí, y no hay obligación de comprar.' },
       ],
-      cta: { title: 'Mapea tus puntos de presión, gratis', text: 'Cinco minutos en la cama de Dream Mapping en Rockwall muestran qué necesita tu espalda de un colchón.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Mapea tus puntos de presión, gratis', text: 'Cinco minutos en la cama de Dream Mapping en Rockwall muestran qué necesita tu espalda de un colchón.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

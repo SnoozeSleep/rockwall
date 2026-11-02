@@ -118,7 +118,7 @@ export function SiteFooter({ locale = 'en' }: { locale?: Locale }) {
               <p className={styles.serving}>
                 <span>{f.serving}</span>
                 {f.areas.map(([label, href], i) => (
-                  <span key={href}>{i > 0 && <span aria-hidden="true"> · </span>}<a href={L(href)}>{label}</a></span>
+                  <span key={label}>{i > 0 && <span aria-hidden="true"> · </span>}{href ? <a href={L(href)}>{label}</a> : <span>{label}</span>}</span>
                 ))}
               </p>
             ) : null}

@@ -46,7 +46,7 @@ const LEFTOVERS = [
   { group: 'location', name: 'Rio Grande Valley / South Texas copy', re: /Rio Grande|Río Grande|the Valley|del Valle|South Texas|sur de Texas|Winter Texan|quincea|Edinburg|Pharr|Harlingen|Monterrey|North 10th|Mission or Pharr|Edinburg, Mission/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'McAllen reviewers / staff', re: /Xandria|Karina R\.|\bPablo\b|\bElias\b/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'drive-time copy', re: /minute drive|minutos en auto/g, ok: (ctx, file) => TOOLING.test(file) },
-  { group: 'location', name: 'rating claim', re: /Top Rated/gi, ok: (ctx, file) => TOOLING.test(file) },
+  { group: 'content', name: 'claims switched off (10° cooler, 85%) / "Snooze Coaches"', re: /Snooze Coaches|around 85%|85% of mattresses|85% de los colchones|85% de nuestros|10° cooler|10 degrees Cooler|10° más fresco|Of Options Eliminated|De Opciones Eliminadas/g, ok: (ctx, file) => TOOLING.test(file) || /^scripts\//.test(file) },
   { group: 'location', name: 'McAllen storefront / hero composites', re: /684480ff2c95c570cfc22e24|699c969010bc9c1e4d659063|69a601e75a52f4e92a27dcf5|69a1cbdf917b4b217201b5ff/g, ok: (ctx, file) => TOOLING.test(file) || /overrides\/overrides\.json$|conversion-report|asset-map|ghl-offline-shim\.js|lib\/ghl-shim\.ts/.test(file) },
   // ---- Brownsville (the clone the McAllen site was generated from)
   { group: 'location', name: 'Brownsville', re: /brownsville/gi, ok: (ctx, file) => /^scripts\/|^README|^overrides\/i18n\//.test(file) },

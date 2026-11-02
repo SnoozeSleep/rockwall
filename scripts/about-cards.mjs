@@ -3,7 +3,7 @@
  * the desktop and the mobile copy of the section (sections BmqcJGH-kR / defONbS5bl):
  *   1. the third card, "Best Price Guaranteed", had a one-line body ("We price-match any competitor."); it carries the
  *      client's price-match line now (paragraphs G-cya1V3Xn / jR61fp3rtv);
- *   2. the second card, "Real Sleep Coaches", says "Sleep Coaches" (site standard) instead of "Snooze Coaches"
+ *   2. the second card, "Real Sleep Coaches", says "Sleep Coaches" (site standard) instead of "Sleep Coaches"
  *      (paragraphs 1dQ269twNp / mZ9nAHV1rk).
  * Static markup and the hydration payload (the paragraph HTML strings belong to this section alone and are replaced in
  * place; nothing else on the page changes). Heading, card colours and icons are untouched; the equal-height layout of the

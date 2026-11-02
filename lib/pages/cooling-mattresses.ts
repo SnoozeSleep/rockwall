@@ -42,7 +42,7 @@ export const PAGE: ContentPage = {
         { question: 'Can I try the cooling models before buying?', answer: 'Yes. They are on the Rockwall showroom floor, and the free Dream Mapping fitting narrows them to the ones that fit how you sleep.' },
         { question: 'Do sheets and pillows matter for sleeping cool?', answer: 'Yes. Breathable sheets and a pillow chosen for your position keep heat from building around you; both are available in store.' },
       ],
-      cta: { title: 'Sleep cooler in Rockwall', text: 'A free five-minute Dream Mapping fitting shows which cooling mattress also fits your body.', button: 'Book a free fitting' },
+      cta: { title: 'Sleep cooler in Rockwall', text: 'A free five-minute Dream Mapping fitting shows which cooling mattress also fits your body.', button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Colchones Frescos en Rockwall, TX | Snooze Mattress',
@@ -80,7 +80,7 @@ export const PAGE: ContentPage = {
         { question: '¿Puedo probar los modelos frescos antes de comprar?', answer: 'Sí. Están en la sala de exhibición de Rockwall, y la sesión gratis de Dream Mapping los reduce a los que van con tu forma de dormir.' },
         { question: '¿Las sábanas y la almohada importan para dormir fresco?', answer: 'Sí. Unas sábanas transpirables y una almohada elegida para tu posición evitan que el calor se acumule a tu alrededor; ambas están disponibles en tienda.' },
       ],
-      cta: { title: 'Duerme más fresco en Rockwall', text: 'Una sesión gratis de Dream Mapping de cinco minutos muestra qué colchón fresco también va con tu cuerpo.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Duerme más fresco en Rockwall', text: 'Una sesión gratis de Dream Mapping de cinco minutos muestra qué colchón fresco también va con tu cuerpo.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

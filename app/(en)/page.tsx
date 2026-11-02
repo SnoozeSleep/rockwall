@@ -4,6 +4,7 @@ import PageClient from './client';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 import { SizeTypeGrid } from '@/components/SizeTypeGrid';
+import { AreaLinks } from '@/components/AreaLinks';
 
 export const metadata: Metadata = {
   "title": "Mattress Store in Rockwall, TX | Snooze Mattress",

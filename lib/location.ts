@@ -32,12 +32,14 @@ export const LOCATION = {
   gbpUrl: '',
   mapLink: 'https://www.google.com/maps/search/?api=1&query=919+E+Interstate+30+Suite+101+Rockwall+TX+75032',
   mapEmbed: 'https://www.google.com/maps?q=Snooze+Mattress+%2B+Wellness%2C+919+E+Interstate+30%2C+Suite+101%2C+Rockwall%2C+TX+75032&output=embed',
-  /* LocalBusiness schema image (components/LocalBusinessJsonLd.tsx). [ROCKWALL_STOREFRONT_PHOTO] NEEDS CLIENT INPUT:
-     the previous location's storefront photo must not represent this store, so until a Rockwall photo arrives the site's Dream
-     Mapping station photo stands in here and in the pages' location cards (scripts/relocate.mjs). */
-  storefrontImage: '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a7577049a9c7792ea57899a.png.webp',
+  /* LocalBusiness schema image (components/LocalBusinessJsonLd.tsx): the Rockwall storefront photo from the store's
+     GoHighLevel media library (served locally by scripts/rockwall-photos.mjs; the same photo is in the pages' location
+     cards through scripts/relocate.mjs). */
+  storefrontImage: '/assets/filesafe/qR8peonBlnjGI3ZuLHQP/media/6a8d8085d0d6a7f1adf28ec7.jpg.webp',
   priceRange: '$$',
-  areaServed: ['Rockwall'],
+  /* the cities the store serves (schema areaServed, the About page's serving line, the footer's "Also serving" line):
+     Rockwall and the I-30 corridor east of Dallas (clone brief, November 2026) */
+  areaServed: ['Rockwall', 'Heath', 'Rowlett', 'Royse City', 'Fate', 'Forney'],
   hours: {
     en: ['Mon–Sat 10 AM–7 PM', 'Sun 10 AM–6 PM'],
     es: ['Lun–Sáb 10 AM–7 PM', 'Dom 10 AM–6 PM'],

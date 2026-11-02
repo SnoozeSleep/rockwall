@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import PageClient from './client';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
+import { AboutTeam } from '@/components/AboutTeam';
 
 export const metadata: Metadata = {
   "title": "About Us: Locally Owned in Rockwall, TX | Snooze Mattress",
@@ -45,6 +46,8 @@ export default function Page() {
       {/* page-level JSON-LD (scripts/page-schema.mjs) */}
       <PageSchema items={PAGE_SCHEMA} />
       <PageClient />
+      {/* the Rockwall team photo and the serving line (components/AboutTeam.tsx) */}
+      <AboutTeam locale="en" />
     </>
   );
 }

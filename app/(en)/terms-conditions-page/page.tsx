@@ -5,7 +5,7 @@ import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
-  "title": "Terms & Conditions | Snooze Mattress",
+  "title": "Terms & Conditions: Rockwall, TX | Snooze Mattress",
   "description": "The terms and conditions for using the Snooze Mattress + Wellness – Rockwall website. By accessing or using the website, you agree to these terms.",
   "alternates": {
     "canonical": "/terms-conditions-page",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Terms & Conditions | Snooze Mattress",
+    "title": "Terms & Conditions: Rockwall, TX | Snooze Mattress",
     "description": "The terms and conditions for using the Snooze Mattress + Wellness – Rockwall website. By accessing or using the website, you agree to these terms.",
     "url": "/terms-conditions-page",
     "type": "website",

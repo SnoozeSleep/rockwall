@@ -76,7 +76,7 @@ const en: UiStrings = {
     recliner: { label: 'Sleep Recliner', desc: 'Recline smarter with the Zcliner®' },
     kit: { label: 'At-Home Sleep Test Kit', desc: 'Find what disrupts your sleep' },
   },
-  feature: { eyebrow: 'Dream Mapping', title: 'Find your perfect mattress in about 5 minutes', cta: 'Book a free fitting', imgAlt: 'Snooze Sleep Coaches fitting a customer on a mattress' },
+  feature: { eyebrow: 'Dream Mapping', title: 'Find your perfect mattress in about 5 minutes', cta: 'Get Dream Mapped', imgAlt: 'Snooze Sleep Coaches fitting a customer on a mattress' },
   drawerBook: 'Book Free Dream Mapping Appointment',
   drawerQuiz: 'Take the Sleep Fit Quiz',
   quizCard: { title: 'Sleep Fit Quiz', desc: 'Not sure which mattress is right for you? Find your comfort + support in 60 seconds.', cta: 'Take the quiz' },
@@ -89,7 +89,7 @@ const en: UiStrings = {
     rights: 'Snooze Mattress + Wellness. All Rights Reserved', madeWith: 'Made with', terms: 'Terms & Conditions', privacy: 'Privacy Policy',
     facebook: 'Snooze Rockwall on Facebook', instagram: 'Snooze Rockwall on Instagram', youtube: 'Snooze Rockwall on YouTube', tiktok: 'Snooze Rockwall on TikTok',
     companyLinks: [['About Us', '/about-us'], ['Financing', '/mattress-financing'], ['Sales', '/mattress-sales'], ['Sleep Blog', '/blog'], ['Sleep Fit Quiz', '/sleep-quiz'], ['Dream Mapping', '/dream-mapping'], ['How to Choose a Mattress', '/how-to-choose-a-mattress'], ['FAQ', '/faq'], ['Book a Dream Mapping Appointment', '/booking'], ['Get In Touch', '/contact-us']],
-    serving: 'Also serving', areas: [], // service-area pages: none for this store yet (the footer skips the line while empty)
+    serving: 'Also serving', areas: [['Heath', '/mattress-store-heath'], ['Rowlett', '/mattress-store-rowlett'], ['Royse City', '/mattress-store-royse-city'], ['Fate', ''], ['Forney', '']], // an empty href renders plain text
   },
   blog: {
     eyebrow: 'Snooze Sleep Blog', indexTitle: 'Better Sleep Starts Here',
@@ -121,7 +121,7 @@ const es: UiStrings = {
     recliner: { label: 'Sillón Reclinable', desc: 'Reclínate mejor con el Zcliner®' },
     kit: { label: 'Kit de Prueba de Sueño en Casa', desc: 'Descubre qué interrumpe tu sueño' },
   },
-  feature: { eyebrow: 'Dream Mapping', title: 'Encuentra tu colchón perfecto en unos 5 minutos', cta: 'Reserva tu cita de Dream Mapping', imgAlt: 'Sleep Coaches de Snooze ajustando a una clienta sobre un colchón' },
+  feature: { eyebrow: 'Dream Mapping', title: 'Encuentra tu colchón perfecto en unos 5 minutos', cta: 'Hazte tu Dream Mapping', imgAlt: 'Sleep Coaches de Snooze ajustando a una clienta sobre un colchón' },
   drawerBook: 'Reserva tu cita de Dream Mapping',
   drawerQuiz: 'Haz el Sleep Fit Quiz',
   quizCard: { title: 'Sleep Fit Quiz', desc: '¿No sabes qué colchón es el ideal para ti? Descubre tu comodidad y soporte en 60 segundos.', cta: 'Hacer el quiz' },
@@ -134,7 +134,7 @@ const es: UiStrings = {
     rights: 'Snooze Mattress + Wellness. Todos los derechos reservados', madeWith: 'Hecho con', terms: 'Términos y Condiciones', privacy: 'Política de Privacidad',
     facebook: 'Snooze Rockwall en Facebook', instagram: 'Snooze Rockwall en Instagram', youtube: 'Snooze Rockwall en YouTube', tiktok: 'Snooze Rockwall en TikTok',
     companyLinks: [['Nosotros', '/about-us'], ['Financiamiento', '/mattress-financing'], ['Ofertas', '/mattress-sales'], ['Blog del Sueño', '/blog'], ['Sleep Fit Quiz', '/sleep-quiz'], ['Dream Mapping', '/dream-mapping'], ['Cómo elegir un colchón', '/how-to-choose-a-mattress'], ['Preguntas frecuentes', '/faq'], ['Reserva tu cita de Dream Mapping', '/booking'], ['Contáctanos', '/contact-us']],
-    serving: 'También atendemos', areas: [], // service-area pages: none for this store yet (the footer skips the line while empty)
+    serving: 'También atendemos', areas: [['Heath', '/mattress-store-heath'], ['Rowlett', '/mattress-store-rowlett'], ['Royse City', '/mattress-store-royse-city'], ['Fate', ''], ['Forney', '']], // an empty href renders plain text
   },
   blog: {
     eyebrow: 'Blog del Sueño de Snooze', indexTitle: 'Dormir Mejor Empieza Aquí',

@@ -44,7 +44,7 @@ export const PAGE: ContentPage = {
         { question: 'Can I put a queen mattress on an adjustable base?', answer: 'Yes. Adjustable bases are available for queen mattresses, with customizable head and foot positioning.' },
         { question: 'Do you deliver queen mattresses?', answer: 'Yes. Delivery and setup are free on orders over $999, and we can haul away your old mattress.' },
       ],
-      cta: { title: 'Try queen mattresses in Rockwall', text: 'A free five-minute Dream Mapping fitting shows you which queen models fit the way you sleep.', button: 'Book a free fitting' },
+      cta: { title: 'Try queen mattresses in Rockwall', text: 'A free five-minute Dream Mapping fitting shows you which queen models fit the way you sleep.', button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Colchones Queen en Rockwall, TX | Snooze Mattress',
@@ -84,7 +84,7 @@ export const PAGE: ContentPage = {
         { question: '¿Puedo poner un colchón queen en una base ajustable?', answer: 'Sí. Hay bases ajustables para colchones queen, con posición de cabeza y pies personalizable.' },
         { question: '¿Entregan colchones queen?', answer: 'Sí. La entrega e instalación son gratis en compras mayores de $999, y podemos llevarnos tu colchón viejo.' },
       ],
-      cta: { title: 'Prueba colchones queen en Rockwall', text: 'Una sesión gratis de Dream Mapping de cinco minutos te muestra qué modelos queen van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Prueba colchones queen en Rockwall', text: 'Una sesión gratis de Dream Mapping de cinco minutos te muestra qué modelos queen van con tu forma de dormir.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

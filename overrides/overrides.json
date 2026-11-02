@@ -2,7 +2,7 @@
  "_comment": "Hand-provided section code and live widget embeds applied by scripts/convert.mjs. `rules` match a GoHighLevel custom-code element by substrings of its current HTML (so desktop + mobile copies are both replaced) and swap in `file`; {{custom_values.*}} merge tags are filled from `vars`.",
  "vars": {
   "custom_values.new_store_city_location": "Rockwall",
-  "custom_values.store_image_url": "https://assets.cdn.filesafe.space/BljrSmLCnm4gF9LpsTRZ/media/6a7577049a9c7792ea57899a.png",
+  "custom_values.store_image_url": "https://assets.cdn.filesafe.space/qR8peonBlnjGI3ZuLHQP/media/6a8d8085d0d6a7f1adf28ec7.jpg",
   "custom_values.5th_image": "https://assets.cdn.filesafe.space/BljrSmLCnm4gF9LpsTRZ/media/6a7577049a9c7792ea57899a.png"
  },
  "imageReplacements": {
@@ -86,7 +86,9 @@
   "d3cbba8a-769c-497c-9a9b-c17e94c8929d": "Thermometer and cloud icon (sleep cooler)",
   "a3f44f2e-08b6-4e7e-bf54-5da512592f7c": "Confetti popper icon",
   "b20f536c-4293-458f-b4c0-b4c740100315": "Email envelope icon",
-  "b20fc504-d9c6-42e8-90ff-70cd33f4eecf": "SMS text message icon"
+  "b20fc504-d9c6-42e8-90ff-70cd33f4eecf": "SMS text message icon",
+  "6a8d8085d0d6a7f1adf28ec7": "Snooze Mattress + Wellness storefront in Rockwall, TX",
+  "6a8df824f9b062f8147fb083": "Sleep Coaches at Snooze Mattress + Wellness in Rockwall"
  },
  "rules": [
   {

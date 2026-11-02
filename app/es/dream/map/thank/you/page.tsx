@@ -6,8 +6,8 @@ import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
   "robots": { "index": false, "follow": true },
-  "title": "¡Gracias por Agendar tu Cita de Dream Mapping!",
-  "description": "¡Nuestros Sleep Coaches ya quieren conocerte y empezar juntos tu nueva etapa de mejor sueño!",
+  "title": "Cita Agendada: Rockwall, TX | Snooze Mattress",
+  "description": "Tu Dream Mapping gratis en Snooze Mattress + Wellness en Rockwall, TX está agendado. Te esperamos en 919 E Interstate 30, Suite 101.",
   "alternates": {
     "canonical": "/es/dream/map/thank/you",
     "languages": {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "¡Gracias por Agendar tu Cita de Dream Mapping!",
-    "description": "¡Nuestros Sleep Coaches ya quieren conocerte y empezar juntos tu nueva etapa de mejor sueño!",
+    "title": "Cita Agendada: Rockwall, TX | Snooze Mattress",
+    "description": "Tu Dream Mapping gratis en Snooze Mattress + Wellness en Rockwall, TX está agendado. Te esperamos en 919 E Interstate 30, Suite 101.",
     "url": "/es/dream/map/thank/you",
     "type": "website",
     "images": [

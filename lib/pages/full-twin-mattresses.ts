@@ -45,7 +45,7 @@ export const PAGE: ContentPage = {
         { question: 'Can a child get a Dream Mapping fitting?', answer: 'Yes. The fitting takes about five minutes and shows which comfort and support level fits any sleeper.' },
         { question: 'Which size makes a split king?', answer: 'Two twin XL mattresses side by side in a king frame.' },
       ],
-      cta: { title: 'Find the right twin or full in Rockwall', text: 'Bring the sleeper in for a free five-minute Dream Mapping fitting and try the smaller sizes on the showroom floor.', button: 'Book a free fitting' },
+      cta: { title: 'Find the right twin or full in Rockwall', text: 'Bring the sleeper in for a free five-minute Dream Mapping fitting and try the smaller sizes on the showroom floor.', button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Colchones Full y Twin en Rockwall, TX | Snooze Mattress',
@@ -86,7 +86,7 @@ export const PAGE: ContentPage = {
         { question: '¿Un niño puede hacerse el ajuste de Dream Mapping?', answer: 'Sí. El ajuste tarda unos cinco minutos y muestra qué nivel de comodidad y soporte va con cualquier persona.' },
         { question: '¿Qué tamaño forma un split king?', answer: 'Dos colchones twin XL lado a lado en una base king.' },
       ],
-      cta: { title: 'Encuentra el twin o full correcto en Rockwall', text: 'Trae a quien va a dormir ahí a una sesión gratis de Dream Mapping de cinco minutos y prueben los tamaños chicos en la sala de exhibición.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Encuentra el twin o full correcto en Rockwall', text: 'Trae a quien va a dormir ahí a una sesión gratis de Dream Mapping de cinco minutos y prueben los tamaños chicos en la sala de exhibición.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

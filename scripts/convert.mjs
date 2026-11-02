@@ -559,7 +559,7 @@ function metaFromHead($, route, pageDir) {
 }
 
 const GUIDE_PAGES = new Set(['/pillows', '/mattress-protectors', '/premium-sheets']); // accessory buying guides (components/AccessoryGuide.tsx, SEO audit build pass D4)
-const HANDWRITTEN_ROUTES = new Set(['/booking', '/dream-mapping', '/queen-mattresses', '/king-mattresses', '/full-twin-mattresses', '/memory-foam-mattresses', '/mattresses-for-back-pain', '/cooling-mattresses', '/faq', '/how-to-choose-a-mattress']); // app/(en)/booking + app/es/booking (components/BookingPage.tsx) and the content pages of lib/pages/* (components/ContentPage.tsx) are hand-written
+const HANDWRITTEN_ROUTES = new Set(['/booking', '/dream-mapping', '/queen-mattresses', '/king-mattresses', '/full-twin-mattresses', '/memory-foam-mattresses', '/mattresses-for-back-pain', '/cooling-mattresses', '/mattress-store-rowlett', '/mattress-store-heath', '/mattress-store-royse-city', '/faq', '/how-to-choose-a-mattress']); // app/(en)/booking + app/es/booking (components/BookingPage.tsx) and the content pages of lib/pages/* (components/ContentPage.tsx) are hand-written
 function convertPage(rel, loc = null) {
   const route = routeFromPage(rel);
   if (HANDWRITTEN_ROUTES.has(route)) return;

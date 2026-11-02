@@ -43,7 +43,7 @@ export const PAGE: ContentPage = {
         { question: 'Can I put a memory foam mattress on an adjustable base?', answer: 'Yes. Foam mattresses bend well, and adjustable bases with customizable head and foot positioning are available in the store.' },
         { question: 'How do I know if foam or coils are better for me?', answer: 'A free five-minute Dream Mapping fitting shows where your body needs relief and where it needs support, and the Sleep Coach walks you to the models that match.' },
       ],
-      cta: { title: 'Try memory foam in Rockwall', text: 'Lie on the Dream Mapping bed for five minutes and find out whether foam, hybrid or coils fit the way you sleep.', button: 'Book a free fitting' },
+      cta: { title: 'Try memory foam in Rockwall', text: 'Lie on the Dream Mapping bed for five minutes and find out whether foam, hybrid or coils fit the way you sleep.', button: 'Get Dream Mapped' },
     },
     es: {
       title: 'Colchones de Memory Foam en Rockwall, TX | Snooze Mattress',
@@ -82,7 +82,7 @@ export const PAGE: ContentPage = {
         { question: '¿Puedo poner un colchón de memory foam en una base ajustable?', answer: 'Sí. Los colchones de espuma se doblan bien, y en la tienda hay bases ajustables con posición de cabeza y pies personalizable.' },
         { question: '¿Cómo sé si me conviene espuma o resortes?', answer: 'Una sesión gratis de Dream Mapping de cinco minutos muestra dónde tu cuerpo necesita alivio y dónde necesita soporte, y el Sleep Coach te lleva a los modelos que coinciden.' },
       ],
-      cta: { title: 'Prueba el memory foam en Rockwall', text: 'Recuéstate cinco minutos en la cama de Dream Mapping y descubre si la espuma, un híbrido o los resortes van con tu forma de dormir.', button: 'Reservar ajuste gratis' },
+      cta: { title: 'Prueba el memory foam en Rockwall', text: 'Recuéstate cinco minutos en la cama de Dream Mapping y descubre si la espuma, un híbrido o los resortes van con tu forma de dormir.', button: 'Hazte tu Dream Mapping' },
     },
   },
 };

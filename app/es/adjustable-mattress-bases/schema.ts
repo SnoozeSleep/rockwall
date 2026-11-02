@@ -43,7 +43,7 @@ export const PAGE_SCHEMA: JsonLd[] = [
         "name": "¿Hay presión para comprar?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. Nuestra tecnología Dream Mapping elimina las adivinanzas al buscar el colchón perfecto para ti: una vez que completas tu Dream Map, la tecnología descarta prácticamente el 85% de nuestros productos, así que obtienes un colchón verdaderamente a la medida de tu cuerpo."
+          "text": "No. Nuestra tecnología Dream Mapping elimina las adivinanzas al buscar el colchón perfecto para ti: una vez que completas tu Dream Map, la tecnología reduce nuestros productos a los que te quedan, así que obtienes un colchón verdaderamente a la medida de tu cuerpo."
         }
       },
       {

@@ -44,10 +44,15 @@ export const META = {
          es: ['Sillón Reclinable Zcliner en Rockwall, TX | Snooze Mattress', 'El SleepRecliner (Zcliner®) de Flexsteel, disponible en Snooze Mattress + Wellness en Rockwall: tecnología de confort avanzada con posiciones terapéuticas.'] },
   '/at-home-sleep-test-kit-by-sleepcorner': { en: ['At-Home Sleep Test Kit in Rockwall, TX | Snooze Mattress', 'The At-Home Sleep Test Kit by SleepCorner at Snooze Mattress + Wellness in Rockwall: an FDA-cleared overnight test read by licensed sleep professionals.'],
          es: ['Kit de Prueba de Sueño en Casa en Rockwall | Snooze Mattress', 'El Kit de Prueba de Sueño en Casa de SleepCorner en Snooze Mattress + Wellness, Rockwall: prueba nocturna aprobada por la FDA y revisada por profesionales.'] },
-  '/privacy-policy-page': { en: ['Privacy Policy | Snooze Mattress', 'How Snooze Mattress + Wellness – Rockwall collects, uses and shares your personal information when you visit our website, contact us or use our services.'],
-         es: ['Política de Privacidad | Snooze Mattress', 'Cómo Snooze Mattress + Wellness – Rockwall recopila, usa y comparte tu información personal cuando visitas nuestro sitio web o nos contactas.'] },
-  '/terms-conditions-page': { en: ['Terms & Conditions | Snooze Mattress', 'The terms and conditions for using the Snooze Mattress + Wellness – Rockwall website. By accessing or using the website, you agree to these terms.'],
-         es: ['Términos y Condiciones | Snooze Mattress', 'Los términos y condiciones para usar el sitio web de Snooze Mattress + Wellness – Rockwall. Al acceder o usar el sitio web, aceptas estos términos.'] },
+  '/privacy-policy-page': { en: ['Privacy Policy: Rockwall, TX | Snooze Mattress', 'How Snooze Mattress + Wellness – Rockwall collects, uses and shares your personal information when you visit our website, contact us or use our services.'],
+         es: ['Política de Privacidad: Rockwall, TX | Snooze Mattress', 'Cómo Snooze Mattress + Wellness – Rockwall recopila, usa y comparte tu información personal cuando visitas nuestro sitio web o nos contactas.'] },
+  '/terms-conditions-page': { en: ['Terms & Conditions: Rockwall, TX | Snooze Mattress', 'The terms and conditions for using the Snooze Mattress + Wellness – Rockwall website. By accessing or using the website, you agree to these terms.'],
+         es: ['Términos y Condiciones: Rockwall, TX | Snooze Mattress', 'Los términos y condiciones para usar el sitio web de Snooze Mattress + Wellness – Rockwall. Al acceder o usar el sitio web, aceptas estos términos.'] },
+  /* the noindex confirmation pages: titled like every other page (clone brief, November 2026: "Rockwall" in every title) */
+  '/thank/you': { en: ['Thank You: Rockwall, TX | Snooze Mattress', 'Thanks for contacting Snooze Mattress + Wellness in Rockwall, TX. A Sleep Coach will be in touch shortly.'],
+         es: ['Gracias: Rockwall, TX | Snooze Mattress', 'Gracias por escribir a Snooze Mattress + Wellness en Rockwall, TX. Un Sleep Coach se pondrá en contacto contigo pronto.'] },
+  '/dream/map/thank/you': { en: ['Dream Mapping Booked: Rockwall, TX | Snooze Mattress', 'Your free Dream Mapping fitting at Snooze Mattress + Wellness in Rockwall, TX is booked. See you at 919 E Interstate 30, Suite 101.'],
+         es: ['Cita Agendada: Rockwall, TX | Snooze Mattress', 'Tu Dream Mapping gratis en Snooze Mattress + Wellness en Rockwall, TX está agendado. Te esperamos en 919 E Interstate 30, Suite 101.'] },
 };
 
 let problems = 0, changed = 0;

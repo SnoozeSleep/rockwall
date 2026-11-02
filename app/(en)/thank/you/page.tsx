@@ -6,8 +6,8 @@ import { PAGE_SCHEMA } from './schema';
 
 export const metadata: Metadata = {
   "robots": { "index": false, "follow": true },
-  "title": "Thank You",
-  "description": "You’re on your way to better sleep—our Dream Mapping Coach will connect with you soon.",
+  "title": "Thank You: Rockwall, TX | Snooze Mattress",
+  "description": "Thanks for contacting Snooze Mattress + Wellness in Rockwall, TX. A Sleep Coach will be in touch shortly.",
   "alternates": {
     "canonical": "/thank/you",
     "languages": {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     }
   },
   "openGraph": {
-    "title": "Thank You",
-    "description": "You’re on your way to better sleep—our Dream Mapping Coach will connect with you soon.",
+    "title": "Thank You: Rockwall, TX | Snooze Mattress",
+    "description": "Thanks for contacting Snooze Mattress + Wellness in Rockwall, TX. A Sleep Coach will be in touch shortly.",
     "url": "/thank/you",
     "type": "website",
     "images": [

@@ -157,11 +157,15 @@ export const ROCKWALL = {
   domain: 'rockwall.snoozemattresscompany.com',
   hoursEn: ['Mon–Sat 10 AM–7 PM', 'Sun 10 AM–6 PM'],
   hoursEs: ['Lun–Sáb 10 AM–7 PM', 'Dom 10 AM–6 PM'],
-  /* [ROCKWALL_STOREFRONT_PHOTO] NEEDS CLIENT INPUT: the McAllen storefront photo (684480ff…) showed the McAllen store, so
-     the site's Dream Mapping station photo (a brand photo already used on the site) stands in, with its own alt text */
-  storefrontImage: 'BljrSmLCnm4gF9LpsTRZ/media/6a7577049a9c7792ea57899a.png',
-  storefrontAltEn: "Snooze Sleep Coach reviewing a customer's Dream Mapping results on screen",
-  storefrontAltEs: 'Sleep Coach de Snooze revisando en pantalla los resultados de Dream Mapping de un cliente',
+  /* The Rockwall store's own photos (its GoHighLevel media library, served locally by scripts/rockwall-photos.mjs): the
+     storefront replaces the McAllen storefront photo (684480ff…) in the location cards and the About page's circle, the
+     team photo replaces the McAllen team photo in the home page's About section (clone brief, November 2026) */
+  storefrontImage: 'qR8peonBlnjGI3ZuLHQP/media/6a8d8085d0d6a7f1adf28ec7.jpg',
+  storefrontAltEn: 'Snooze Mattress + Wellness storefront in Rockwall, TX',
+  storefrontAltEs: 'Fachada de Snooze Mattress + Wellness en Rockwall, TX',
+  teamImage: 'qR8peonBlnjGI3ZuLHQP/media/6a8df824f9b062f8147fb083.jpg',
+  teamAltEn: 'Sleep Coaches at Snooze Mattress + Wellness in Rockwall',
+  teamAltEs: 'Sleep Coaches de Snooze Mattress + Wellness en Rockwall',
   /* [ROCKWALL_HERO_ART] NEEDS CLIENT INPUT: the McAllen desktop hero composites of the home, About Us and Financing pages
      (699c9690…, 69a601e7…, 69a1cbdf…) include the McAllen storefront and a "22+ five-star reviews" badge — a review count
      this store does not have — so those three pages use the site's gradient hero (the phone hero image) on desktop too */
@@ -210,32 +214,45 @@ export const RULES_MCALLEN_TO_ROCKWALL = [
   [/https:\/\/www\.instagram\.com\/snoozemcallen\/?/g, R.instagram],
   lit('https://www.youtube.com/@SnoozeMcAllen', R.youtube),
 
-  // ---- images that show the McAllen store (see ROCKWALL.storefrontImage / heroFallback)
+  // ---- images that show the McAllen store (see ROCKWALL.storefrontImage / teamImage / heroFallback)
+  // the storefront photo in the location cards (its 4:3 size attributes fit the Rockwall photo, 640×480)
   lit('ARD47WoZpqaZSQ9MSxLD/media/684480ff2c95c570cfc22e24.jpeg', R.storefrontImage),
   lit('Snooze Mattress + Wellness McAllen storefront', R.storefrontAltEn),
   lit('Tienda Snooze Mattress + Wellness en McAllen', R.storefrontAltEs),
-  // the location card's <img> carries the photo's intrinsic size (the CSS aspect rule in overrides/global.css covers the hydrated copy)
-  [/(<img src=\\"\/assets\/filesafe\/BljrSmLCnm4gF9LpsTRZ\/media\/6a7577049a9c7792ea57899a\.png\.webp\\"[^>]*?)width=\\"1600\\" height=\\"1200\\"/g, '$1width=\\"1000\\" height=\\"667\\"'],
-  // the home page's About section photo named two McAllen Sleep Coaches on the picture itself (staff names must not carry
-  // over): the site's "Sleep Coach with customers at the Pressure Mapping station" photo takes its place, with that alt
-  lit('BljrSmLCnm4gF9LpsTRZ/media/6a7578249a9c7792ea5a8b22.jpg.webp', 'ARD47WoZpqaZSQ9MSxLD/media/8c1d8f3c-37bd-452b-89b8-cae044e4cf74.jpeg'),
-  lit('Two Snooze Sleep Coaches at the Dream Mapping station', 'Sleep Coach with customers at the Pressure Mapping station'),
-  lit('Dos Sleep Coaches de Snooze en la estación de Dream Mapping', 'Sleep Coach con clientes en la estación de Pressure Mapping'),
-  [/(<img src=\\"\/assets\/lcimg\/image\/f_webp\/q_80\/r_1200\/u\/filesafe\/ARD47WoZpqaZSQ9MSxLD\/media\/8c1d8f3c-37bd-452b-89b8-cae044e4cf74\.jpeg\\"[^>]*?)width=\\"800\\" height=\\"1066\\"/g, '$1width=\\"1000\\" height=\\"525\\"'],
-  // the About page's "I said yes to better rest" photo is a McAllen customer with a McAllen Sleep Coach (his name on the shirt):
-  // the site's "Sleep Coaches fitting a customer on a mattress" photo takes its place in the same circular frame
-  // (overrides/global.css crops it to the circle), with that photo's alt text
-  lit('qR8peonBlnjGI3ZuLHQP/media/38eee3d4-abcb-49e3-94e6-cd7ebd89d910.png', 'ARD47WoZpqaZSQ9MSxLD/media/695fbfed-24ba-4132-b604-2e6042bbb83f.jpeg'),
-  lit("Snooze Sleep Coaches with a customer holding an 'I said yes to better rest' sign", 'Snooze Sleep Coaches fitting a customer on a mattress'),
-  lit("Sleep Coaches de Snooze con una clienta que sostiene un letrero 'I said yes to better rest'", 'Sleep Coaches de Snooze ajustando a una clienta sobre un colchón'),
+  // the home page's About section photo named two McAllen Sleep Coaches on the picture itself: the Rockwall team photo
+  // takes its place (every responsive variant path, scripts/rockwall-photos.mjs), landscape 4:3 (the CSS aspect rule in
+  // overrides/global.css covers the hydrated copy)
+  lit('BljrSmLCnm4gF9LpsTRZ/media/6a7578249a9c7792ea5a8b22.jpg.webp', R.teamImage),
+  lit('Two Snooze Sleep Coaches at the Dream Mapping station', R.teamAltEn),
+  lit('Dos Sleep Coaches de Snooze en la estación de Dream Mapping', R.teamAltEs),
+  [/(<img src=\\"\/assets\/lcimg\/image\/f_webp\/q_80\/r_1200\/u\/filesafe\/qR8peonBlnjGI3ZuLHQP\/media\/6a8df824f9b062f8147fb083\.jpg\\"[^>]*?)width=\\"800\\" height=\\"1066\\"/g, '$1width=\\"1024\\" height=\\"768\\"'],
+  // the About page's "I said yes to better rest" photo is a McAllen customer with a McAllen Sleep Coach: the Rockwall
+  // storefront takes its place in the same circular frame (overrides/global.css crops it to the circle)
+  lit('qR8peonBlnjGI3ZuLHQP/media/38eee3d4-abcb-49e3-94e6-cd7ebd89d910.png', R.storefrontImage),
+  lit("Snooze Sleep Coaches with a customer holding an 'I said yes to better rest' sign", R.storefrontAltEn),
+  lit("Sleep Coaches de Snooze con una clienta que sostiene un letrero 'I said yes to better rest'", R.storefrontAltEs),
   lit('ARD47WoZpqaZSQ9MSxLD/media/699c969010bc9c1e4d659063.png', R.heroFallback), // home desktop hero
   lit('ARD47WoZpqaZSQ9MSxLD/media/69a601e75a52f4e92a27dcf5.png', R.heroFallback), // About Us desktop hero
   lit('ARD47WoZpqaZSQ9MSxLD/media/69a1cbdf917b4b217201b5ff.png', R.heroFallback), // Financing desktop hero
 
-  // ---- the trust ticker on /about-us claimed a rating ("McAllen's Top Rated Mattress Store"): a new store has no reviews, so the item
-  //      becomes a fact the site states everywhere (the templates in overrides/ carry the same change)
-  lit("McAllen's Top Rated Mattress Store", 'Free Dream Mapping Fitting'),
-  lit('La Tienda de Colchones Mejor Calificada de McAllen', 'Ajuste Dream Mapping Gratis'),
+  // ---- wording and claims (clone brief, November 2026): "Sleep Coaches" is the team's only name; the numeric claims stay
+  //      off until their terms are confirmed — the "10° cooler" hero line becomes "cooler", the "85%" statistics become
+  //      the free fitting (the About page's stat) or plain wording (the FAQ answer, the "Your Body" bullets). The trust
+  //      ticker's "McAllen's Top Rated Mattress Store" keeps its wording with the new city (the brief asks for it).
+  lit('Snooze Coaches', 'Sleep Coaches'),
+  lit('Sleep up to 10 degrees Cooler', 'Sleep Cooler'),
+  [/Sleep up to (?=(?:<|\\u003C)\/span)/g, 'Sleep '],
+  lit('10° cooler for deeper,', 'cooler for deeper,'),
+  [/Duerme hasta (?=(?:<|\\u003C)\/span)/g, 'Duerme '],
+  lit('10° más fresco para un descanso', 'más fresco para un descanso'),
+  lit('Of Options Eliminated', 'Dream Mapping Fitting'),
+  lit('De Opciones Eliminadas', 'Ajuste Dream Mapping'),
+  lit('Eliminates 85% of mattresses — so you only try the', "Rules out the mattresses that don't fit — so you only try the"),
+  lit('Elimina el 85% de los colchones — para que solo pruebes los', 'Descarta los colchones que no te quedan — para que solo pruebes los'),
+  lit("reads your body's unique pressure points and eliminates 85% of mattresses before you ever lie down on one", "reads your body's unique pressure points and rules out the mattresses that don't fit before you ever lie down on one"),
+  lit('lee los puntos de presión únicos de tu cuerpo y elimina el 85% de los colchones antes de que te acuestes en uno solo', 'lee los puntos de presión únicos de tu cuerpo y descarta los colchones que no te quedan antes de que te acuestes en uno solo'),
+  lit('the technology essentially eliminates around 85% of our products, so you get', 'the technology narrows our products to the ones that fit, so you get'),
+  lit('la tecnología descarta prácticamente el 85% de nuestros productos, así que obtienes', 'la tecnología reduce nuestros productos a los que te quedan, así que obtienes'),
 
   // ---- links to the McAllen blog posts (removed from this site): the size guide link goes to the buying guide, which carries the size table
   lit('/blog/mattress-size-guide-mcallen', '/how-to-choose-a-mattress'),
@@ -258,8 +275,14 @@ export const RULES_MCALLEN_TO_ROCKWALL = [
 /** Both stages, in order. */
 export const RULES = [...RULES_BROWNSVILLE_TO_MCALLEN, ...RULES_MCALLEN_TO_ROCKWALL];
 
+/* Language-specific rules for strings that read the same in both languages: the About page's "85%" statistic becomes
+   the free fitting in each language (app/es/ gets RULES_ES, everything else RULES_EN). */
+export const RULES_EN = [[/(>|\\u003E)85%(?=<|\\u003C)/g, '$1Free']];
+export const RULES_ES = [[/(>|\\u003E)85%(?=<|\\u003C)/g, '$1Gratis']];
+const rulesFor = (rel) => [...RULES, ...(rel.startsWith('app/es/') ? RULES_ES : RULES_EN)];
+
 /** Leftover patterns reported by --check (and by the final sweep): both old locations. */
-export const LEFTOVER = /brownsville|303-3666|3033666|306-3666|3831 Frontage|3831\+Frontage|78520|snoozebrownsville|tfrench\.|mcallen|956[-. ]?586[-. ]?5646|9565865646|7913 N(?:orth)? 10th|7913\+N|78504|ChIJBYBxOXChZYYR48f71GAS7YY|Rio Grande|Río Grande|the Valley|del Valle|South Texas|sur de Texas|Winter Texan|quincea|Edinburg|Pharr|Harlingen|Monterrey/gi;
+export const LEFTOVER = /brownsville|303-3666|3033666|306-3666|3831 Frontage|3831\+Frontage|78520|snoozebrownsville|tfrench\.|mcallen|956[-. ]?586[-. ]?5646|9565865646|7913 N(?:orth)? 10th|7913\+N|78504|ChIJBYBxOXChZYYR48f71GAS7YY|Rio Grande|Río Grande|the Valley|del Valle|South Texas|sur de Texas|Winter Texan|quincea|Edinburg|Pharr|Harlingen|Monterrey|Snooze Coaches|around 85%|85% of mattresses|85% de los colchones|85% de nuestros|10° cooler|10 degrees|10° más fresco/gi;
 /** Leftovers that are expected: the source clone host, the old Vercel deployment host, the clone path, the McAllen repository this site was cloned from (README). */
 export const LEFTOVER_OK = /brownsville-webiste|brownsville\.snoozemattresscompany\.com|C:\/clones\/brownsville|unsplash\.com\/photo-1597852075012/;
 
@@ -301,7 +324,7 @@ function relocateFile(file, check) {
   } else if (rel.startsWith('overrides/i18n/')) {
     return null; // chunks / segments / missing: extraction artifacts of the English clone
   } else {
-    next = applyRules(src);
+    next = applyRules(src, rulesFor(rel));
   }
   if (next !== src && !check) fs.writeFileSync(file, next);
   return next !== src ? rel : null;
