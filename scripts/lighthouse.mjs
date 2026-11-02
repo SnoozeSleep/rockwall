@@ -31,7 +31,9 @@ const rows = [];
 for (const route of list) {
   const name = route === '/' ? 'home' : route.slice(1).replace(/\//g, '_');
   const json = path.join(DEST, `${name}.json`);
-  const r = spawnSync(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['-y', 'lighthouse@12', BASE + route, '--quiet', '--form-factor=mobile', '--screenEmulation.mobile', '--screenEmulation.width=412', '--screenEmulation.height=823', '--screenEmulation.deviceScaleFactor=1.75', '--throttling-method=simulate', '--only-categories=performance,accessibility,best-practices,seo', '--output=json', `--output-path=${json}`, '--chrome-flags=--headless=new --no-first-run --disable-gpu'], { env: { ...process.env, CHROME_PATH: BROWSER }, encoding: 'utf8', shell: process.platform === 'win32', timeout: 300000 });
+  // one quoted command line: npx is a .cmd on Windows (needs a shell) and the chrome flags carry spaces
+  const cmd = ['npx -y lighthouse@12', JSON.stringify(BASE + route), '--quiet', '--form-factor=mobile', '--screenEmulation.mobile', '--screenEmulation.width=412', '--screenEmulation.height=823', '--screenEmulation.deviceScaleFactor=1.75', '--throttling-method=simulate', '--only-categories=performance,accessibility,best-practices,seo', '--output=json', `--output-path=${JSON.stringify(json)}`, '--chrome-flags="--headless=new --no-first-run --disable-gpu"'].join(' ');
+  const r = spawnSync(cmd, { env: { ...process.env, CHROME_PATH: BROWSER }, encoding: 'utf8', shell: true, timeout: 300000 });
   if (!fs.existsSync(json)) { console.log(`${route}: lighthouse failed\n${(r.stderr || r.stdout || '').slice(-600)}`); continue; }
   const lh = JSON.parse(fs.readFileSync(json, 'utf8'));
   const c = lh.categories, a = lh.audits;
