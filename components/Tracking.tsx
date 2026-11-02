@@ -1,18 +1,19 @@
 'use client';
-/* Tracking tags for every page, rendered once by both root layouts (and by the converter's layout template), high in
-   <head>, all loading at parse time, in the order the client's snippets use:
-     1. Google tag (gtag.js) + its config, once per GA4 measurement id
-     2. Google Tag Manager (the standard inline loader; it injects an async gtm.js)
+/* Tracking tags for every page (both languages), rendered once by both root layouts (and by the converter's layout
+   template), high in <head>, all loading at parse time, in this order:
+     1. Google Tag Manager (the standard inline loader; it injects an async gtm.js) — the container shared with the
+        other stores
+     2. Google tag (gtag.js) + its config, once per GA4 measurement id (the client's snippet carried the block twice;
+        it is installed ONCE)
+     3. Simpli.fi (async)
    plus the GTM noscript iframe as the first element we render in <body> (Next.js itself emits an empty <div hidden>
    before it). Nothing waits for an interaction, the load event or consent (a previous performance pass deferred the tags
    until the first interaction and GA4 stopped recording visitors who bounced). Site events (phone_click,
    directions_click, booking_confirmation, optin_submit, quiz events) go to the same dataLayer from public/snz-events.js
-   and public/sleep-fit-quiz.js, whether or not a tag is configured.
+   and public/sleep-fit-quiz.js.
 
-   Rockwall (October 31, 2026): the ids come from lib/integrations.json — [ROCKWALL_GTM] and [ROCKWALL_GA4] — and are
-   EMPTY until the client supplies them, so this component renders nothing and no tag loads. The previous location's
-   tags (two GA4 properties, its GTM container and a Simpli.fi pixel) were not carried over; its container goes in only
-   if the agency confirms it is shared.
+   The ids live in lib/integrations.json (client brief, November 2026); an empty value leaves that tag out, and with no
+   id at all this component renders nothing.
 
    Why this is a client component: React 19 treats every `<script async src>` as a hoistable resource and moves it
    ahead of the rest of <head>, which would put the gtag.js loaders before the inline config / GTM snippets. A script
@@ -26,7 +27,7 @@ import { Fragment } from 'react';
 import { INTEGRATIONS } from '@/lib/integrations';
 
 const keep = () => {};
-const { gtmId, ga4Ids } = INTEGRATIONS;
+const { gtmId, ga4Ids, simplifiId } = INTEGRATIONS;
 
 /* The standard snippets, with the id filled in. */
 const gtagConfig = (id: string) => `
@@ -43,19 +44,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 const gtmNoscript = (id: string) => `<iframe src="https://www.googletagmanager.com/ns.html?id=${id}"
 height="0" width="0" style="display:none;visibility:hidden"></iframe>`;
 
-/** <head> tags, in the snippets' order; nothing while no id is configured. */
+/** <head> tags, in the order above; nothing while no id is configured. */
 export function TrackingHead() {
-  if (!gtmId && !ga4Ids.length) return null;
+  if (!gtmId && !ga4Ids.length && !simplifiId) return null;
   return (
     <>
-      <link rel="preconnect" href="https://www.googletagmanager.com" />
-      {ga4Ids.map((id) => (
-        <Fragment key={id}>
-          {/* Google tag (gtag.js) */}
-          <script async src={`https://www.googletagmanager.com/gtag/js?id=${id}`} onLoad={keep} />
-          <script dangerouslySetInnerHTML={{ __html: gtagConfig(id) }} />
-        </Fragment>
-      ))}
+      {gtmId || ga4Ids.length ? <link rel="preconnect" href="https://www.googletagmanager.com" /> : null}
+      {simplifiId ? <link rel="dns-prefetch" href="https://tag.simpli.fi" /> : null}
       {gtmId ? (
         <>
           {/* Google Tag Manager */}
@@ -63,6 +58,14 @@ export function TrackingHead() {
           {/* End Google Tag Manager */}
         </>
       ) : null}
+      {ga4Ids.map((id) => (
+        <Fragment key={id}>
+          {/* Google tag (gtag.js) */}
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${id}`} onLoad={keep} />
+          <script dangerouslySetInnerHTML={{ __html: gtagConfig(id) }} />
+        </Fragment>
+      ))}
+      {simplifiId ? <script async src={`https://tag.simpli.fi/sifitag/${simplifiId}`} onLoad={keep} /> : null}
     </>
   );
 }

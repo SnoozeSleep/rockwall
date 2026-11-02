@@ -13,14 +13,16 @@
 import { useEffect } from 'react';
 import { INTEGRATIONS } from '@/lib/integrations';
 
-/* [ROCKWALL_CHAT_EN] / [ROCKWALL_CHAT_ES] in lib/integrations.json (Rockwall, October 31, 2026): an empty id means no
-   widget is loaded in that language; the previous location's widget ids were not carried over. */
+/* [ROCKWALL_CHAT_EN] / [ROCKWALL_CHAT_ES] in lib/integrations.json (client brief, November 2026): the widget is gated
+   off until BOTH language ids exist, so neither language ever shows the other's chat; the previous location's widget
+   ids were not carried over. */
 const WIDGET_IDS = INTEGRATIONS.chatWidgetId;
+const CHAT_READY = Boolean(WIDGET_IDS.en && WIDGET_IDS.es);
 const SCRIPT_ID = 'snz-chat-widget';
 
 export function ChatWidget({ locale }: { locale: 'en' | 'es' }) {
   useEffect(() => {
-    if (!WIDGET_IDS[locale] || document.getElementById(SCRIPT_ID)) return;
+    if (!CHAT_READY || document.getElementById(SCRIPT_ID)) return;
     let idle = 0;
     let timer = 0;
     const add = () => {
