@@ -89,6 +89,7 @@ for (const [name, route] of PAGES) {
 /* sections the brief asks to see: the reviews section (card + widget), the About page's team photo and form, the contact
    form, the booking calendar and the footer — the visible copy of each, scrolled into view, desktop and phone */
 const SECTIONS = [
+  ['/', '.pm-section', 'dream-mapping-steps'],
   ['/', '.snz-reviews', 'reviews-section'],
   ['/', 'img[src*="6a8df824f9b062f8147fb083"]', 'home-team'],
   ['/about-us', '#snz-team-title', 'about-team'],

@@ -18,7 +18,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LIVE = process.argv.includes('--live'); const VERBOSE = process.argv.includes('--verbose');
-const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
+// --live fetches the pages from the deployed site: pass the origin as --base=https://host (or set NEXT_PUBLIC_SITE_URL)
+const SITE_URL = ((process.argv.find((a) => a.startsWith('--base=')) || '').slice(7) || process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/+$/, '');
+if (LIVE && !SITE_URL) { console.error('usage: node scripts/validate-schema.mjs --live --base=https://<host>'); process.exit(2); }
 const TYPES = new Set(['ContactPage', 'FurnitureStore', 'LocalBusiness', 'Store', 'PostalAddress', 'GeoCoordinates', 'OpeningHoursSpecification', 'City', 'State', 'Country', 'ImageObject', 'Organization', 'FAQPage', 'Question', 'Answer', 'BreadcrumbList', 'ListItem', 'BlogPosting', 'Article', 'WebPage', 'Person', 'Service', 'Offer', 'ContactPoint', 'WebSite', 'AdministrativeArea']);
 const FORBIDDEN = new Set(['AggregateRating', 'Review', 'Rating']);
 const BUSINESS = new Set(['FurnitureStore', 'LocalBusiness', 'Store']);

@@ -13,6 +13,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,19 +31,26 @@ const NEW = {
   mapsQ: '919+E+Interstate+30',
   hoursEn: ['Mon–Sat 10 AM–7 PM', 'Sun 10 AM–6 PM'],
   hoursEs: ['Lun–Sáb 10 AM–7 PM', 'Dom 10 AM–6 PM'],
-  domain: 'https://rockwall.snoozemattresscompany.com',
 };
+/* The site origin is a build-time value (lib/site-url.ts): NEXT_PUBLIC_SITE_URL when set, else the deployment's own host, else
+   localhost. The audit expects the canonicals to share one origin: the one from the environment when it is set, otherwise
+   whatever the built home page declares (and it says which). The custom domain itself is hardcoded nowhere outside tooling. */
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/+$/, '');
+const CUSTOM_DOMAIN = /rockwall\.snoozemattresscompany\.com/g;
 
 /* Leftover patterns; `ok` returns true when the hit is expected in that context. */
 const TOOLING = /^scripts\/(relocate|audit-location|integrations|reviews-cta)\.mjs$|^README\.md$|^overrides\/i18n\//; // the mapping and the scripts that rewrite the old ids (they must name them), this audit, the McAllen build history, the translation memory of the clone
 const LEFTOVERS = [
   // ---- location copy
-  { group: 'location', name: 'McAllen', re: /mcallen/gi, ok: (ctx, file) => TOOLING.test(file) },
+  // vercel.json may name the old McAllen blog slugs only as the source of a 308 to /blog (brief section E)
+  { group: 'location', name: 'McAllen', re: /mcallen/gi, ok: (ctx, file) => TOOLING.test(file) || (file === 'vercel.json' && /"source": "\/(?:es\/)?blog\/[^"]*mcallen", "destination": "\/(?:es\/)?blog"/.test(ctx)) },
   { group: 'location', name: 'old phone (956) 586-5646', re: /956[-. ]?586[-. ]?5646|9565865646/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'old address 7913 N 10th St / 78504', re: /7913\s*\+?\s*N(?:orth)?\s*\+?\s*10th|78504/gi, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'old e-mail / socials', re: /northmcallen@|snoozemcallen|SnoozeMcAllen|61575812121380/gi, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'old Google Place ID', re: /ChIJBYBxOXChZYYR48f71GAS7YY/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'old domain', re: /mcallen\.snoozemattresscompany\.com/gi, ok: (ctx, file) => TOOLING.test(file) },
+  // the live domain may appear only in tooling and docs; in the built pages only when the build was given it as NEXT_PUBLIC_SITE_URL
+  { group: 'content', name: 'custom domain hardcoded (lib/site-url.ts resolves the origin from the environment)', re: CUSTOM_DOMAIN, ok: (ctx, file) => (file.startsWith('out/') ? /rockwall\.snoozemattresscompany\.com$/.test(SITE_URL) : TOOLING.test(file) || /^scripts\/vercel-config\.mjs$|^vercel\.json$|^lib\/site-url\.ts$/.test(file)) }, // lib/site-url.ts names it in its comments as the example value
   { group: 'location', name: 'Rio Grande Valley / South Texas copy', re: /Rio Grande|Río Grande|the Valley|del Valle|South Texas|sur de Texas|Winter Texan|quincea|Edinburg|Pharr|Harlingen|Monterrey|North 10th|Mission or Pharr|Edinburg, Mission/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'McAllen reviewers / staff', re: /Xandria|Karina R\.|\bPablo\b|\bElias\b/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'drive-time copy', re: /minute drive|minutos en auto/g, ok: (ctx, file) => TOOLING.test(file) },
@@ -104,12 +112,38 @@ function sourceMeta() {
 scan(walk(ROOT).concat([path.join(ROOT, 'public', 'sleep-fit-quiz.js'), path.join(ROOT, 'public', 'snz-events.js'), path.join(ROOT, 'public', 'ghl-offline-shim.js'), path.join(ROOT, 'public', 'ghl-stub.html')].filter(fs.existsSync)), 'source tree');
 sourceMeta();
 
+/* vercel.json host redirects (scripts/vercel-config.mjs): present only when NEXT_PUBLIC_SITE_URL is set, page paths only */
+{
+  console.log('\n=== vercel.json host redirects ===');
+  const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'vercel-config.mjs'), '--check'], { encoding: 'utf8' });
+  console.log('  ' + ((r.stdout || '') + (r.stderr || '')).trim().split('\n').join('\n  '));
+  if (r.status !== 0) problems++;
+  const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  const hostRules = (cfg.redirects || []).filter((x) => (x.has || []).some((h) => h.type === 'host'));
+  const assetSafe = hostRules.every((x) => /\(\?!_next\//.test(x.source));
+  if (!assetSafe) { problems++; console.log('  ✗ a host redirect rule matches asset paths (no (?!_next/… exclusion)'); }
+  else console.log(`  ✓ ${hostRules.length} host rule(s), ${hostRules.length ? 'each excluding /_next, /api, /assets, favicon, robots.txt, sitemap and files with an extension' : 'none to check'}`);
+}
+
 if (!SOURCE_ONLY) {
   const html = walkHtml(OUT).filter((f) => !/\/404\.html$|\/ghl-stub\.html$|\/ghl-stub\//.test(rel(f)));
   scan(html, 'built routes (out/)');
 
   console.log('\n=== Rockwall data and SEO invariants per built route ===');
   const count = (s, needle) => s.split(needle).length - 1;
+  // the origin every canonical, hreflang and sitemap URL must share
+  const homeHtml = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
+  const homeCanonical = (homeHtml.match(/rel="canonical" href="([^"]+)"/) || [])[1] || '';
+  const ORIGIN = SITE_URL || homeCanonical.replace(/\/+$/, '');
+  console.log(`  site origin: ${ORIGIN || '(none found)'} ${SITE_URL ? '(NEXT_PUBLIC_SITE_URL)' : '(no NEXT_PUBLIC_SITE_URL in this environment: taken from the built home page canonical)'}`);
+  if (!ORIGIN) { problems++; console.log('  ✗ no canonical on the home page'); }
+  else if (SITE_URL && homeCanonical.replace(/\/+$/, '') !== SITE_URL) { problems++; console.log(`  ✗ home canonical ${homeCanonical} does not match NEXT_PUBLIC_SITE_URL ${SITE_URL}: rebuild with the variable set`); }
+  const sitemapXml = fs.existsSync(path.join(OUT, 'sitemap.xml')) ? fs.readFileSync(path.join(OUT, 'sitemap.xml'), 'utf8') : '';
+  const locs = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  const offOrigin = locs.filter((u) => u !== ORIGIN && !u.startsWith(ORIGIN + '/'));
+  if (!locs.length || offOrigin.length) { problems++; console.log(`  ✗ sitemap: ${locs.length} URLs, ${offOrigin.length} off-origin${offOrigin[0] ? ` (e.g. ${offOrigin[0]})` : ''}`); } else console.log(`  ✓ sitemap: ${locs.length} URLs, all on ${ORIGIN}`);
+  const robotsTxt = fs.existsSync(path.join(OUT, 'robots.txt')) ? fs.readFileSync(path.join(OUT, 'robots.txt'), 'utf8') : '';
+  if (!robotsTxt.includes(`Sitemap: ${ORIGIN}/sitemap.xml`)) { problems++; console.log(`  ✗ robots.txt sitemap line is not ${ORIGIN}/sitemap.xml`); } else console.log('  ✓ robots.txt points at the sitemap on the same origin');
   const rows = []; let bad = 0;
   for (const f of html) {
     const s = fs.readFileSync(f, 'utf8'); const r = rel(f).replace(/^out\//, '/').replace(/\.html$/, '').replace(/^\/index$/, '/');
@@ -119,7 +153,7 @@ if (!SOURCE_ONLY) {
     const flat = ld.flatMap((d) => (d && d['@graph'] ? d['@graph'] : [d])).filter(Boolean);
     const stores = flat.filter((d) => Array.isArray(d['@type']) && d['@type'].includes('LocalBusiness'));
     const store = stores[0];
-    const ldOk = stores.length === 1 && store.address?.streetAddress === NEW.street && store.address?.addressLocality === 'Rockwall' && store.address?.postalCode === '75032' && /^\+1 \(?469\)? ?769-1300$/.test(store.telephone || '') && store.email === NEW.email && Array.isArray(store.sameAs) && store.sameAs.includes(NEW.fb) && store.sameAs.includes(NEW.ig) && Array.isArray(store.openingHoursSpecification) && store.openingHoursSpecification.length === 2 && store.openingHoursSpecification[1].opens === '10:00' && String(store['@id']).startsWith(NEW.domain) && !('aggregateRating' in store) && !('review' in store);
+    const ldOk = stores.length === 1 && store.address?.streetAddress === NEW.street && store.address?.addressLocality === 'Rockwall' && store.address?.postalCode === '75032' && /^\+1 \(?469\)? ?769-1300$/.test(store.telephone || '') && store.email === NEW.email && Array.isArray(store.sameAs) && store.sameAs.includes(NEW.fb) && store.sameAs.includes(NEW.ig) && Array.isArray(store.openingHoursSpecification) && store.openingHoursSpecification.length === 2 && store.openingHoursSpecification[1].opens === '10:00' && String(store['@id']).startsWith(ORIGIN) && !('aggregateRating' in store) && !('review' in store);
     const types = new Set(flat.map((d) => (Array.isArray(d['@type']) ? d['@type'].join('+') : d['@type'])));
     const decode = (t) => t.replace(/&amp;/g, '&').replace(/&#39;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     const title = decode((s.match(/<title>([^<]*)<\/title>/) || [])[1] || '');
@@ -141,7 +175,7 @@ if (!SOURCE_ONLY) {
     const why = [];
     if (!row.address || !row.phone || !row.tel || !row.fb || !row.ig || !row.hours || !row.maps) why.push('missing Rockwall data');
     if (!row.jsonld) why.push(`LocalBusiness JSON-LD (${stores.length} found)`);
-    if (!row.canonical.startsWith(NEW.domain)) why.push('canonical ' + row.canonical);
+    if (!row.canonical.startsWith(ORIGIN + '/') && row.canonical !== ORIGIN) why.push('canonical ' + row.canonical);
     if (!thanks && (row.titleLen > 60 || !/\| Snooze Mattress$/.test(title))) why.push(`title (${row.titleLen}) "${title}"`);
     if (row.descLen > 155) why.push(`description ${row.descLen}`);
     if (row.h1 !== 1) why.push(`${row.h1} h1`);

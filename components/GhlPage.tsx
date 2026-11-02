@@ -1,7 +1,8 @@
 'use client';
 /* A client component on purpose: each route's generated client.tsx imports its markup and renders this, so the
    markup is server-rendered into the HTML once and never serialized into the React hydration payload. */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { fillSiteTokens } from '@/lib/site-url';
 
 export type PageScript = { id: string; src?: string; type?: string; crossOrigin?: string; code?: string };
 
@@ -59,6 +60,10 @@ function runPageScripts(scripts: PageScript[]) {
 }
 
 export function GhlPage({ headHtml, bodyHtml, scripts, preload }: { headHtml: string; bodyHtml: string; scripts: PageScript[]; preload?: PagePreload[] }) {
+  // The generated pages carry the site origin as tokens (__SITE_URL__ / __SITE_HOST__, written by scripts/relocate.mjs) in
+  // the markup and in the hydration payload; both are filled from the one build-time value (lib/site-url.ts), which Next
+  // inlines identically into the server and client bundles, so the hydrated page matches the served HTML.
+  const filled = useMemo(() => scripts.map((s) => (s.code && s.code.includes('__SITE_') ? { ...s, code: fillSiteTokens(s.code) } : s)), [scripts]);
   useEffect(() => {
     const w = document.querySelector('[data-ghl-page]');
     if (!w) return;
@@ -69,8 +74,8 @@ export function GhlPage({ headHtml, bodyHtml, scripts, preload }: { headHtml: st
     if (!w.childNodes.length && g.__snzGhlNodes) { for (const n of g.__snzGhlNodes) w.appendChild(n); console.warn('[snz] page markup put back after a React re-render'); }
     if (w.getAttribute('data-ghl-scripts')) return;
     w.setAttribute('data-ghl-scripts', '1');
-    runPageScripts(scripts);
-  }, [scripts]);
+    runPageScripts(filled);
+  }, [filled]);
   return (
     <>
       {/* hero background = LCP element; React hoists these into <head> */}
@@ -79,7 +84,7 @@ export function GhlPage({ headHtml, bodyHtml, scripts, preload }: { headHtml: st
       ))}
       {/* __html is '' on the client (client.tsx): React keeps the server-rendered markup as long as the value does not change;
           the font preloads (FONT_PRELOADS) are added to the server markup only, so the client value stays '' */}
-      <div data-ghl-page="" style={{ display: 'contents' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: headHtml ? FONT_PRELOADS + headHtml + bodyHtml : '' }} />
+      <div data-ghl-page="" style={{ display: 'contents' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: headHtml ? FONT_PRELOADS + fillSiteTokens(headHtml) + fillSiteTokens(bodyHtml) : '' }} />
       {/* keeps a handle on the server-rendered nodes before React runs: third-party loaders (CallRail, tag managers)
           can insert elements between the wrapper and its siblings while the HTML is still streaming, and a hydration
           mismatch then makes React regenerate the tree with an empty wrapper; the effect above puts the nodes back */}

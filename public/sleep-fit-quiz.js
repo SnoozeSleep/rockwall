@@ -1,5 +1,5 @@
 /* =================================================================================
-   SNOOZE SLEEP FIT QUIZ — Rockwall site build (rockwall.snoozemattresscompany.com)
+   SNOOZE SLEEP FIT QUIZ — Rockwall site build
    =================================================================================
    The single-store quiz (sleep-fit-quiz.html) as the site's /sleep-quiz and /es/sleep-quiz pages. Rendered by
    components/SleepQuiz.tsx (markup + scoped stylesheet); this file is loaded after hydration and boots on the
@@ -15,7 +15,8 @@
   if (!root || root.dataset.booted) return;
   root.dataset.booted = "1";
   const LANG = root.getAttribute("data-lang") === "es" ? "es" : "en";
-  const SITE_URL = "https://rockwall.snoozemattresscompany.com";
+  // the site's public origin from the build (components/SleepQuiz.tsx writes window.__snzSiteUrl from lib/site-url.ts); the page's own origin otherwise
+  const SITE_URL = String(window.__snzSiteUrl || location.origin).replace(/\/+$/, "");
   const PREFIX = LANG === "es" ? "/es" : "";
 
 /* =================================================================================
@@ -374,8 +375,8 @@ function decodeAnswers(str){
     QUESTIONS.forEach((q,i)=>{ if(q.options.some(o=>o.v===parts[i])) a[q.key]=parts[i]; });
     return Object.keys(a).length===QUESTIONS.length ? a : null; }catch(e){ return null; }
 }
-/* shareable results link: always the production page (not the host the quiz happens to run on: kiosk tablet, preview
-   deployment, local build), so the link in the lead's email and in GoHighLevel is the public one */
+/* shareable results link: the site's public origin from the build (window.__snzSiteUrl), not the host the quiz happens
+   to run on (kiosk tablet, preview deployment, local build), so the link in the lead's email and in GoHighLevel is the public one */
 function resultsUrl(){ const u = new URL(SITE_URL + location.pathname.replace(/\.html$/, "")); u.searchParams.set("r", encodeAnswers(state.answers)); return u.toString(); }
 function summaryText(){
   const r = state.result; const a = PROFILES[r.primary], b = PROFILES[r.secondary];

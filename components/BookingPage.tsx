@@ -2,6 +2,7 @@ import { SITE } from './site-config';
 import { FormEmbedScript } from './GhlScripts';
 import { LOCATION } from '@/lib/location';
 import { INTEGRATIONS } from '@/lib/integrations';
+import { SITE_URL } from '@/lib/site-url';
 import { PageSchema } from './PageSchema';
 import { Icon, type IconName } from './icons';
 import type { Locale } from '@/lib/i18n';
@@ -10,7 +11,6 @@ import styles from './BookingPage.module.css';
 /* Service schema for the Dream Mapping fitting (SEO audit, October 2026 — section 5d): free, about 5 minutes,
    in the Rockwall store — the three facts the audit supplied. Provider = the store's LocalBusiness record
    (components/LocalBusinessJsonLd.tsx, @id …/#store), rendered by the footer on this page too. */
-const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const serviceSchema = (locale: Locale) => ({
   '@context': 'https://schema.org',
   '@type': 'Service',

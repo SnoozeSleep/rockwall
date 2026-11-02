@@ -31,7 +31,9 @@ import { relocate } from './relocate.mjs';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const CLONE = (process.env.CLONE_ROOT || 'C:/clones').replace(/\\/g, '/').replace(/\/+$/, '');
 const SITE_HOST = 'brownsville.snoozemattresscompany.com';
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://rockwall.snoozemattresscompany.com').replace(/\/+$/, '');
+// absolute self-links in the converted pages are written as the __SITE_URL__ token by default (components/GhlPage.tsx fills
+// it from the build-time origin, lib/site-url.ts); an explicit NEXT_PUBLIC_SITE_URL bakes that origin in instead
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || '__SITE_URL__').replace(/\/+$/, '');
 const SITE_DIR = `${CLONE}/${SITE_HOST}`;
 const PUBLIC = path.join(ROOT, 'public');
 const APP = path.join(ROOT, 'app');

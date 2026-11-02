@@ -1,4 +1,5 @@
 import { LOCATION } from '@/lib/location';
+import { SITE_URL } from '@/lib/site-url';
 import { SITE } from './site-config';
 import type { Locale } from '@/lib/i18n';
 
@@ -12,7 +13,6 @@ import type { Locale } from '@/lib/i18n';
    email, opening hours, priceRange, url, image, sameAs (Facebook, Instagram, and YouTube, TikTok and the Google
    Business Profile URL when the client supplies them — empty values are left out), hasMap and areaServed; geo only
    once the coordinates are supplied. No AggregateRating or Review markup, on purpose. */
-const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 
 export function LocalBusinessJsonLd({ locale = 'en' }: { locale?: Locale }) {
   const L = LOCATION;

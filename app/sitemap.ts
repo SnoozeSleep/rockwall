@@ -5,8 +5,7 @@ export const dynamic = 'force-static';
 import { altBlogPath, postsFor } from '@/lib/blog-posts';
 import { localizeHref } from '@/lib/i18n';
 import LASTMOD from '@/lib/lastmod.json';
-
-const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
+import { SITE_URL } from '@/lib/site-url';
 
 /* Public, indexable pages of the converted site (hand-maintained; regeneration keeps this file). Every page exists in
    English and Spanish (/es/...); each sitemap entry lists both as hreflang alternates. Not listed on purpose: the

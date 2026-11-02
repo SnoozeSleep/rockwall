@@ -9,6 +9,7 @@ import { TrackingHead, TrackingBody } from '@/components/Tracking';
 import { ChatWidget } from '@/components/ChatWidget';
 import { GHL_SHIM } from '@/lib/ghl-shim';
 import { BODY_GUARD } from '@/lib/body-guard';
+import { METADATA_BASE } from '@/lib/site-url';
 import { Poppins } from 'next/font/google';
 import '../../overrides/global.css';
 
@@ -22,7 +23,8 @@ import '../../overrides/global.css';
 const poppins = Poppins({ weight: ['400', '500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-poppins', preload: true });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rockwall.snoozemattresscompany.com"),
+  // the build-time site origin (lib/site-url.ts): NEXT_PUBLIC_SITE_URL, else the deployment's own host
+  metadataBase: METADATA_BASE,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

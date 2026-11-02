@@ -3,6 +3,7 @@ import Script from 'next/script';
 import type { Locale } from '@/lib/i18n';
 import { PageSchema } from './PageSchema';
 import { INTEGRATIONS } from '@/lib/integrations';
+import { SITE_URL } from '@/lib/site-url';
 import './sleep-quiz/sleep-fit-quiz.css';
 
 /* The Snooze Sleep Fit Quiz as a site page (/sleep-quiz, /es/sleep-quiz), hand-written like the booking page
@@ -15,7 +16,6 @@ import './sleep-quiz/sleep-fit-quiz.css';
    so React never re-renders the subtree the quiz mutates; it reads the language from data-lang and sends the
    lead to the Rockwall GoHighLevel inbound webhook ([ROCKWALL_QUIZ_WEBHOOK] in lib/integrations.json, passed in as window.__snzQuizWebhook). */
 
-const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
 const FAVICON = '/assets/filesafe/qR8peonBlnjGI3ZuLHQP/media/695b9e7d17768458ae206a19.png';
 const OG_IMAGE = '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a90ca4e747464c6b3a3be10.png.webp';
 export const QUIZ_SCRIPT = '/sleep-fit-quiz.js?v=4';
@@ -80,7 +80,8 @@ export function SleepQuiz({ locale = 'en' }: { locale?: Locale }) {
         </div>
       </div>
       {/* [ROCKWALL_QUIZ_WEBHOOK] (lib/integrations.json): the quiz script reads window.__snzQuizWebhook; empty = the lead is not sent */}
-      <script dangerouslySetInnerHTML={{ __html: `window.__snzQuizWebhook=${JSON.stringify(INTEGRATIONS.quizWebhookUrl)};` }} />
+      {/* the site origin for the shareable results link (lib/site-url.ts), so the link is the public one even when the quiz runs on a kiosk, a preview deployment or a local build */}
+      <script dangerouslySetInnerHTML={{ __html: `window.__snzQuizWebhook=${JSON.stringify(INTEGRATIONS.quizWebhookUrl)};window.__snzSiteUrl=${JSON.stringify(SITE_URL)};` }} />
       <Script src={QUIZ_SCRIPT} strategy="afterInteractive" />
     </>
   );

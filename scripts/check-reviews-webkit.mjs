@@ -1,6 +1,7 @@
 // WebKit (Safari engine) check of the mobile reviews sizing. Needs the playwright package + `npx playwright install webkit` (see scratchpad setup); usage: node scripts/check-reviews-webkit.mjs <baseUrl> [route]
 import { webkit, devices } from 'playwright';
-const BASE = process.argv[2] || 'https://rockwall.snoozemattresscompany.com';
+const BASE = (process.argv[2] || process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/+$/, '');
+if (!BASE) { console.error('usage: node scripts/check-reviews-webkit.mjs https://<host>'); process.exit(2); }
 const routes = process.argv[3] ? [process.argv[3]] : ['/mattresses', '/'];
 const browser = await webkit.launch();
 for (const route of routes) {

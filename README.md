@@ -23,13 +23,40 @@ Where the Rockwall values live:
   until supplied (**NEEDS CLIENT INPUT**).
 - **Reviews** — [`lib/reviews.json`](lib/reviews.json) (one Facebook review, verbatim) → the Recent Reviews card above the
   widget (`scripts/recent-reviews.mjs`).
-- **Domain** — `rockwall.snoozemattresscompany.com` is assumed in `scripts/relocate.mjs` (canonicals, hreflang, sitemap,
-  robots, the `*.vercel.app` redirect in `vercel.json`); confirm it in the Vercel project's domain settings.
+- **Domain / site origin** — hardcoded nowhere. [`lib/site-url.ts`](lib/site-url.ts) resolves the origin once per build
+  (`next.config.ts` exposes it as `NEXT_PUBLIC_SITE_URL` to every bundle): `NEXT_PUBLIC_SITE_URL` when the Vercel project
+  sets it, otherwise the deployment's own host (`VERCEL_PROJECT_PRODUCTION_URL`, the `*.vercel.app` alias until a domain is
+  attached; `VERCEL_URL` on previews), otherwise `http://localhost:3000`. Canonicals, hreflang, Open Graph, sitemap, robots,
+  JSON-LD, the quiz's results link and the generated pages' own self-links (the `__SITE_URL__` / `__SITE_HOST__` tokens
+  that `components/GhlPage.tsx` fills in, markup and hydration payload alike) all derive from it.
+  **Going live on the custom domain** (expected `rockwall.snoozemattresscompany.com`; it still served the old GoHighLevel
+  funnel on November 2, 2026): attach the domain in the Vercel project and wait until it resolves, then (1) set
+  `NEXT_PUBLIC_SITE_URL=https://rockwall.snoozemattresscompany.com` in the project's environment variables (Production), and
+  (2) run `NEXT_PUBLIC_SITE_URL=https://rockwall.snoozemattresscompany.com npm run vercel:config` and commit `vercel.json`:
+  that adds the `*.vercel.app → domain` and `www → apex` 308s for **page paths only**. The site is a static export, so there
+  is no middleware and no request-time environment: the host redirect lives in `vercel.json`, which Vercel reads from the
+  repository, and the matcher
+  `/:path((?!_next/|api/|assets/|images/|fonts/|ghl-stub/|favicon|robots[.]txt|sitemap|.*[.][A-Za-z0-9]{1,8}$).*)`
+  never touches assets (the November 2 outage on the `*.vercel.app` host was the old `/:path*` host rule redirecting every
+  CSS chunk, font and image to the unattached domain). Without the variable `vercel.json` carries no host rule and the
+  deployment serves on whichever host it is reached on; `node scripts/vercel-config.mjs --check` (run by the audit) fails
+  when the file and the environment disagree. http → https is Vercel's own behaviour on every domain.
+- **Icons** — no icon font. The builder's Font Awesome glyphs (CTA button phone / arrow / book icons, FAQ chevrons, the
+  financing sub-heading mark) are drawn by `scripts/icon-svg.mjs` (`npm run icons:svg`) as SVG masks in a generated block of
+  `overrides/global.css`, from outlines it extracts once into `overrides/icons/fa-glyphs.json` (Font Awesome Free, CC BY 4.0).
+  Bullet lists already carry inline SVG checks (`scripts/icons.mjs`); the Font Awesome webfonts are never requested.
+- **Brush strokes under headings** — the builder's SVG flourishes were pulled up with fixed negative pixel margins
+  (−5 … −12px), which assume the heading's exact rendered height. `scripts/svg-flourish.mjs` (`npm run svg:flourish`)
+  writes overrides into `overrides/global.css` that anchor each one to the bottom edge of the heading box and tuck it up by
+  a share of its own height, so the offset never depends on the text's metrics (the one stroke under a picture is left as is).
 
 Checks (run after `npm run build`): `node scripts/audit-location.mjs` (old-location leftovers, NAP per route, SEO invariants;
 must print CLEAN), `node scripts/validate-schema.mjs`, `node scripts/embed-check.mjs` (every tag and helper script once per page,
 GA4 hit, embeds visible — headless Edge/Chrome), `node scripts/serve-out.mjs 4178` + `node scripts/check-es.mjs http://127.0.0.1:4178`
-(Spanish mirror), `node scripts/screenshots.mjs --full`, `node scripts/lighthouse.mjs`.
+(Spanish mirror), `node scripts/screenshots.mjs --full`, `node scripts/lighthouse.mjs`. The audit also runs
+`node scripts/vercel-config.mjs --check` (host redirects in `vercel.json` agree with `NEXT_PUBLIC_SITE_URL`) and the icon block
+is verified with `node scripts/icon-svg.mjs --check`. Build with `NEXT_PUBLIC_SITE_URL=https://…` set to check the production
+origin; without it the local build uses `http://localhost:3000` (and says so in the audit's "site origin" line).
 
 Not carried over from McAllen: its blog posts (`/blog` shows the empty state; the old slugs redirect to `/blog`), its
 Edinburg / Mission / Pharr pages, its reviews, staff names and photos, its tracking and CRM ids, and the "10° cooler" / "85%"

@@ -1,7 +1,6 @@
 import type { ContentPage } from './types';
 import { LOCATION } from '@/lib/location';
-
-const SITE_URL = 'https://rockwall.snoozemattresscompany.com';
+import { SITE_URL } from '@/lib/site-url';
 const service = (locale: 'en' | 'es') => ({
   '@context': 'https://schema.org',
   '@type': 'Service',

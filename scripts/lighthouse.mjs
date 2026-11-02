@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -33,8 +33,11 @@ for (const route of list) {
   const json = path.join(DEST, `${name}.json`);
   // one quoted command line: npx is a .cmd on Windows (needs a shell) and the chrome flags carry spaces
   const cmd = ['npx -y lighthouse@12', JSON.stringify(BASE + route), '--quiet', '--form-factor=mobile', '--screenEmulation.mobile', '--screenEmulation.width=412', '--screenEmulation.height=823', '--screenEmulation.deviceScaleFactor=1.75', '--throttling-method=simulate', '--only-categories=performance,accessibility,best-practices,seo', '--output=json', `--output-path=${JSON.stringify(json)}`, '--chrome-flags="--headless=new --no-first-run --disable-gpu"'].join(' ');
-  const r = spawnSync(cmd, { env: { ...process.env, CHROME_PATH: BROWSER }, encoding: 'utf8', shell: true, timeout: 300000 });
-  if (!fs.existsSync(json)) { console.log(`${route}: lighthouse failed\n${(r.stderr || r.stdout || '').slice(-600)}`); continue; }
+  // awaited async spawn: a blocking spawnSync would freeze this process's event loop, and with it the static server above
+  // that Lighthouse loads the page from (the run then hangs until the timeout)
+  const r = await new Promise((resolve) => { let out = ''; const p = spawn(cmd, { env: { ...process.env, CHROME_PATH: BROWSER }, shell: true, timeout: 300000 }); p.stdout.on('data', (d) => (out += d)); p.stderr.on('data', (d) => (out += d)); p.on('close', (code) => resolve({ code, out })); p.on('error', (e) => resolve({ code: -1, out: out + String(e) })); });
+  if (!fs.existsSync(json)) { console.log(`${route}: lighthouse failed (exit ${r.code})
+${r.out.slice(-600)}`); continue; }
   const lh = JSON.parse(fs.readFileSync(json, 'utf8'));
   const c = lh.categories, a = lh.audits;
   const pct = (k) => Math.round((c[k]?.score ?? 0) * 100);
