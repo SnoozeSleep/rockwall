@@ -64,9 +64,37 @@ input::placeholder, textarea::placeholder { font-family: var(--font-poppins-stac
 .snz-quiz ul.why { gap: var(--snz-list-item-gap); }
 .snz-quiz ul.why > li { gap: var(--snz-list-icon-gap); line-height: var(--snz-list-line-height); text-align: left; }
 
-/* ---- The financing page's former one-off overrides (the intro-line offsets, the "These options are ideal…" body copy, the
-   "Traditional Mattress Financing" container-query headline size, the 0% band's paragraph gap) were removed in November
-   2026: those elements now follow the shared typography system at the end of this file (scripts/typography.mjs). ---- */
+/* ---- Financing page copy (desktop section #section-XBz7r5mHB5, phone #section-s9jzFpVhnj; both languages share
+   the element ids). The list rhythm is the rule set above; these are the builder settings on this one page that
+   fought it, plus the two hierarchy fixes. They sit here, not in overrides/site.css, because site.css is copied
+   into every generated page by the converter and only changes with a re-conversion; this file is bundled on every
+   build. ---- */
+/* the nested row that holds the lists was pulled 13px up into the intro line */
+.hl_page-preview--content #row-uijtZft2ja, .hl_page-preview--content #row-EKTHi8EX0l { margin-top: 0 !important; }
+/* "Qualified buyers may access:" sat 6px under the headline */
+.hl_page-preview--content #sub-heading-HP5QvF-Stn, .hl_page-preview--content #sub-heading-x65IKvSzlY { margin-top: 14px !important; }
+/* "These options are ideal for customers…" is body copy the builder set as an H1 in the headline face: the list
+   items' size (20px desktop, 16px phone) at weight 400 and the lists' 1.6 line-height; inline <strong>/<b> stays bold */
+.hl_page-preview--content :is(.cheading-0Ke59u-Zyv, .cheading-LvWh8ejTgG) :is(h1, p),
+.hl_page-preview--content :is(.cheading-0Ke59u-Zyv, .cheading-LvWh8ejTgG) :is(h1, p) [style*="Visby"] { font-family: var(--font-poppins-stack) !important; font-size: 20px !important; font-weight: 400 !important; line-height: 1.6 !important; }
+.hl_page-preview--content :is(.cheading-0Ke59u-Zyv, .cheading-LvWh8ejTgG) :is(h1, p) :is(strong, b) { font-weight: 700 !important; }
+@media (max-width: 767px) {
+  .hl_page-preview--content :is(.cheading-0Ke59u-Zyv, .cheading-LvWh8ejTgG) :is(h1, p),
+  .hl_page-preview--content :is(.cheading-0Ke59u-Zyv, .cheading-LvWh8ejTgG) :is(h1, p) [style*="Visby"] { font-size: 16px !important; }
+}
+/* Headline "Traditional Mattress Financing (Synchrony & Wells Fargo)" (desktop #heading-nh1OX4OVP9, phone
+   #heading-9UhGiuQIC6): the highlighted title phrase and the parenthesis are two lines (the span stacks its <u> and
+   the text after it), and the size follows the column (container query on the text-output) so the title phrase never
+   breaks mid-phrase. English fits at the builder's 42px on desktop and needs 18px on a 390px phone; Spanish
+   ("Financiamiento Tradicional para Colchones") fits at 34px on desktop and keeps three clean lines on phones. */
+.hl_page-preview--content :is(.cheading-nh1OX4OVP9, .cheading-9UhGiuQIC6) { container-type: inline-size; }
+.hl_page-preview--content :is(.cheading-nh1OX4OVP9, .cheading-9UhGiuQIC6) h2 > span { display: flex !important; flex-direction: column; align-items: flex-start; }
+.hl_page-preview--content :is(.cheading-nh1OX4OVP9, .cheading-9UhGiuQIC6) h2 u { line-height: 1.15 !important; }
+html[lang="en"] .hl_page-preview--content :is(.cheading-nh1OX4OVP9, .cheading-9UhGiuQIC6) h2 { font-size: clamp(18px, 6.1cqw, 42px) !important; }
+html[lang="es"] .hl_page-preview--content .cheading-nh1OX4OVP9 h2 { font-size: clamp(18px, 4.3cqw, 42px) !important; }
+html[lang="es"] .hl_page-preview--content .cheading-9UhGiuQIC6 h2 { font-size: clamp(18px, 6.8cqw, 25px) !important; }
+/* the financing band's two paragraphs ("Get 0% Financing…" / "Upgrade your mattress…") read as two */
+#section-FVn4UvdYfr .c-paragraph p + p, #section-KI-fCuyF5S .c-paragraph p + p, #section-yWefy4dO1- .c-paragraph p + p { margin-top: 16px !important; }
 
 /* ---- Current offer band (components/CurrentOffer.tsx, copy and dates in lib/offer.ts): rendered on the home page
    under the header only while the offer is enabled and in date. Navy band, white copy, orange call to action — the
@@ -94,15 +122,16 @@ input::placeholder, textarea::placeholder { font-family: var(--font-poppins-stac
 @media (max-width: 767px) {
   .hl_page-preview--content .snz-card.c-row .c-column + .c-column .c-heading h3 { margin: 0 0 6px !important; } /* location-card labels (were h1) */
 }
+html[lang="es"] #heading-JQfUWePMYv h2 { max-width: none; font-size: min(46px, 5.6cqw) !important; } /* Spanish price-match headline (was h1) */
 
 
 /* ---- Service-area band (the former components/AreaLinks.tsx service-area band; the classes are shared by components/ContactDetails.tsx) at the end of the home
    page, linking the three area pages (SEO audit build pass, C1). Same palette as the offer band, on white. ---- */
-.snz-areas { background: #fff; color: #1e223c; padding: var(--snz-section-pad) 20px; text-align: center; border-top: 1px solid rgba(0, 20, 137, 0.1); } /* the shared section rhythm (typography system below) */
+.snz-areas { background: #fff; color: #1e223c; padding: 44px 20px; text-align: center; border-top: 1px solid rgba(0, 20, 137, 0.1); }
 .snz-areas__inner { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .snz-areas__eyebrow { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #F58433; }
-.snz-areas__title { margin: 0 0 6px; font-family: var(--font-poppins-stack); font-size: var(--snz-h2-size); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; max-width: 22ch; color: var(--snz-ink); text-wrap: balance; } /* the shared section heading */
-.snz-areas__text { margin: 0; font-size: var(--snz-body-size); line-height: 1.5; max-width: 720px; color: var(--snz-ink-body); } /* the shared body copy */
+.snz-areas__title { margin: 0; font-size: clamp(22px, 3vw, 30px); font-weight: 800; line-height: 1.2; color: #001489; }
+.snz-areas__text { margin: 0; font-size: 16px; line-height: 1.6; max-width: 720px; }
 /* the three city cards (October 27, 2026; the pill links before): map-pin badge, city, drive line, "View page" */
 .snz-areas__cards { width: 100%; margin-top: 18px; text-align: left; }
 .snz-areas__cards .snz-card__title { font-size: 20px; }
@@ -111,7 +140,7 @@ input::placeholder, textarea::placeholder { font-family: var(--font-poppins-stac
    at the end of the home page and, without the page's own card, on the size/type pages and the buying guide. ---- */
 .snz-sizes { background: #f6f7fb; color: #1e223c; padding: 44px 20px 48px; border-top: 1px solid rgba(0, 20, 137, 0.1); font-family: var(--font-poppins-stack); }
 .snz-sizes__inner { max-width: 980px; margin: 0 auto; }
-.snz-sizes__title { margin: 0 auto 16px; font-family: var(--font-poppins-stack); font-size: var(--snz-h2-size); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; max-width: 22ch; color: var(--snz-ink); text-align: center; } /* the shared section heading */
+.snz-sizes__title { margin: 0 0 18px; font-size: clamp(22px, 3vw, 30px); font-weight: 800; line-height: 1.2; color: #001489; text-align: center; }
 .snz-sizes--inline { background: none; border: 0; padding: 8px 0 0; }
 .snz-sizes--inline .snz-sizes__title { text-align: left; margin: 6px 0 14px; font-size: clamp(22px, 3vw, 28px); }
 
@@ -546,115 +575,9 @@ html .hl_page-preview--content .svg-YK4nq0VgCf { margin-top: 0 !important; line-
 html .hl_page-preview--content .svg-YK4nq0VgCf .svg-component { transform: translateY(-30%); }
 /* ---- snz-svg-flourish:end ---- */
 
-/* ==== Typography system (client brief, November 2026) ===============================================================
-   One scale for section headings, lead-in lines, check-icon lists, body copy, two-column blocks, call-to-action buttons
-   and section padding. The React pages use it through components/ui.tsx (SectionHeading, LeadIn, BodyText, CheckList,
-   TwoColumn, CtaButton, Section); the builder pages (/mattress-financing, /about-us, EN + ES) through the wrapper classes
-   scripts/typography.mjs adds to their elements (snz-section, snz-h2-wrap, snz-lead-wrap, snz-body-wrap, snz-list-wrap,
-   snz-cta-wrap, snz-two-col). Every value lives here and only here. Heroes, nav, footer, offer banner and location cards
-   are not tagged and keep their own styles. ===================================================================== */
-:root {
-  --snz-ink: #111111;            /* section headings: black; the key phrase keeps its orange span */
-  --snz-ink-body: #1a1a1a;       /* list items and body copy: near-black */
-  --snz-ink-navy: #0b1437;       /* lead-in lines: navy-black */
-  --snz-orange: #f58433;
-  --snz-h2-size: clamp(30px, 3.4vw, 44px);   /* 30px at 375px, 44px from 1295px; long headings wrap, never below 28px */
-  --snz-lead-size: 20px;
-  --snz-body-size: 20px;
-  --snz-li-size: 18px;
-  --snz-section-pad: 72px;
-  --snz-container: 1200px;
-}
-@media (max-width: 767px) {
-  :root { --snz-lead-size: 18px; --snz-body-size: 18px; --snz-li-size: 17px; --snz-section-pad: 48px; }
-}
-
-/* section band + container */
-.snz-section { padding: var(--snz-section-pad) 0; }
-.snz-container { box-sizing: border-box; max-width: var(--snz-container); margin: 0 auto; padding: 0 20px; }
-
-/* section heading: Poppins 800, two-tone through .snz-accent (or the builder page's own colour span) */
-.snz-h2 { margin: 0 0 16px; font-family: var(--font-poppins-stack); font-weight: 800; font-size: var(--snz-h2-size); line-height: 1.15; letter-spacing: -0.01em; max-width: 22ch; color: var(--snz-ink); text-wrap: balance; }
-.snz-h2--center { margin-left: auto; margin-right: auto; text-align: center; }
-.snz-h2--light { color: #fff; }
-.snz-accent { color: var(--snz-orange); }
-
-/* lead-in line before a list, and body copy between lists */
-.snz-lead { margin: 0 0 12px; font-family: var(--font-poppins-stack); font-weight: 400; font-size: var(--snz-lead-size); line-height: 1.4; color: var(--snz-ink-navy); }
-.snz-body { margin: 24px 0 12px; font-family: var(--font-poppins-stack); font-weight: 400; font-size: var(--snz-body-size); line-height: 1.5; color: var(--snz-ink-body); }
-.snz-body:first-child { margin-top: 0; }
-.snz-body--light, .snz-lead--light { color: #fff; }
-.snz-body a, .snz-lead a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
-
-/* check-icon list: 20px orange outline circle with an orange check (the inline SVG in components/icons.tsx and the one
-   scripts/icons.mjs bakes into the builder lists), icon top-aligned to the first line, text wrapping under itself */
-.snz-check-list { list-style: none !important; margin: 0 0 24px; padding: 0 !important; display: grid; gap: 14px; }
-.snz-check-list > li { display: flex; align-items: flex-start; gap: 12px; margin: 0; padding: 0; font-family: var(--font-poppins-stack); font-weight: 400; font-size: var(--snz-li-size); line-height: 1.5; color: var(--snz-ink-body); text-align: left; }
-.snz-check-list > li > span { flex: 1 1 auto; min-width: 0; }
-.snz-check-list > li strong, .snz-check-list > li b { font-weight: 700; font-size: inherit; color: inherit; }
-.snz-check-list .snz-li-ico, .snz-list-wrap .snz-li-ico { width: 20px !important; height: 20px !important; flex: 0 0 20px; margin-top: calc((1.5em - 20px) / 2); color: var(--snz-orange); vertical-align: 0; }
-.snz-check-list .snz-ico--check circle, .snz-list-wrap .snz-ico--check circle { fill: none; stroke: currentColor; stroke-width: 2; }
-.snz-check-list .snz-ico--check path, .snz-list-wrap .snz-ico--check path { stroke: currentColor; stroke-width: 2.4; }
-
-/* two-column block: image 45 / text 55, vertically centred; stacks image-first on phones */
-.snz-two-col:not(.c-row) { display: grid; grid-template-columns: 45fr 55fr; gap: 48px; align-items: center; }
-.snz-two-col__media img { display: block; width: 100%; height: auto; border-radius: 16px; }
-@media (max-width: 767px) { .snz-two-col:not(.c-row) { grid-template-columns: 1fr; gap: 24px; } .snz-two-col__media { order: -1; } }
-
-/* call-to-action button: two lines, orange gradient */
-.snz-cta-btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-sizing: border-box; width: 100%; max-width: 520px; margin: 32px 0 0; padding: 18px 28px; border: 0; border-radius: 10px; background: linear-gradient(135deg, #f58433 0%, #e8702a 100%); color: #fff; text-decoration: none; text-align: center; box-shadow: 0 10px 26px rgba(245, 132, 51, 0.28); transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.snz-cta-btn:hover, .snz-cta-btn:focus-visible { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(245, 132, 51, 0.34); color: #fff; }
-.snz-cta-btn:focus-visible { outline: 2px solid #001489; outline-offset: 3px; }
-.snz-cta-btn__main { font-family: var(--font-poppins-stack); font-weight: 800; font-size: 18px; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.02em; }
-.snz-cta-btn__sub { font-family: var(--font-poppins-stack); font-weight: 400; font-size: 14px; line-height: 1.3; }
-@media (max-width: 767px) { .snz-cta-btn { max-width: none; } }
-
-/* ---- the same scale on the builder pages: the wrappers scripts/typography.mjs tags. The builder page keeps its own
-   per-element rules (font sizes, paddings, breakpoint overrides) in its <style>, so these win with !important. ---- */
-.hl_page-preview--content .snz-section { padding-top: var(--snz-section-pad) !important; padding-bottom: var(--snz-section-pad) !important; --snz-list-item-gap: 14px; --snz-list-block-gap: 24px; --snz-list-lead-gap: 24px; --snz-list-icon-gap: 12px; --snz-list-line-height: 1.5; }
-.hl_page-preview--content :is(.snz-h2-wrap, .snz-lead-wrap, .snz-body-wrap) { padding-top: 0 !important; padding-bottom: 0 !important; }
-.hl_page-preview--content :is(.snz-h2-wrap, .snz-lead-wrap, .snz-body-wrap) > * { padding-top: 0 !important; padding-bottom: 0 !important; }
-.hl_page-preview--content .snz-h2-wrap { margin-bottom: 16px !important; }
-.hl_page-preview--content .snz-h2-wrap :is(h1, h2, h3, h4, p:not(.snz-area-line)) { margin: 0 !important; font-family: var(--font-poppins-stack) !important; font-weight: 800 !important; font-size: var(--snz-h2-size) !important; line-height: 1.15 !important; letter-spacing: -0.01em !important; max-width: 22ch; color: var(--snz-ink) !important; }
-.hl_page-preview--content .snz-h2-wrap.snz-h2-wrap--center :is(h1, h2, h3, h4, p:not(.snz-area-line)) { margin-left: auto !important; margin-right: auto !important; text-align: center !important; }
-.hl_page-preview--content .snz-h2-wrap.snz-h2-wrap--light :is(h1, h2, h3, h4, p:not(.snz-area-line)) { color: #fff !important; }
-.hl_page-preview--content .snz-h2-wrap :is(h1, h2, h3, h4, p:not(.snz-area-line)) :is(span:not(.snz-h2-line), strong, b, em, u) { font-family: inherit !important; font-size: inherit !important; font-weight: inherit !important; line-height: inherit !important; letter-spacing: inherit !important; }
-/* a heading the guarantee band splits into a big line and a small line (.snz-h2-line, scripts/guarantee-section.mjs) keeps that split */
-.hl_page-preview--content .snz-h2-wrap .snz-h2-line { font-family: inherit !important; line-height: 1.15 !important; letter-spacing: inherit !important; }
-.hl_page-preview--content .snz-lead-wrap { margin-bottom: 12px !important; }
-.hl_page-preview--content .snz-lead-wrap :is(p, h1, h2, h3, h4, li) { margin: 0 !important; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-lead-size) !important; line-height: 1.4 !important; color: var(--snz-ink-navy) !important; }
-.hl_page-preview--content .c-wrapper.snz-lead-wrap + .c-bullet-list.c-wrapper { margin-top: 0 !important; } /* beats the older list-block rule above (0,5,0) */
-.hl_page-preview--content .snz-body-wrap { margin-top: 24px !important; margin-bottom: 12px !important; }
-.hl_page-preview--content .snz-body-wrap :is(p, h1, h2, h3, h4, li) { margin: 0 !important; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-body-size) !important; line-height: 1.5 !important; color: var(--snz-ink-body) !important; }
-.hl_page-preview--content .c-wrapper.snz-body-wrap + .c-bullet-list.c-wrapper { margin-top: 0 !important; }
-/* two paragraphs inside one builder text element, and a list row right under its lead-in */
-.hl_page-preview--content :is(.snz-lead-wrap, .snz-body-wrap) :is(p, h1, h2, h3, h4) + :is(p, h1, h2, h3, h4) { margin-top: 12px !important; }
-.hl_page-preview--content .snz-lead-wrap + .c-row { margin-top: 0 !important; }
-.hl_page-preview--content .snz-lead-wrap + .c-row, .hl_page-preview--content .snz-lead-wrap + .c-row > .inner, .hl_page-preview--content .snz-lead-wrap + .c-row > .inner > .c-column, .hl_page-preview--content .snz-lead-wrap + .c-row > .inner > .c-column > .inner { padding-top: 0 !important; }
-.hl_page-preview--content .c-column > .inner > .snz-lead-wrap:last-child { margin-bottom: 24px !important; }
-/* the About intro's service-area line (scripts/about-areas.mjs): plain body copy under the section heading, in the heading's colour */
-.hl_page-preview--content .snz-h2-wrap p.snz-area-line { margin: 16px auto 0 !important; padding: 0 !important; max-width: 46ch; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-body-size) !important; line-height: 1.5 !important; letter-spacing: 0 !important; text-align: center !important; }
-.hl_page-preview--content .snz-h2-wrap p.snz-area-line span { font: inherit !important; }
-.hl_page-preview--content :is(.snz-lead-wrap, .snz-body-wrap).snz-text-wrap--light :is(p, h1, h2, h3, h4, li) { color: #fff !important; }
-.hl_page-preview--content :is(.snz-lead-wrap, .snz-body-wrap) :is(p, h1, h2, h3, h4, li) :is(span, em, u, a) { font-family: inherit !important; font-size: inherit !important; line-height: inherit !important; }
-.hl_page-preview--content :is(.snz-lead-wrap, .snz-body-wrap) :is(p, h1, h2, h3, h4, li) :is(strong, b) { font-weight: 700 !important; font-size: inherit !important; }
-.hl_page-preview--content .snz-list-wrap .text-output li { font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-li-size) !important; line-height: 1.5 !important; color: var(--snz-ink-body) !important; gap: 12px !important; }
-.hl_page-preview--content .snz-list-wrap .text-output li :is(span, p) { font-size: inherit !important; line-height: inherit !important; color: inherit !important; }
-.hl_page-preview--content .snz-list-wrap .text-output li :is(strong, b) { font-weight: 700 !important; font-size: inherit !important; color: inherit !important; }
-.hl_page-preview--content .snz-list-wrap.c-wrapper + .snz-list-wrap.c-wrapper { margin-top: 14px !important; }
-.hl_page-preview--content .snz-list-wrap.c-wrapper + .c-wrapper:not(.snz-list-wrap) { margin-top: 24px !important; }
-.hl_page-preview--content .c-button.snz-cta-wrap { margin-top: 32px !important; padding: 0 !important; }
-.hl_page-preview--content .c-button.snz-cta-wrap a { display: inline-flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 2px !important; box-sizing: border-box !important; width: 100% !important; max-width: 520px !important; min-width: 0 !important; margin: 0 !important; padding: 18px 28px !important; border: 0 !important; border-radius: 10px !important; background: linear-gradient(135deg, #f58433 0%, #e8702a 100%) !important; color: #fff !important; box-shadow: 0 10px 26px rgba(245, 132, 51, 0.28) !important; text-align: center !important; }
-.hl_page-preview--content .c-button.snz-cta-wrap a .main-heading-group { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; }
-.hl_page-preview--content .c-button.snz-cta-wrap a .main-heading-button { font-family: var(--font-poppins-stack) !important; font-weight: 800 !important; font-size: 18px !important; line-height: 1.2 !important; text-transform: uppercase !important; letter-spacing: 0.02em !important; color: #fff !important; }
-.hl_page-preview--content .c-button.snz-cta-wrap a :is(.sub-heading-group, .sub-heading-button) { font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: 14px !important; line-height: 1.3 !important; text-transform: none !important; letter-spacing: 0 !important; color: #fff !important; }
-.hl_page-preview--content .c-button.snz-cta-wrap a :is(.button-icon-start, .button-icon-end) { color: #fff !important; margin: 0 !important; }
-@media (max-width: 767px) { .hl_page-preview--content .c-button.snz-cta-wrap a { max-width: none !important; } }
-.hl_page-preview--content .snz-two-col > .inner { width: 100% !important; box-sizing: border-box !important; display: grid !important; grid-template-columns: var(--snz-two-col-columns, 45fr 55fr) !important; gap: 48px !important; align-items: center !important; }
-.hl_page-preview--content .snz-two-col > .inner > .c-column { width: auto !important; max-width: none !important; min-width: 0 !important; flex: none !important; margin: 0 !important; }
-.hl_page-preview--content .snz-two-col .c-image img { border-radius: 16px !important; width: 100% !important; height: auto !important; }
-.hl_page-preview--content .snz-two-col--image-right { --snz-two-col-columns: 55fr 45fr; }
-@media (max-width: 767px) {
-  .hl_page-preview--content .snz-two-col > .inner { grid-template-columns: 1fr !important; gap: 24px !important; }
-  .hl_page-preview--content .snz-two-col--image-right > .inner > .c-column:last-child { order: -1; }
-}
+/* ---- The About intro's service-area line (scripts/about-areas.mjs): plain body copy under "This Isn't Your Typical
+   Mattress Store.", in the heading's own first colour (the span carries it). The heading's builder size and face do not
+   reach it: 20px / 18px Poppins 400, centred under the heading. ---- */
+.hl_page-preview--content .text-output p.snz-area-line { margin: 16px auto 0 !important; padding: 0 !important; max-width: 46ch; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: 20px !important; line-height: 1.5 !important; letter-spacing: 0 !important; text-align: center !important; }
+.hl_page-preview--content .text-output p.snz-area-line span { font: inherit !important; }
+@media (max-width: 767px) { .hl_page-preview--content .text-output p.snz-area-line { font-size: 18px !important; } }

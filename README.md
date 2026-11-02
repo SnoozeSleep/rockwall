@@ -59,15 +59,6 @@ Where the Rockwall values live:
   (−5 … −12px), which assume the heading's exact rendered height. `scripts/svg-flourish.mjs` (`npm run svg:flourish`)
   writes overrides into `overrides/global.css` that anchor each one to the bottom edge of the heading box and tuck it up by
   a share of its own height, so the offset never depends on the text's metrics (the one stroke under a picture is left as is).
-- **Typography system** (client brief, November 2026) — one scale for section headings (Poppins 800, 30–44px, two-tone
-  through an orange span), lead-in lines, check-icon lists (20px orange outline check, SVG), body copy, two-column blocks,
-  the two-line CTA button and section padding (72px / 48px). Every value lives in the "Typography system" block of
-  [`overrides/global.css`](overrides/global.css); the React pages use [`components/ui.tsx`](components/ui.tsx)
-  (SectionHeading, LeadIn, BodyText, CheckList, TwoColumn, CtaButton, Section) and the builder pages
-  (`/mattress-financing`, `/about-us`, EN + ES) get the same classes from `scripts/typography.mjs` (`npm run typography`,
-  `--check`), which tags section headings, lead-ins, body lines, bullet lists, buttons and image + text rows outside
-  heroes and card rows. Heroes, nav, footer, offer banner and location cards are untouched; card titles inside
-  three-column rows (the financing partners, the location cards) keep the builder's sizes.
 - **Blog** — five client articles (the "Rockwall Blogs" document, published November 3, 2026) in
   [`lib/blog-posts.ts`](lib/blog-posts.ts) (English) and [`lib/blog-posts-es.ts`](lib/blog-posts-es.ts) (Spanish, different
   slugs paired by `altSlug` and `lib/blog-nav.ts`). Copy verbatim; sections as `blocks` (paragraphs, h3, check-icon /

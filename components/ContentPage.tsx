@@ -1,7 +1,6 @@
 import { Faq } from '@/components/blog/Faq';
 import { Rich, plain } from '@/components/blog/Rich';
 import { CheckItem, Icon, iconFor } from '@/components/icons';
-import { BodyText, CtaButton, LeadIn, SectionHeading } from '@/components/ui';
 import { PageSchema } from '@/components/PageSchema';
 import { SizeTypeGrid } from '@/components/SizeTypeGrid';
 import { LOCATION } from '@/lib/location';
@@ -46,7 +45,7 @@ function ListBlock({ items, style }: { items: string[]; style?: ListStyle }) {
   if (style === 'facts') {
     return (
       <div className="snz-facts">
-        <ul className="snz-check-list">{items.map((b, j) => <CheckItem key={j}><Rich text={b} /></CheckItem>)}</ul>
+        <ul className={`${styles.list} snz-check-list`}>{items.map((b, j) => <CheckItem key={j}><Rich text={b} /></CheckItem>)}</ul>
       </div>
     );
   }
@@ -86,16 +85,7 @@ function ListBlock({ items, style }: { items: string[]; style?: ListStyle }) {
       </ul>
     );
   }
-  return <ul className="snz-check-list">{items.map((b, j) => <CheckItem key={j}><Rich text={b} /></CheckItem>)}</ul>;
-}
-
-/* a section's paragraphs: the last one before a list is the lead-in line, the others body copy (components/ui.tsx) */
-function Paragraphs({ items, beforeList }: { items: string[]; beforeList: boolean }) {
-  return (
-    <>
-      {items.map((p, j) => (beforeList && j === items.length - 1 ? <LeadIn key={j}><Rich text={p} /></LeadIn> : <BodyText key={j}><Rich text={p} /></BodyText>))}
-    </>
-  );
+  return <ul className={`${styles.list} snz-check-list`}>{items.map((b, j) => <CheckItem key={j}><Rich text={b} /></CheckItem>)}</ul>;
 }
 
 export function ContentPage({ page, locale }: { page: ContentPageData; locale: Locale }) {
@@ -131,13 +121,13 @@ export function ContentPage({ page, locale }: { page: ContentPageData; locale: L
         <article className={styles.article}>
           {c.sections.map((s, i) => (
             <section key={i} className={styles.section}>
-              <SectionHeading>{s.h2}</SectionHeading>
-              <Paragraphs items={s.paragraphs || []} beforeList={!!s.bullets} />
+              <h2 className={styles.h2}>{s.h2}</h2>
+              {(s.paragraphs || []).map((p, j) => <p key={j} className={styles.p}><Rich text={p} /></p>)}
               {s.bullets ? <ListBlock items={s.bullets} style={s.listStyle} /> : null}
               {(s.h3s || []).map((sub, j) => (
                 <div key={j} className={styles.sub}>
                   <h3 className={styles.h3}>{sub.h3}</h3>
-                  <Paragraphs items={sub.paragraphs || []} beforeList={!!sub.bullets} />
+                  {(sub.paragraphs || []).map((p, k) => <p key={k} className={styles.p}><Rich text={p} /></p>)}
                   {sub.bullets ? <ListBlock items={sub.bullets} style={sub.listStyle} /> : null}
                 </div>
               ))}
@@ -154,12 +144,12 @@ export function ContentPage({ page, locale }: { page: ContentPageData; locale: L
           ) : null}
           {c.faqGroups ? c.faqGroups.map((g, i) => (
             <section key={i} className={styles.faq} aria-labelledby={`content-faq-${i}`}>
-              <SectionHeading id={`content-faq-${i}`}>{g.h2}</SectionHeading>
+              <h2 id={`content-faq-${i}`} className={styles.h2}>{g.h2}</h2>
               <Faq items={g.faqs} />
             </section>
           )) : c.faqs.length ? (
             <section className={styles.faq} aria-labelledby="content-faq-title">
-              <SectionHeading id="content-faq-title">{c.faqTitle}</SectionHeading>
+              <h2 id="content-faq-title" className={styles.h2}>{c.faqTitle}</h2>
               <Faq items={c.faqs} />
             </section>
           ) : null}
@@ -169,7 +159,7 @@ export function ContentPage({ page, locale }: { page: ContentPageData; locale: L
           <h2 id="content-cta-title" className={styles.ctaTitle}>{c.cta.title}</h2>
           <p className={styles.ctaText}>{c.cta.text}</p>
           <div className={styles.ctaBtns}>
-            <CtaButton href={localizeHref('/booking', locale)} main={c.cta.button} className={styles.ctaMain} />
+            <a className={styles.btn} href={localizeHref('/booking', locale)}>{c.cta.button}</a>
             <a className={`${styles.btn} ${styles.btnGhost}`} href={L.phoneHref}>{t.menu.call(L.phone)}</a>
           </div>
           <p className={styles.ctaAddr}>{L.street}, {L.city}, {L.region} {L.postalCode} · {(L.hours[locale] || L.hours.en).join(', ')}</p>

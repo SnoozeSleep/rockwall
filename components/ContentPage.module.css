@@ -2,8 +2,7 @@
    orange accent, light page ground. The blog's FAQ accordion renders with its own module styles. */
 .page { --navy: #001489; --orange: #f58433; --ink: #1e223c; --muted: #4b5068; --line: rgba(0, 20, 137, 0.1); --ui: var(--font-poppins-stack); background: linear-gradient(180deg, #f6f7fb 0%, #ffffff 260px); color: var(--ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; }
 .page *, .page *::before, .page *::after { box-sizing: border-box; }
-/* the article keeps its 860px reading measure inside the shared section rhythm (overrides/global.css --snz-section-pad) */
-.container { max-width: 860px; margin: 0 auto; padding: 28px 20px var(--snz-section-pad); }
+.container { max-width: 860px; margin: 0 auto; padding: 28px 20px 64px; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 18px; }
 .crumbs a { color: var(--navy); text-decoration: none; }
 .crumbs a:hover, .crumbs a:focus-visible { text-decoration: underline; }
@@ -13,11 +12,11 @@
 .lede { margin: 0 0 12px; font-size: 18px; line-height: 1.6; color: var(--ink); }
 .article { display: grid; gap: 26px; }
 .section { display: grid; gap: 10px; }
-/* section headings, lead-ins, body copy and check lists: the shared system (components/ui.tsx, overrides/global.css) */
-.section { margin-top: 14px; }
-.section :global(.snz-h2) { margin-top: 0; }
+.h2 { margin: 6px 0 2px; font-size: clamp(22px, 3vw, 28px); font-weight: 800; line-height: 1.2; color: var(--navy); text-wrap: balance; }
 .h3 { margin: 10px 0 4px; font-size: 18px; font-weight: 700; color: var(--navy); }
 .sub { display: grid; gap: 8px; }
+.p { margin: 0; font-size: 16.5px; line-height: 1.7; }
+.list { font-size: 16.5px; }
 .tableWrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
 .table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .caption { caption-side: top; text-align: left; padding: 12px 14px 6px; font-weight: 700; color: var(--navy); }
@@ -28,8 +27,7 @@
 .cta { margin-top: 36px; padding: 30px 24px; border-radius: 18px; background: var(--navy); color: #fff; text-align: center; }
 .ctaTitle { margin: 0 0 8px; font-size: clamp(22px, 3vw, 30px); font-weight: 800; line-height: 1.2; color: #fff; text-wrap: balance; }
 .ctaText { margin: 0 auto 18px; max-width: 60ch; font-size: 16px; line-height: 1.6; color: rgba(255, 255, 255, 0.92); }
-.ctaBtns { display: flex; flex-wrap: wrap; flex-direction: column; align-items: center; gap: 12px; }
-.ctaMain { margin-top: 8px; }
+.ctaBtns { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 26px; border-radius: 10px; background: linear-gradient(135deg, #d96a1a 0%, #f58433 100%); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
 .btn:hover, .btn:focus-visible { background: linear-gradient(135deg, #c85f14 0%, #d96a1a 100%); }
 .btnGhost { background: transparent; border: 2px solid rgba(255, 255, 255, 0.6); }
