@@ -93,10 +93,10 @@ const SECTIONS = [
   ['/', 'img[src*="6a8d8085d0d6a7f1adf28ec7"]', 'location-card'],
   ['/', '.snz-reviews', 'reviews-section'],
   ['/', 'img[src*="6a8df824f9b062f8147fb083"]', 'home-team'],
-  ['/about-us', '#snz-team-title', 'about-team'],
-  ['/about-us', 'iframe[src*="widget/form/"]', 'about-form'],
   ['/contact-us', 'iframe[src*="widget/form/"]', 'contact-form'],
   ['/booking', 'iframe[src*="widget/booking/"], [class*="pending"]', 'booking-calendar'],
+  ['/about-us', '[aria-labelledby="blog-cta-title"]', 'about-bottom'],
+  ['/es/about-us', '[aria-labelledby="blog-cta-title"]', 'about-bottom-es'],
   ['/', 'footer', 'footer'],
 ];
 for (const [route, selector, name] of SECTIONS) {

@@ -2,10 +2,9 @@
 import type { Metadata } from 'next';
 import PageClient from './client';
 import { ReviewWidgetScript } from '@/components/GhlScripts';
+import { ShowroomCtaBand } from '@/components/blog/BlogLayout';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
-import { AboutTeam } from '@/components/AboutTeam';
-import { ContactFormEmbed } from '@/components/ContactFormEmbed';
 
 export const metadata: Metadata = {
   "title": "Nosotros: Tienda Local en Rockwall, TX | Snooze Mattress",
@@ -50,10 +49,8 @@ export default function Page() {
       <PageClient />
       {/* review-widget.js once per page, after the widget iframes (components/GhlScripts.tsx) */}
       <ReviewWidgetScript />
-      {/* the Rockwall team photo and the serving line (components/AboutTeam.tsx) */}
-      <AboutTeam locale="es" />
-      {/* the opt-in form under its own heading (components/ContactFormEmbed.tsx) */}
-      <ContactFormEmbed locale="es" />
+      {/* the showroom band closes the page: Get Dream Mapped → /booking (components/blog/BlogLayout.tsx) */}
+      <ShowroomCtaBand locale="es" />
     </>
   );
 }
