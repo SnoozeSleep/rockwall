@@ -46,7 +46,7 @@ const LEFTOVERS = [
   { group: 'location', name: 'Rio Grande Valley / South Texas copy', re: /Rio Grande|Río Grande|the Valley|del Valle|South Texas|sur de Texas|Winter Texan|quincea|Edinburg|Pharr|Harlingen|Monterrey|North 10th|Mission or Pharr|Edinburg, Mission/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'McAllen reviewers / staff', re: /Xandria|Karina R\.|\bPablo\b|\bElias\b/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'location', name: 'drive-time copy', re: /minute drive|minutos en auto/g, ok: (ctx, file) => TOOLING.test(file) },
-  { group: 'content', name: 'claims switched off (10° cooler, 85%) / "Snooze Coaches"', re: /Snooze Coaches|around 85%|85% of mattresses|85% de los colchones|85% de nuestros|10° cooler|10 degrees Cooler|10° más fresco|Of Options Eliminated|De Opciones Eliminadas/g, ok: (ctx, file) => TOOLING.test(file) || /^scripts\//.test(file) },
+  { group: 'content', name: 'claims switched off (10° cooler, 85%) / "Snooze Coaches"', re: /Snooze Coaches|around 85%|85% of mattresses|85% de los colchones|85% de nuestros|10° cooler|10 degrees Cooler|10 grados|10° más fresco|Of Options Eliminated|De Opciones Eliminadas|Sleep up to (?:<|\\\\?u003C)|Duerme hasta (?:<|\\\\?u003C)/g, ok: (ctx, file) => TOOLING.test(file) || /^scripts\//.test(file) },
   { group: 'location', name: 'McAllen storefront / hero composites', re: /684480ff2c95c570cfc22e24|699c969010bc9c1e4d659063|69a601e75a52f4e92a27dcf5|69a1cbdf917b4b217201b5ff/g, ok: (ctx, file) => TOOLING.test(file) || /overrides\/overrides\.json$|conversion-report|asset-map|ghl-offline-shim\.js|lib\/ghl-shim\.ts/.test(file) },
   // ---- Brownsville (the clone the McAllen site was generated from)
   { group: 'location', name: 'Brownsville', re: /brownsville/gi, ok: (ctx, file) => /^scripts\/|^README|^overrides\/i18n\//.test(file) },
@@ -59,7 +59,6 @@ const LEFTOVERS = [
   { group: 'integrations', name: 'McAllen chat widgets', re: /6ada7129c5fa6117307c554f|6ada73894325b023027e7371/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'integrations', name: 'McAllen quiz webhook', re: /00b3cdec-7a6f-4184-95ec-81210f1e7bc8/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'integrations', name: 'McAllen GA4 / Simpli.fi', re: /G-9R1JGVBRBR|G-TS1RXQVPYT|b781856a/g, ok: (ctx, file) => TOOLING.test(file) },
-  { group: 'integrations', name: 'GTM-TVPN94M (McAllen container; keep only if the agency confirms it is shared)', re: /GTM-TVPN94M/g, ok: (ctx, file) => TOOLING.test(file) },
   { group: 'integrations', name: 'McAllen form / calendar / reviews widget ids', re: /0BTnYKylVR6OcWJug3r8|lrAns7Z8j3vEJW3DC0Yr|67f5847f79c4ab793baf0087/g, ok: (ctx, file) => TOOLING.test(file) || /overrides\/overrides\.json$/.test(file) },
   { group: 'integrations', name: 'tel: not E.164', re: /(?<![a-z-])tel:(?!\+14697691300)[^"'\\\s<>]+/g, ok: (ctx, file) => /^scripts\/|^README|^public\//.test(file) || /tel:\/mailto:|tel:\$\{/.test(ctx) }, // public/: the quiz and events scripts build or test tel: links in code
 ];

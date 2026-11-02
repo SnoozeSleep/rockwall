@@ -241,9 +241,11 @@ export const RULES_MCALLEN_TO_ROCKWALL = [
   //      ticker's "McAllen's Top Rated Mattress Store" keeps its wording with the new city (the brief asks for it).
   lit('Snooze Coaches', 'Sleep Coaches'),
   lit('Sleep up to 10 degrees Cooler', 'Sleep Cooler'),
-  [/Sleep up to (?=(?:<|\\u003C)\/span)/g, 'Sleep '],
+  lit('Duerme hasta 10 grados más Fresco', 'Duerme más Fresco'),
+  // the hero line's lead-in sits before a </span> that is plain in the page markup and \\u003C/span in the payload string
+  [/Sleep up to (?=(?:<|\\\\u003C)\/span)/g, 'Sleep '],
   lit('10° cooler for deeper,', 'cooler for deeper,'),
-  [/Duerme hasta (?=(?:<|\\u003C)\/span)/g, 'Duerme '],
+  [/Duerme hasta (?=(?:<|\\\\u003C)\/span)/g, 'Duerme '],
   lit('10° más fresco para un descanso', 'más fresco para un descanso'),
   lit('Of Options Eliminated', 'Dream Mapping Fitting'),
   lit('De Opciones Eliminadas', 'Ajuste Dream Mapping'),
