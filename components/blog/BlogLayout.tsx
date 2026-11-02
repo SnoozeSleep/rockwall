@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { SITE } from '@/components/site-config';
-import type { BlogPost } from '@/lib/blog-posts';
+import { readTimeOf, type BlogBlock, type BlogPost, type BlogSection, type BlogTable } from '@/lib/blog-posts';
 import { localizeHref, ui, type Locale } from '@/lib/i18n';
 import { Faq } from './Faq';
 import { Rich } from './Rich';
-import { ArrowRightIcon } from '@/components/icons';
+import { ArrowRightIcon, CheckItem } from '@/components/icons';
 import styles from './blog.module.css';
 
 /* Orange brush-stroke divider used under the site's own headings (same SVG as the GHL pages). */
@@ -30,7 +30,7 @@ export function BlogShell({ children }: { children: ReactNode }) {
   );
 }
 
-function Meta({ post, byline }: { post: BlogPost; byline: string }) {
+function Meta({ post, byline, locale = 'en' }: { post: BlogPost; byline: string; locale?: Locale }) {
   return (
     <div className={styles.meta}>
       <span className={styles.byline}>{byline}</span>
@@ -42,9 +42,42 @@ function Meta({ post, byline }: { post: BlogPost; byline: string }) {
       <span aria-hidden="true" className={styles.metaDot}>•</span>
       <span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-        {post.readTime}
+        {readTimeOf(post, locale)}
       </span>
     </div>
+  );
+}
+
+function DataTable({ table }: { table: BlogTable }) {
+  return (
+    <>
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          {table.caption && <caption>{table.caption}</caption>}
+          <thead><tr>{table.head.map((h, k) => <th key={k} scope="col">{h}</th>)}</tr></thead>
+          <tbody>{table.rows.map((r, k) => <tr key={k}>{r.map((cell, m) => (m === 0 ? <th key={m} scope="row">{cell}</th> : <td key={m}>{cell}</td>))}</tr>)}</tbody>
+        </table>
+      </div>
+      {table.note && <p className={styles.tableNote}>{table.note}</p>}
+    </>
+  );
+}
+
+/* A section's content in the order written: `blocks` (paragraphs, h3 sub-headings, check-icon or numbered lists,
+   tables) when the post uses them, otherwise the paragraphs followed by the table. Check lists reuse the site's
+   inline SVG check (components/icons CheckItem, styled by .snz-check-list in overrides/global.css): no emoji, no icon font. */
+function SectionBody({ s }: { s: BlogSection }) {
+  const blocks: BlogBlock[] = s.blocks || [...s.paragraphs.map((p) => ({ p })), ...(s.table ? [{ table: s.table }] : [])];
+  return (
+    <>
+      {blocks.map((b, j) => {
+        if ('p' in b) return <p key={j} className={styles.p}><Rich text={b.p} /></p>;
+        if ('h3' in b) return <h3 key={j} className={styles.h3}>{b.h3}</h3>;
+        if ('table' in b) return <DataTable key={j} table={b.table} />;
+        if (b.list.style === 'number') return <ol key={j} className={styles.olist}>{b.list.items.map((it, k) => <li key={k}><Rich text={it} /></li>)}</ol>;
+        return <ul key={j} className={`${styles.list} snz-check-list`}>{b.list.items.map((it, k) => <CheckItem key={k}><Rich text={it} /></CheckItem>)}</ul>;
+      })}
+    </>
   );
 }
 
@@ -58,7 +91,7 @@ export function PostCard({ post, headingLevel = 'h3', locale = 'en' }: { post: B
         <Image src={post.featured.src} alt={post.featured.alt} width={post.featured.width} height={post.featured.height} sizes="(max-width: 720px) 100vw, 33vw" />
       </a>
       <div className={styles.cardBody}>
-        <Meta post={post} byline={t.byline} />
+        <Meta post={post} byline={t.byline} locale={locale} />
         <H className={styles.cardTitle}>
           <a href={href}>{post.title}</a>
         </H>
@@ -112,7 +145,7 @@ export function BlogArticle({ post, related, locale = 'en' }: { post: BlogPost; 
           </nav>
           <p className={styles.eyebrow}>{t.eyebrow}</p>
           <h1 className={styles.title}>{post.title}</h1>
-          <Meta post={post} byline={t.byline} />
+          <Meta post={post} byline={t.byline} locale={locale} />
           <Divider />
         </div>
       </header>
@@ -125,23 +158,7 @@ export function BlogArticle({ post, related, locale = 'en' }: { post: BlogPost; 
         {post.sections.map((s, i) => (
           <section key={i} className={styles.section}>
             {s.heading && <h2 className={styles.h2}>{s.heading}</h2>}
-            {s.paragraphs.map((p, j) => (
-              <p key={j} className={styles.p}>
-                <Rich text={p} />
-              </p>
-            ))}
-            {s.table && (
-              <>
-                <div className={styles.tableWrap}>
-                  <table className={styles.table}>
-                    {s.table.caption && <caption>{s.table.caption}</caption>}
-                    <thead><tr>{s.table.head.map((h, k) => <th key={k} scope="col">{h}</th>)}</tr></thead>
-                    <tbody>{s.table.rows.map((r, k) => <tr key={k}>{r.map((cell, m) => (m === 0 ? <th key={m} scope="row">{cell}</th> : <td key={m}>{cell}</td>))}</tr>)}</tbody>
-                  </table>
-                </div>
-                {s.table.note && <p className={styles.tableNote}>{s.table.note}</p>}
-              </>
-            )}
+            <SectionBody s={s} />
             {s.image && (
               <figure className={styles.figure}>
                 <Image src={s.image.src} alt={s.image.alt} width={s.image.width} height={s.image.height} sizes="(max-width: 820px) 100vw, 780px" loading="lazy" />
@@ -151,10 +168,15 @@ export function BlogArticle({ post, related, locale = 'en' }: { post: BlogPost; 
           </section>
         ))}
 
-        <section className={styles.faq} aria-labelledby="faq-title">
-          <h2 id="faq-title" className={styles.h2}>{t.faq}</h2>
-          <Faq items={post.faqs} />
-        </section>
+        {/* the client's closing line ("Stop Guessing. Start Sleeping."): a styled paragraph, not a heading */}
+        {post.tagline && <p className={styles.tagline}>{post.tagline}</p>}
+
+        {post.faqs.length ? (
+          <section className={styles.faq} aria-labelledby="faq-title">
+            <h2 id="faq-title" className={styles.h2}>{t.faq}</h2>
+            <Faq items={post.faqs} />
+          </section>
+        ) : null}
 
         {post.visit && (
           <section className={styles.visit} aria-labelledby="visit-title">

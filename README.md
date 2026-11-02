@@ -54,6 +54,12 @@ Where the Rockwall values live:
   (−5 … −12px), which assume the heading's exact rendered height. `scripts/svg-flourish.mjs` (`npm run svg:flourish`)
   writes overrides into `overrides/global.css` that anchor each one to the bottom edge of the heading box and tuck it up by
   a share of its own height, so the offset never depends on the text's metrics (the one stroke under a picture is left as is).
+- **Blog** — five client articles (the "Rockwall Blogs" document, published November 3, 2026) in
+  [`lib/blog-posts.ts`](lib/blog-posts.ts) (English) and [`lib/blog-posts-es.ts`](lib/blog-posts-es.ts) (Spanish, different
+  slugs paired by `altSlug` and `lib/blog-nav.ts`). Copy verbatim; sections as `blocks` (paragraphs, h3, check-icon /
+  numbered lists, a table), the closing line as `tagline`, no FAQ blocks. Featured images are the site's own photos
+  (`lib/blog-images.ts`). JSON-LD per post: BlogPosting (author "Snooze Mattress Company", publisher the store) +
+  BreadcrumbList; FAQPage only when a post has FAQs. The post routes are `app/(en)/blog/[slug]` and `app/es/blog/[slug]`.
 
 Checks (run after `npm run build`): `node scripts/audit-location.mjs` (old-location leftovers, NAP per route, SEO invariants;
 must print CLEAN), `node scripts/validate-schema.mjs`, `node scripts/embed-check.mjs` (every tag and helper script once per page,

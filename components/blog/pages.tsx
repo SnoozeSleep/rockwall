@@ -5,7 +5,7 @@ import { BlogArticle, BlogCta, BlogShell, Divider, PostCard } from '@/components
 import { plain } from '@/components/blog/Rich';
 import { SITE } from '@/components/site-config';
 import styles from '@/components/blog/blog.module.css';
-import { altBlogPath, getPost, postsFor, relatedPosts, type BlogPost } from '@/lib/blog-posts';
+import { altBlogPath, byNewest, getPost, postsFor, relatedPosts, wordCountOf, type BlogPost } from '@/lib/blog-posts';
 import { localizeHref, ui, type Locale } from '@/lib/i18n';
 import { SITE_URL } from '@/lib/site-url';
 const FAVICON = '/assets/filesafe/qR8peonBlnjGI3ZuLHQP/media/695b9e7d17768458ae206a19.png';
@@ -23,6 +23,9 @@ const postAlternates = (post: BlogPost, locale: Locale) => {
   const en = locale === 'en' ? own : other; const es = localizeHref(locale === 'es' ? own : other, 'es');
   return { canonical: localizeHref(own, locale), languages: { 'en-US': en, 'es-US': es, 'x-default': en } };
 };
+
+/* BlogPosting author: the company (client brief, November 2026); the publisher is the store (t.org) with the site logo */
+const AUTHOR = { '@type': 'Organization', name: 'Snooze Mattress Company', url: 'https://snoozemattresscompany.com' } as const;
 
 /* the site's Open Graph image, used while the blog has no post to take the newest featured image from */
 const OG_IMAGE = '/assets/filesafe/BljrSmLCnm4gF9LpsTRZ/media/6a90ca4e747464c6b3a3be10.png.webp';
@@ -43,7 +46,7 @@ export function blogIndexMetadata(locale: Locale): Metadata {
 
 export function BlogIndexPage({ locale }: { locale: Locale }) {
   const t = ui(locale).blog;
-  const posts = [...postsFor(locale)].sort((a, b) => (a.datePublished < b.datePublished ? 1 : -1));
+  const posts = [...postsFor(locale)].sort(byNewest); // newest first; same-day posts keep the document's order
   /* BreadcrumbList Home › Sleep Blog, like every other indexable page (Rockwall clone brief, October 31, 2026: sitewide) */
   const breadcrumb = {
     '@context': 'https://schema.org',
@@ -102,7 +105,7 @@ export function postMetadata(slug: string, locale: Locale): Metadata {
       siteName: 'Snooze Mattress + Wellness',
       publishedTime: post.datePublished,
       modifiedTime: post.dateModified || post.datePublished,
-      authors: [t.org],
+      authors: [AUTHOR.name],
       images: [{ url: post.featured.src, width: post.featured.width, height: post.featured.height, alt: post.featured.alt }],
     },
     twitter: { card: 'summary_large_image', title: post.metaTitle, description: post.metaDescription, images: [post.featured.src] },
@@ -117,8 +120,17 @@ export function PostPage({ slug, locale }: { slug: string; locale: Locale }) {
   const related = relatedPosts(post.slug, locale);
   const url = `${SITE_URL}${localizeHref(`/blog/${post.slug}`, locale)}`;
   const home = `${SITE_URL}${localizeHref('/', locale)}`;
-  const wordCount = post.sections.flatMap((s) => s.paragraphs).map(plain).join(' ').split(/\s+/).length;
+  const wordCount = wordCountOf(post);
 
+  /* FAQPage only when the post has FAQ sections (the November 2026 posts have none: no FAQ block is invented) */
+  const faqPage = post.faqs.length
+    ? [{
+        '@type': 'FAQPage',
+        '@id': `${url}#faq`,
+        inLanguage: LANG[locale],
+        mainEntity: post.faqs.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: plain(f.answer) } })),
+      }]
+    : [];
   const graph = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -132,19 +144,14 @@ export function PostPage({ slug, locale }: { slug: string; locale: Locale }) {
         image: { '@type': 'ImageObject', url: `${SITE_URL}${post.featured.src}`, width: post.featured.width, height: post.featured.height },
         datePublished: post.datePublished,
         dateModified: post.dateModified || post.datePublished,
-        author: { '@type': 'Organization', name: t.org, url: SITE_URL },
+        author: AUTHOR,
         publisher: { '@type': 'Organization', name: t.org, url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}${SITE.logo}` } },
         keywords: post.keywords.join(', '),
         wordCount,
         articleSection: t.section,
         inLanguage: LANG[locale],
       },
-      {
-        '@type': 'FAQPage',
-        '@id': `${url}#faq`,
-        inLanguage: LANG[locale],
-        mainEntity: post.faqs.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: plain(f.answer) } })),
-      },
+      ...faqPage,
       {
         '@type': 'BreadcrumbList',
         '@id': `${url}#breadcrumb`,

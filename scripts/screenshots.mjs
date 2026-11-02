@@ -51,7 +51,7 @@ async function shot(page, name, opts = {}) {
   written.push(path.relative(ROOT, file).replace(/\\/g, '/'));
 }
 
-const PAGES = [['home', '/'], ['about', '/about-us'], ['financing', '/mattress-financing'], ['booking', '/booking'], ['contact-us', '/contact-us']];
+const PAGES = [['home', '/'], ['about', '/about-us'], ['financing', '/mattress-financing'], ['booking', '/booking'], ['contact-us', '/contact-us'], ['blog', '/blog'], ['post-dream-mapping', '/blog/what-is-dream-mapping-rockwall']];
 for (const [name, route] of PAGES) {
   for (const [kind, vp] of [['desktop', DESKTOP], ['mobile', PHONE]]) {
     const page = await open(route, vp);
