@@ -1,26 +1,40 @@
 # Rockwall Snooze — Next.js site
 
-**This repository is the Snooze Mattress + Wellness site for Rockwall, TX** (919 E Interstate 30, Suite 101 · (469) 769-1300 ·
-Mon–Sat 10 AM–7 PM, Sun 10 AM–6 PM), cloned on October 31, 2026 from the McAllen site's `main` branch (commit `2749672`, its
-latest production commit) and relocated with [`scripts/relocate.mjs`](scripts/relocate.mjs) (stage 2, McAllen → Rockwall).
-The location values live in [`lib/location.ts`](lib/location.ts) and in `ROCKWALL` inside `scripts/relocate.mjs`: change both together.
+**This repository is the Snooze Mattress + Wellness site for Rockwall, TX** — 919 E Interstate 30, Suite 101, Rockwall, TX 75032 ·
+(469) 769-1300 · Mon–Sat 10 AM–7 PM, Sun 10 AM–6 PM · jadams@snoozemattresscompany.com — serving Rockwall, Heath, Rowlett,
+Royse City, Fate and Forney. It was cloned on October 31, 2026 from the McAllen site's `main` branch (commit `2749672`) and
+rebranded with [`scripts/relocate.mjs`](scripts/relocate.mjs) (stage 2, McAllen → Rockwall); the generated pages under `app/`
+are reproducible from that import: restore every `content.ts` from commit `7465706`, then run `relocate`, `recent-reviews`,
+`reviews-cta`, `integrations`, `page-schema`, `seo-metadata` and `lastmod` (in that order).
 
-What changed for Rockwall (one commit per section of the client's brief):
+Where the Rockwall values live:
 
-- **Localised.** Every McAllen value (city, address, phone, e-mail, social links, hours, domain, map links) rewritten in the
-  generated pages, the hand-written components and the scripts that write page copy; the Rio Grande Valley / South Texas
-  copy rewritten for Rockwall (qualitative only: hot summers). Removed as McAllen-only: the Edinburg / Mission / Pharr
-  service-area pages and the home page's "Shopping from…" band, the McAllen reviews and the "Google Verified Reviews"
-  badge (the reviews section carries a "Leave us a Google review" call to action instead — `scripts/reviews-cta.mjs`, the
-  button hidden until the Place ID is supplied), the staff names, the McAllen blog posts (`/blog` shows "New articles
-  coming soon"; the header's Blog item is a plain link until articles exist) and the drive-time copy. The McAllen
-  storefront photo, and the home / About Us / Financing hero composites that include it together with a "22+ reviews"
-  badge, are replaced by the site's own brand imagery until Rockwall photos arrive.
-- **Placeholders still needed from the client** are marked `NEEDS CLIENT INPUT` in `lib/location.ts` and
-  `scripts/relocate.mjs` and listed in the build report.
+- **Store data** — [`lib/location.ts`](lib/location.ts) and `ROCKWALL` in `scripts/relocate.mjs` (change both together): NAP,
+  hours, e-mail, Facebook / Instagram, map links, area served, the storefront photo. `[ROCKWALL_PLACE_ID]` (GBP URL →
+  hasMap, sameAs, the review card's "Read more reviews"), the geo coordinates and TikTok are still **NEEDS CLIENT INPUT**.
+- **Third-party ids** — [`lib/integrations.json`](lib/integrations.json): GTM `GTM-TVPN94M` (shared container), GA4
+  `G-87QBE3D9Z9` (once), Simpli.fi, the reviews widget, the "Optin" form `1LdL8SpYNbiPVKijjrvr`, the booking calendar
+  `DVpZQx1bX7VqidkrE6YN`. `[ROCKWALL_CHAT_EN]` / `[ROCKWALL_CHAT_ES]` and `[ROCKWALL_QUIZ_WEBHOOK]` are empty = off (**NEEDS
+  CLIENT INPUT**). After editing: `node scripts/integrations.mjs` (form), `node scripts/reviews-cta.mjs` (widget), build.
+- **Photos** — the store's GoHighLevel media library (`qR8peonBlnjGI3ZuLHQP`), served locally with WebP twins and responsive
+  variants by [`scripts/rockwall-photos.mjs`](scripts/rockwall-photos.mjs): storefront `6a8d8085…` (location cards,
+  LocalBusiness image, About page frame), team `6a8df824…` (home About section, "Meet Your Sleep Coaches" on /about-us).
+  `[ROCKWALL_HERO_HOME]` / `[ROCKWALL_HERO_ABOUT]` / `[ROCKWALL_HERO_FINANCING]`: those pages use the neutral gradient hero
+  until supplied (**NEEDS CLIENT INPUT**).
+- **Reviews** — [`lib/reviews.json`](lib/reviews.json) (one Facebook review, verbatim) → the Recent Reviews card above the
+  widget (`scripts/recent-reviews.mjs`).
+- **Domain** — `rockwall.snoozemattresscompany.com` is assumed in `scripts/relocate.mjs` (canonicals, hreflang, sitemap,
+  robots, the `*.vercel.app` redirect in `vercel.json`); confirm it in the Vercel project's domain settings.
 
-Everything below this line is the McAllen build's documentation, kept as the history of the code this site was cloned
-from; read "McAllen" there as the previous location.
+Checks (run after `npm run build`): `node scripts/audit-location.mjs` (old-location leftovers, NAP per route, SEO invariants;
+must print CLEAN), `node scripts/validate-schema.mjs`, `node scripts/embed-check.mjs` (every tag and helper script once per page,
+GA4 hit, embeds visible — headless Edge/Chrome), `node scripts/serve-out.mjs 4178` + `node scripts/check-es.mjs http://127.0.0.1:4178`
+(Spanish mirror), `node scripts/screenshots.mjs --full`, `node scripts/lighthouse.mjs`.
+
+Not carried over from McAllen: its blog posts (`/blog` shows the empty state; the old slugs redirect to `/blog`), its
+Edinburg / Mission / Pharr pages, its reviews, staff names and photos, its tracking and CRM ids, and the "10° cooler" / "85%"
+claims (off until their terms are confirmed). Everything below this line is the McAllen build's documentation, kept as the
+history of the code this site was cloned from; read "McAllen" there as the previous location.
 
 ---
 

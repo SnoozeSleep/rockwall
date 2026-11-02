@@ -86,6 +86,34 @@ for (const [name, route] of PAGES) {
   await page.close();
 }
 
+/* sections the brief asks to see: the reviews section (card + widget), the About page's team photo and form, the contact
+   form, the booking calendar and the footer — the visible copy of each, scrolled into view, desktop and phone */
+const SECTIONS = [
+  ['/', '.snz-reviews', 'reviews-section'],
+  ['/', 'img[src*="6a8df824f9b062f8147fb083"]', 'home-team'],
+  ['/about-us', '#snz-team-title', 'about-team'],
+  ['/about-us', 'iframe[src*="widget/form/"]', 'about-form'],
+  ['/contact-us', 'iframe[src*="widget/form/"]', 'contact-form'],
+  ['/booking', 'iframe[src*="widget/booking/"], [class*="pending"]', 'booking-calendar'],
+  ['/', 'footer', 'footer'],
+];
+for (const [route, selector, name] of SECTIONS) {
+  for (const [kind, vp] of [['desktop', DESKTOP], ['mobile', PHONE]]) {
+    const page = await open(route, vp);
+    await sleep(2500); // embeds size themselves and the page's own scripts settle (they reset the scroll position while running)
+    const found = await page.evaluate((sel) => {
+      const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
+      const el = [...document.querySelectorAll(sel)].find(vis) || [...document.querySelectorAll(sel)].find((e) => e.closest('.bg-col, .c-column') && vis(e.closest('.c-column'))); if (!el) return false;
+      const box = el.closest('.c-section, section, footer') || el; const y = box.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'instant' }); return true;
+    }, selector);
+    if (!found) console.log(`  (${name} @${kind}: nothing visible for ${selector})`);
+    await sleep(900);
+    await shot(page, `${name}-${kind}`);
+    await page.close();
+  }
+}
+
 await browser.close();
 server.close();
 console.log(`${written.length} screenshots:`); for (const w of written) console.log('  ' + w);
