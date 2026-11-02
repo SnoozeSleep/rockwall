@@ -18,7 +18,10 @@ const EXTRA = { '/contact-us': ['components/ContactDetails.tsx'], '/dream-mappin
 
 const pageFiles = (dir) => fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^(page\.tsx|content\.ts|client\.tsx|scripts\.ts)$/.test(f)).map((f) => path.join(dir, f)) : [];
 const gitDate = (paths) => { try { const d = execSync(`git log -1 --format=%cI -- ${paths.map((p) => `"${p}"`).join(' ')}`, { cwd: ROOT, encoding: 'utf8' }).trim(); return d ? d.slice(0, 10) : null; } catch { return null; } };
-const mtime = (paths) => { let m = 0; for (const p of paths) { try { const st = fs.statSync(path.join(ROOT, p)); m = Math.max(m, st.mtimeMs); } catch {} } return m ? new Date(m).toISOString().slice(0, 10) : null; };
+/* a local calendar date (YYYY-MM-DD), the same calendar git log %cI reports, so a page edited after midnight UTC but before
+   local midnight does not get an earlier date than its last commit */
+const localDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const mtime = (paths) => { let m = 0; for (const p of paths) { try { const st = fs.statSync(path.join(ROOT, p)); m = Math.max(m, st.mtimeMs); } catch {} } return m ? localDate(new Date(m)) : null; };
 const dirty = (paths) => { try { return execSync(`git status --porcelain -- ${paths.map((p) => `"${p}"`).join(' ')}`, { cwd: ROOT, encoding: 'utf8' }).trim().length > 0; } catch { return false; } };
 
 const out = {};
@@ -29,7 +32,7 @@ for (const route of ROUTES) {
     const files = [...pageFiles(path.join(ROOT, dir)).map((f) => path.relative(ROOT, f)), ...(EXTRA[route] || [])];
     if (route === '/blog') files.push(path.join(dir)); // the route folder itself (page.tsx + [slug])
     const url = locale === 'en' ? route : route === '/' ? '/es' : `/es${route}`;
-    const date = (dirty(files) ? mtime(files) : null) || gitDate(files) || mtime(files) || new Date().toISOString().slice(0, 10);
+    const date = (dirty(files) ? mtime(files) : null) || gitDate(files) || mtime(files) || localDate(new Date());
     out[url] = date;
   }
 }

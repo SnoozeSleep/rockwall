@@ -5,7 +5,6 @@ import { FormEmbedScript } from '@/components/GhlScripts';
 import { ReviewWidgetScript } from '@/components/GhlScripts';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
-import { AccessoryGuide } from '@/components/AccessoryGuide';
 
 export const metadata: Metadata = {
   "title": "Protectores de Colchón en Rockwall, TX | Snooze Mattress",
@@ -52,8 +51,6 @@ export default function Page() {
       <FormEmbedScript />
       {/* review-widget.js once per page, after the widget iframes (components/GhlScripts.tsx) */}
       <ReviewWidgetScript />
-      {/* buying guide built from the page's own claims (SEO audit build pass, D4) */}
-      <AccessoryGuide page="mattress-protectors" locale="es" />
     </>
   );
 }

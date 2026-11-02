@@ -21,7 +21,9 @@ Where the Rockwall values live:
   LocalBusiness image, About page frame), team `6a8df824…` (home About section; `TEAM_PHOTO_URL` stays in `lib/location.ts`, unused on /about-us since the "Meet Your
   Sleep Coaches" section was removed in November 2026). /about-us (EN + ES) ends with the shared showroom band (Get Dream Mapped →
   /booking, `ShowroomCtaBand`); its service-area sentence sits under the intro heading (`scripts/about-areas.mjs`), and the
-  opt-in form lives on /contact-us only.
+  opt-in form lives on /contact-us only. The accessory buying guides that followed the FAQ + Sleep Quiz card on /pillows,
+  /mattress-protectors and /premium-sheets (EN + ES; `components/AccessoryGuide.tsx`, injected by `scripts/convert.mjs`)
+  were removed at the source in November 2026: those pages end with the FAQ and the quiz card.
   Hero art (supplied November 2026): the home, About Us and Financing heroes show the Rockwall composites
   (`6a8d7ddc…`, `6a8c9656…`, `6a8d7b7e…`) from 768px up, written by `scripts/hero-images.mjs` as one marked `<style>` per
   page (`@media (min-width:768px)` background-image override for the desktop and the mobile section copies, builder
