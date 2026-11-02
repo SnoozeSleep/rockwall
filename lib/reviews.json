@@ -1,4 +1,12 @@
 {
-  "_comment": "Customer reviews supplied by the client, verbatim — customer text is never edited or translated. Rendered above the reviews block by scripts/recent-reviews.mjs (npm run reviews). Rockwall (October 31, 2026): the Rockwall reviews were not carried over; EMPTY on purpose until the Rockwall store supplies its own (NEEDS CLIENT INPUT). With no reviews nothing is rendered.",
-  "reviews": []
+  "_comment": "Customer reviews supplied by the client, VERBATIM — customer text is never edited or translated (the Spanish pages carry the same text with Spanish labels). Rendered as the Recent Reviews card above the reviews widget by scripts/recent-reviews.mjs (npm run reviews). Rockwall (client brief, November 2026): one Facebook review; first name + last initial, month/year; `source` is facebook or google. Not included on purpose: the 'Anonymous' entry (a duplicate of the same text) and the John R. Evans entry (not a review).",
+  "reviews": [
+    {
+      "name": "Doris R.",
+      "date": "2026-07",
+      "stars": 5,
+      "source": "facebook",
+      "text": "We had a fantastic experience at Snooze Mattress in Rockwall! From the moment we walked in, John and Jacob made us feel welcome without any pressure to buy. What impressed us most was how knowledgeable they were about every product they carried. They took the time to answer every question we had and explained the differences between the mattresses in a way that actually made sense. One of the most valuable parts of our visit was the pressure mapping technology. They created personalized sleep profiles for both my husband and me, showing where our pressure points were and explaining which mattresses would best support our individual needs. They also reviewed the results with us, discussed customer reviews, and helped us narrow down the best options. We ended up purchasing a mattress and two pillows, and we left feeling confident that we made the right decision. Outstanding customer service, knowledgeable staff, and a truly personalized shopping experience. If you're looking for a new mattress, I highly recommend visiting Snooze Mattress in Rockwall and asking for John or Jacob. You won't be disappointed!"
+    }
+  ]
 }

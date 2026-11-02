@@ -133,7 +133,9 @@ if (!SOURCE_ONLY) {
       route: r, address: count(s, NEW.street), cityZip: count(s, NEW.cityZip), phone: count(s, NEW.phone), tel: count(s, NEW.tel), fb: count(s, NEW.fb), ig: count(s, `href="${NEW.ig}"`),
       hours: (es ? NEW.hoursEs : NEW.hoursEn).every((h) => s.includes(h)), maps: count(s, NEW.mapsQ), jsonld: ldOk, breadcrumb: types.has('BreadcrumbList'),
       canonical: (s.match(/rel="canonical" href="([^"]+)"/) || [])[1] || '', title, titleLen: title.length, descLen: desc.length, h1, noAlt, hreflang,
-      aboutBlank: /src="about:blank"/.test(s), optin: /href="[^"]*\/optin-page/.test(s), reviewsCta: count(s, 'snz-review-cta__btn'),
+      aboutBlank: /src="about:blank"/.test(s), optin: /href="[^"]*\/optin-page/.test(s), reviewsCta: count(s, 'snz-review-cta__btn') + count(s, 'lc_reviews_widget'),
+      // parse-time script tags only: the hydration payload and the React flight data quote the same URLs inside JSON strings (\"…\")
+      formEmbedScripts: (s.match(/<script[^>]+src="https:\/\/link\.snoozesleep\.com\/js\/form_embed\.js"/g) || []).length, reviewScripts: (s.match(/<script[^>]+src="https:\/\/reputationhub\.site\/reputation\/assets\/review-widget\.js"/g) || []).length, gtmLoaders: count(s, 'googletagmanager.com/gtm.js'), ga4Loaders: (s.match(/<script[^>]+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=/g) || []).length,
     };
     rows.push(row);
     const why = [];
@@ -148,6 +150,7 @@ if (!SOURCE_ONLY) {
     if (!row.breadcrumb && r !== '/' && r !== '/es' && !thanks) why.push('no BreadcrumbList');
     if (row.aboutBlank) why.push('about:blank iframe');
     if (row.optin) why.push('link to /optin-page');
+    if (row.formEmbedScripts > 1 || row.reviewScripts > 1 || row.gtmLoaders > 1 || row.ga4Loaders > 1) why.push(`scripts more than once (form_embed ${row.formEmbedScripts}, review-widget ${row.reviewScripts}, gtm ${row.gtmLoaders}, gtag ${row.ga4Loaders})`);
     if (why.length) { bad++; console.log(`  ✗ ${r}: ${why.join('; ')}`); }
   }
   problems += bad;

@@ -10,10 +10,10 @@
   "_chatWidgetId": "[ROCKWALL_CHAT_EN] / [ROCKWALL_CHAT_ES] LeadConnector chat widget ids (one per language); loaded after the page is idle, never styled by the site. NEEDS CLIENT INPUT: the widget stays off until BOTH ids exist.",
   "quizWebhookUrl": "",
   "_quizWebhookUrl": "[ROCKWALL_QUIZ_WEBHOOK] the Rockwall sub-account's inbound webhook URL for the Sleep Fit Quiz lead: https://services.leadconnectorhq.com/hooks/qR8peonBlnjGI3ZuLHQP/webhook-trigger/… (Automation -> Workflows -> trigger). NEEDS CLIENT INPUT: the quiz runs but the lead is not sent (logged to the console) while empty.",
-  "calendarId": "",
-  "_calendarId": "The Dream Mapping booking calendar id, the <id> in https://link.snoozesleep.com/widget/booking/<id>. Empty = /booking shows the phone call to action where the calendar goes.",
-  "formId": "",
-  "_formId": "The contact (opt-in) form id, the <id> in https://link.snoozesleep.com/widget/form/<id>. Empty = the pages show a card with the phone number and e-mail where the form goes. Run `node scripts/integrations.mjs` after changing it.",
-  "reviewsWidget": { "locationId": "", "widgetId": "" },
-  "_reviewsWidget": "The LeadConnector reviews widget, reputationhub.site/reputation/widgets/review_widget/<locationId>?widgetId=<widgetId>. Empty = the 'Leave us a Google review' call to action. Run `node scripts/reviews-cta.mjs` after changing it."
+  "calendarId": "DVpZQx1bX7VqidkrE6YN",
+  "_calendarId": "The Dream Mapping booking calendar, https://link.snoozesleep.com/widget/booking/<id> on /booking (the client's embed id is <id>_1793636519475). Empty = /booking shows the phone call to action where the calendar goes.",
+  "formId": "1LdL8SpYNbiPVKijjrvr",
+  "_formId": "The contact (opt-in) form 'Optin', https://link.snoozesleep.com/widget/form/<id>, on /contact-us, /about-us and the generated pages' get-in-touch sections. Empty = the pages show a card with the phone number and e-mail where the form goes. Run `node scripts/integrations.mjs` after changing it.",
+  "reviewsWidget": { "locationId": "qR8peonBlnjGI3ZuLHQP", "widgetId": "68e3eba9962e6d982132ed32" },
+  "_reviewsWidget": "The LeadConnector reviews widget, reputationhub.site/reputation/widgets/review_widget/<locationId>?widgetId=<widgetId>, once per 'Some of Our Happy Customers' section. Empty = the 'Leave us a Google review' call to action. Run `node scripts/reviews-cta.mjs` after changing it."
 }

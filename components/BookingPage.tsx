@@ -1,5 +1,5 @@
-import Script from 'next/script';
 import { SITE } from './site-config';
+import { FormEmbedScript } from './GhlScripts';
 import { LOCATION } from '@/lib/location';
 import { INTEGRATIONS } from '@/lib/integrations';
 import { PageSchema } from './PageSchema';
@@ -94,7 +94,7 @@ const VISIT_ICONS: IconName[] = ['sensor-bed', 'clock', 'user', 'badge-check', '
    Empty until the client supplies it: the page then shows the phone call to action where the calendar goes, and never
    the previous location's calendar. */
 export const BOOKING_CALENDAR_ID = INTEGRATIONS.calendarId;
-const BOOKING_EMBED_ID = `${BOOKING_CALENDAR_ID || 'calendar'}_1788459899479`;
+const BOOKING_EMBED_ID = `${BOOKING_CALENDAR_ID || 'calendar'}_1793636519475`;
 
 /* Height guard for the calendar iframe (October 27, 2026; made deterministic October 28, 2026).
    The widget reports its height two ways: iframe-resizer messages ("[iFrameSizer]<id>:<height>:<width>:<trigger>"), which
@@ -202,7 +202,8 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
         </div>
       </section>
       </main>
-      {BOOKING_CALENDAR_ID ? <Script src="https://link.snoozesleep.com/js/form_embed.js" strategy="afterInteractive" /> : null}
+      {/* form_embed.js once per page (components/GhlScripts.tsx: the same id as the form pages, so a page with both loads it once) */}
+      {BOOKING_CALENDAR_ID ? <FormEmbedScript /> : null}
     </>
   );
 }

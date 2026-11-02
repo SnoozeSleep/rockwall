@@ -378,15 +378,13 @@ html[lang="es"] #heading-JQfUWePMYv h2 { max-width: none; font-size: min(46px, 5
 .snz-contact__phone:hover, .snz-contact__phone:focus-visible { color: #F58433; text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---- Reviews section for a new location (scripts/reviews-cta.mjs, Rockwall, October 31, 2026): the "Leave us a Google
-   review" call to action stands where the previous location's reviews widget was; its button is hidden until the store's Google
-   Business Profile URL is supplied. The "Google Verified Reviews" badge image in the same section (alt emptied by the
-   script) is hidden: the store has no reviews yet. ------------------------------------------------------------------ */
+   review" call to action stands where the reviews widget goes while no widget ids are configured; its button is hidden until
+   the store's Google Business Profile URL is supplied. ------------------------------------------------------------------ */
 .snz-review-cta { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0 auto; max-width: 640px; padding: 28px 22px; border-radius: 16px; background: #fff; border: 1px solid rgba(0, 20, 137, 0.09); box-shadow: 0 10px 30px -22px rgba(0, 20, 137, 0.35); text-align: center; font-family: var(--font-poppins-stack); }
 .snz-review-cta__text { margin: 0; font-size: 16px; line-height: 1.55; color: #1e223c; }
 .snz-review-cta__btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px; background: #f58433; color: #fff !important; font-weight: 700; font-size: 15px; text-decoration: none !important; transition: background 200ms, transform 200ms; }
 .snz-review-cta__btn:hover { background: #d96a1a; transform: translateY(-1px); }
 .snz-review-cta__btn[hidden] { display: none; }
-img[src*="7eeb64ed-8497-4240-a956-802db60e201b"], img[src*="bae599bb-e93f-4cd3-95a1-31b6fdc0acef"] { display: none !important; }
 
 /* ---- Contact form placeholder (scripts/integrations.mjs): until the Rockwall form id is supplied ([ROCKWALL_FORM_ID] in
    lib/integrations.json) the generated pages show the phone number and e-mail where the LeadConnector form goes. ---- */
@@ -401,3 +399,9 @@ img[src*="6a8df824f9b062f8147fb083"] { aspect-ratio: 4 / 3 !important; }
 .img-circle[src*="6a8d8085d0d6a7f1adf28ec7"] { object-fit: cover; }
 /* ---- "Meet Your Sleep Coaches" on /about-us (components/AboutTeam.tsx): the team photo under the serving line */
 .snz-team__photo { display: block; width: 100%; max-width: 960px; height: auto; margin: 26px auto 0; border-radius: 18px; aspect-ratio: 4 / 3; object-fit: cover; box-shadow: 0 18px 40px -28px rgba(0, 20, 137, 0.45); }
+
+/* ---- LeadConnector opt-in form (scripts/integrations.mjs, components/ContactFormEmbed.tsx): the iframe has no height of its own;
+   744px is reserved until form_embed.js writes the content height into the style attribute, so nothing jumps and no
+   fixed height is left behind (client brief, November 2026, C3) */
+iframe[data-form-id]:not([style*="height:"]) { min-height: 744px; }
+.snz-form__frame { display: block; width: 100%; max-width: 760px; margin: 22px auto 0; }

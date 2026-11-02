@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ROCKWALL } from './relocate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK = process.argv.includes('--check');
@@ -25,17 +26,26 @@ const STAR = '<svg class="snz-ico snz-ico--star" viewBox="0 0 24 24" width="1em"
 const START = '<!--snz-recent-reviews-->', END = '<!--/snz-recent-reviews-->';
 // the widget embed: its loader script (present once per page in the markup, in every copy of the payload string) followed
 // by the iframe; attributes are double-quoted in the page markup (the converter normalises them), single-quoted in the payload
-const WIDGET_START = /(?:<script type=["']text\/javascript["'] src=["']https:\/\/reputationhub\.site\/reputation\/assets\/review-widget\.js["']><\/script>\s*)?<iframe[^>]*\blc_reviews_widget\b/g;
+// … and, since the Rockwall build, the widget sits between scripts/reviews-cta.mjs's <!--snz-review-cta--> markers: the card
+// goes in front of that marker so a later run of that script (which rewrites everything between its markers) leaves it alone
+const WIDGET_START = /(?:<!--snz-review-cta-->)?(?:<script[^>]*review-widget\.js[^>]*><\/script>\s*)?<iframe[^>]*\blc_reviews_widget\b/g;
 const placeBefore = (html, block) => strip(html).replace(WIDGET_START, (m) => block + m);
-const LABELS = { en: { title: 'Recent Reviews', stars: (n) => `${n} out of 5 stars`, from: 'Google review' }, es: { title: 'Reseñas Recientes', stars: (n) => `${n} de 5 estrellas`, from: 'Reseña en Google' } };
+const LABELS = {
+  en: { title: 'Recent Reviews', stars: (n) => `${n} out of 5 stars`, google: 'Google review', facebook: 'Facebook review', more: 'Read more reviews' },
+  es: { title: 'Reseñas Recientes', stars: (n) => `${n} de 5 estrellas`, google: 'Reseña en Google', facebook: 'Reseña de Facebook', more: 'Ver más reseñas' },
+};
+/* "Read more reviews" goes to the store's Google Business Profile ([ROCKWALL_PLACE_ID]: scripts/relocate.mjs ROCKWALL.gbpUrl); hidden until it is supplied */
+const MORE_URL = ROCKWALL.gbpUrl;
 
 const reviews = (DATA.reviews || []).filter((r) => r && r.name && r.text && r.stars);
 function render(locale) {
   if (!reviews.length) return '';
   const t = LABELS[locale] || LABELS.en;
-  const fmt = (d) => { try { return new Intl.DateTimeFormat(locale === 'es' ? 'es-US' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${d}T00:00:00Z`)); } catch { return esc(d); } };
-  const items = reviews.map((r) => `<li class="snz-reviews__item"><div class="snz-reviews__head"><span class="snz-reviews__stars" role="img" aria-label="${esc(t.stars(r.stars))}">${STAR.repeat(Math.max(1, Math.min(5, Math.round(r.stars))))}</span><span class="snz-reviews__who">${esc(r.name)}${r.city ? `, ${esc(r.city)}` : ''}</span>${r.date ? `<time class="snz-reviews__date" datetime="${esc(r.date)}">${fmt(r.date)}</time>` : ''}<span class="snz-reviews__source">${esc(t.from)}</span></div><p class="snz-reviews__text">${esc(r.text)}</p></li>`).join('');
-  return START + TEMPLATE.replace('{{title}}', esc(t.title)).replace('{{items}}', items) + END;
+  // a full date (YYYY-MM-DD) reads "July 14, 2026"; a month (YYYY-MM, as the client supplied it) reads "July 2026"
+  const fmt = (d) => { try { const month = /^\d{4}-\d{2}$/.test(d); return new Intl.DateTimeFormat(locale === 'es' ? 'es-US' : 'en-US', { month: 'long', ...(month ? {} : { day: 'numeric' }), year: 'numeric', timeZone: 'UTC' }).format(new Date(`${month ? `${d}-01` : d}T00:00:00Z`)); } catch { return esc(d); } };
+  const items = reviews.map((r) => `<li class="snz-reviews__item"><div class="snz-reviews__head"><span class="snz-reviews__stars" role="img" aria-label="${esc(t.stars(r.stars))}">${STAR.repeat(Math.max(1, Math.min(5, Math.round(r.stars))))}</span><span class="snz-reviews__who">${esc(r.name)}${r.city ? `, ${esc(r.city)}` : ''}</span>${r.date ? `<time class="snz-reviews__date" datetime="${esc(r.date)}">${fmt(r.date)}</time>` : ''}<span class="snz-reviews__source">${esc(r.source === 'facebook' ? t.facebook : t.google)}</span></div><p class="snz-reviews__text">${esc(r.text)}</p></li>`).join('');
+  const more = MORE_URL ? `<a class="snz-reviews__more" href="${esc(MORE_URL)}" target="_blank" rel="noopener noreferrer">${esc(t.more)}</a>` : `<a class="snz-reviews__more" hidden>${esc(t.more)}</a>`;
+  return START + TEMPLATE.replace('{{title}}', esc(t.title)).replace('{{items}}', items).replace('{{more}}', more) + END;
 }
 const strip = (html) => html.replace(new RegExp(`${START}[\\s\\S]*?${END}`, 'g'), '');
 
