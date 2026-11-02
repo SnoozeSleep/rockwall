@@ -57,14 +57,6 @@ for (const slug of PAGES) {
 
     const isHero = (el) => $(el).closest('[data-snz-hero]').length > 0;
     const cardRow = (el) => { const row = $(el).closest('.c-row'); return row.length > 0 && row.children('.inner').children('.c-column').length >= 3; };
-    /* card columns: a picture plus one or two short text elements and nothing else (the About feature cards, the
-       location cards, the financing partners), repeated at least three times in a section. On phones the builder
-       stacks each card as its own one-column row, so the three-column test above does not see them. */
-    const elementKids = (col) => { const inner = $(col).children('.inner'); return (inner.length ? inner : $(col)).children().filter((_, k) => /\bc-/.test($(k).attr('class') || '')).toArray(); };
-    const isCardColumn = (col) => { const kids = elementKids(col); const imgs = kids.filter((k) => $(k).hasClass('c-image')).length; const texts = kids.filter((k) => $(k).is('.c-heading, .c-sub-heading, .c-paragraph')).length; return imgs >= 1 && texts >= 1 && texts <= 2 && imgs + texts === kids.length; };
-    const cardCols = new Set();
-    $('.c-section').each((_, s) => { const cols = $(s).find('.c-column').toArray().filter(isCardColumn); if (cols.length >= 3) for (const c of cols) cardCols.add(c); });
-    const inCard = (el) => { const col = $(el).closest('.c-column')[0]; return !!col && cardCols.has(col); };
     const hasHeading = (el) => $(el).find('h1, h2, h3, h4').length > 0;
     const text = (el) => $(el).text().replace(/\s+/g, ' ').trim();
     const nextElementIsList = (el) => { const n = $(el).nextAll('.c-wrapper, [class*="c-"]').first(); return n.length > 0 && n.hasClass('c-bullet-list'); };
@@ -74,7 +66,7 @@ for (const slug of PAGES) {
 
     $('.c-heading, .c-sub-heading, .c-paragraph').each((_, el) => {
       if (isHero(el)) return;
-      if (cardRow(el) || inCard(el)) { totals.skippedCards++; return; }
+      if (cardRow(el)) { totals.skippedCards++; return; }
       const $el = $(el); const id = idOf(el); const light = paintedWhite(head, id);
       if ($el.hasClass('c-heading') && hasHeading(el)) {
         $el.addClass('snz-h2-wrap'); if (light) $el.addClass('snz-h2-wrap--light'); if (centered(head, id)) $el.addClass('snz-h2-wrap--center'); totals.h2++; return;
@@ -85,7 +77,7 @@ for (const slug of PAGES) {
     });
 
     $('.c-bullet-list').each((_, el) => { if (isHero(el)) return; $(el).addClass('snz-list-wrap'); totals.lists++; });
-    $('.c-button').each((_, el) => { if (isHero(el) || cardRow(el) || inCard(el)) return; $(el).addClass('snz-cta-wrap'); totals.buttons++; });
+    $('.c-button').each((_, el) => { if (isHero(el) || cardRow(el)) return; $(el).addClass('snz-cta-wrap'); totals.buttons++; });
 
     $('.c-row').each((_, row) => {
       if (isHero(row)) return;
