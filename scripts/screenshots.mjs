@@ -51,7 +51,7 @@ async function shot(page, name, opts = {}) {
   written.push(path.relative(ROOT, file).replace(/\\/g, '/'));
 }
 
-const PAGES = [['home', '/'], ['about', '/about-us'], ['booking', '/booking'], ['contact-us', '/contact-us']];
+const PAGES = [['home', '/'], ['about', '/about-us'], ['financing', '/mattress-financing'], ['booking', '/booking'], ['contact-us', '/contact-us']];
 for (const [name, route] of PAGES) {
   for (const [kind, vp] of [['desktop', DESKTOP], ['mobile', PHONE]]) {
     const page = await open(route, vp);
@@ -90,6 +90,7 @@ for (const [name, route] of PAGES) {
    form, the booking calendar and the footer — the visible copy of each, scrolled into view, desktop and phone */
 const SECTIONS = [
   ['/', '.pm-section', 'dream-mapping-steps'],
+  ['/', 'img[src*="6a8d8085d0d6a7f1adf28ec7"]', 'location-card'],
   ['/', '.snz-reviews', 'reviews-section'],
   ['/', 'img[src*="6a8df824f9b062f8147fb083"]', 'home-team'],
   ['/about-us', '#snz-team-title', 'about-team'],

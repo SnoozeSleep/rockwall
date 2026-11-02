@@ -167,9 +167,10 @@ export const ROCKWALL = {
   teamImage: 'qR8peonBlnjGI3ZuLHQP/media/6a8df824f9b062f8147fb083.jpg',
   teamAltEn: 'Sleep Coaches at Snooze Mattress + Wellness in Rockwall',
   teamAltEs: 'Sleep Coaches de Snooze Mattress + Wellness en Rockwall',
-  /* [ROCKWALL_HERO_ART] NEEDS CLIENT INPUT: the McAllen desktop hero composites of the home, About Us and Financing pages
-     (699c9690…, 69a601e7…, 69a1cbdf…) include the McAllen storefront and a "22+ five-star reviews" badge — a review count
-     this store does not have — so those three pages use the site's gradient hero (the phone hero image) on desktop too */
+  /* The McAllen desktop hero composites of the home, About Us and Financing pages (699c9690…, 69a601e7…, 69a1cbdf…) show
+     the McAllen store, so the relocation maps them to the site's gradient hero (the phone hero image). The Rockwall
+     composites the client supplied in November 2026 (lib/location.ts HERO_PHOTO_URLS) are then laid over that for
+     viewports of 768px and up by scripts/hero-images.mjs, which runs after this script. */
   heroFallback: 'BljrSmLCnm4gF9LpsTRZ/media/6a9899f9da522bf173a9bd91.png',
 };
 const R = ROCKWALL;

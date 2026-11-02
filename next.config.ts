@@ -20,8 +20,11 @@ const nextConfig: NextConfig = {
   // the page's own CSS (global.css, the Poppins faces, component modules: ~15 KB) is written into the HTML instead
   // of three render-blocking stylesheet requests
   experimental: { inlineCss: true },
-  // next/image (footer logo, blog images) serves the local files as they are; nothing is optimized per request
-  images: { unoptimized: true },
+  // next/image (footer logo, blog images) serves the local files as they are; nothing is optimized per request (a static
+  // export has no /_next/image). The store's media-library host is listed so a next/image with one of its URLs is
+  // accepted should the site ever run with the optimizer; today those photos are served from this origin
+  // (lib/location.ts localPhoto, scripts/rockwall-photos.mjs).
+  images: { unoptimized: true, remotePatterns: [{ protocol: 'https', hostname: 'assets.cdn.filesafe.space' }] },
 };
 
 export default nextConfig;

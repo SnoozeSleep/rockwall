@@ -19,8 +19,13 @@ Where the Rockwall values live:
 - **Photos** — the store's GoHighLevel media library (`qR8peonBlnjGI3ZuLHQP`), served locally with WebP twins and responsive
   variants by [`scripts/rockwall-photos.mjs`](scripts/rockwall-photos.mjs): storefront `6a8d8085…` (location cards,
   LocalBusiness image, About page frame), team `6a8df824…` (home About section, "Meet Your Sleep Coaches" on /about-us).
-  `[ROCKWALL_HERO_HOME]` / `[ROCKWALL_HERO_ABOUT]` / `[ROCKWALL_HERO_FINANCING]`: those pages use the neutral gradient hero
-  until supplied (**NEEDS CLIENT INPUT**).
+  Hero art (supplied November 2026): the home, About Us and Financing heroes show the Rockwall composites
+  (`6a8d7ddc…`, `6a8c9656…`, `6a8d7b7e…`) from 768px up, written by `scripts/hero-images.mjs` as one marked `<style>` per
+  page (`@media (min-width:768px)` background-image override for the desktop and the mobile section copies, builder
+  placement/overlay/sizing unchanged) with the desktop hero preload pointing at the same WebP; phones keep the shared
+  gradient hero. The CDN URLs of every store photo live in [`lib/location.ts`](lib/location.ts) (`STORE_PHOTO_URL`,
+  `TEAM_PHOTO_URL`, `HERO_PHOTO_URLS`; `localPhoto()` maps one to its local WebP), and `scripts/rockwall-photos.mjs` reads
+  that list.
 - **Reviews** — [`lib/reviews.json`](lib/reviews.json) (one Facebook review, verbatim) → the Recent Reviews card above the
   widget (`scripts/recent-reviews.mjs`).
 - **Domain / site origin** — hardcoded nowhere. [`lib/site-url.ts`](lib/site-url.ts) resolves the origin once per build

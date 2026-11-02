@@ -30,6 +30,8 @@
     "schema:check": "node scripts/validate-schema.mjs",
     "icons:svg": "node scripts/icon-svg.mjs",
     "svg:flourish": "node scripts/svg-flourish.mjs",
+    "photos": "node --no-warnings scripts/rockwall-photos.mjs",
+    "hero:images": "node --no-warnings scripts/hero-images.mjs",
     "vercel:config": "node scripts/vercel-config.mjs",
     "audit": "node scripts/audit-location.mjs",
     "lighthouse": "node scripts/lighthouse.mjs",
