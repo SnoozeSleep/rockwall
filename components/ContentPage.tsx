@@ -1,6 +1,7 @@
 import { Faq } from '@/components/blog/Faq';
 import { Rich, plain } from '@/components/blog/Rich';
 import { CheckItem, Icon, iconFor } from '@/components/icons';
+import { BodyText, LeadIn, SectionHeading } from '@/components/ui';
 import { PageSchema } from '@/components/PageSchema';
 import { SizeTypeGrid } from '@/components/SizeTypeGrid';
 import { LOCATION } from '@/lib/location';
@@ -88,6 +89,15 @@ function ListBlock({ items, style }: { items: string[]; style?: ListStyle }) {
   return <ul className={`${styles.list} snz-check-list`}>{items.map((b, j) => <CheckItem key={j}><Rich text={b} /></CheckItem>)}</ul>;
 }
 
+/* a section's paragraphs: the last one before a list is the lead-in line, the others body copy (components/ui.tsx) */
+function Paragraphs({ items, beforeList }: { items: string[]; beforeList: boolean }) {
+  return (
+    <>
+      {items.map((p, j) => (beforeList && j === items.length - 1 ? <LeadIn key={j}><Rich text={p} /></LeadIn> : <BodyText key={j}><Rich text={p} /></BodyText>))}
+    </>
+  );
+}
+
 export function ContentPage({ page, locale }: { page: ContentPageData; locale: Locale }) {
   const c = withDreamMappingLink(page.copy[locale] || page.copy.en, page.slug, locale);
   const t = ui(locale);
@@ -118,16 +128,17 @@ export function ContentPage({ page, locale }: { page: ContentPageData; locale: L
           <h1 className={styles.title}>{c.h1}</h1>
           {c.intro.map((p, i) => <p key={i} className={styles.lede}><Rich text={p} /></p>)}
         </header>
-        <article className={styles.article}>
+        {/* the light content block: the shared typography applies inside it (overrides/global.css, scoped) */}
+        <article className={`${styles.article} content-light`}>
           {c.sections.map((s, i) => (
             <section key={i} className={styles.section}>
-              <h2 className={styles.h2}>{s.h2}</h2>
-              {(s.paragraphs || []).map((p, j) => <p key={j} className={styles.p}><Rich text={p} /></p>)}
+              <SectionHeading className={styles.h2}>{s.h2}</SectionHeading>
+              <Paragraphs items={s.paragraphs || []} beforeList={!!s.bullets} />
               {s.bullets ? <ListBlock items={s.bullets} style={s.listStyle} /> : null}
               {(s.h3s || []).map((sub, j) => (
                 <div key={j} className={styles.sub}>
                   <h3 className={styles.h3}>{sub.h3}</h3>
-                  {(sub.paragraphs || []).map((p, k) => <p key={k} className={styles.p}><Rich text={p} /></p>)}
+                  <Paragraphs items={sub.paragraphs || []} beforeList={!!sub.bullets} />
                   {sub.bullets ? <ListBlock items={sub.bullets} style={sub.listStyle} /> : null}
                 </div>
               ))}
@@ -144,12 +155,12 @@ export function ContentPage({ page, locale }: { page: ContentPageData; locale: L
           ) : null}
           {c.faqGroups ? c.faqGroups.map((g, i) => (
             <section key={i} className={styles.faq} aria-labelledby={`content-faq-${i}`}>
-              <h2 id={`content-faq-${i}`} className={styles.h2}>{g.h2}</h2>
+              <SectionHeading id={`content-faq-${i}`} className={styles.h2}>{g.h2}</SectionHeading>
               <Faq items={g.faqs} />
             </section>
           )) : c.faqs.length ? (
             <section className={styles.faq} aria-labelledby="content-faq-title">
-              <h2 id="content-faq-title" className={styles.h2}>{c.faqTitle}</h2>
+              <SectionHeading id="content-faq-title" className={styles.h2}>{c.faqTitle}</SectionHeading>
               <Faq items={c.faqs} />
             </section>
           ) : null}

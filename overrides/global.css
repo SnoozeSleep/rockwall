@@ -581,3 +581,94 @@ html .hl_page-preview--content .svg-YK4nq0VgCf .svg-component { transform: trans
 .hl_page-preview--content .text-output p.snz-area-line { margin: 16px auto 0 !important; padding: 0 !important; max-width: 46ch; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: 20px !important; line-height: 1.5 !important; letter-spacing: 0 !important; text-align: center !important; }
 .hl_page-preview--content .text-output p.snz-area-line span { font: inherit !important; }
 @media (max-width: 767px) { .hl_page-preview--content .text-output p.snz-area-line { font-size: 18px !important; } }
+
+/* ==== Typography system, SCOPED (client brief, November 2026; re-applied after the revert of 7130686) ===================
+   One scale for section headings, lead-in lines, check-icon lists, body copy, two-column blocks and the two-line CTA —
+   applied ONLY inside light-background content blocks that carry the wrapper class `content-light`:
+     · React pages: the article of the hand-written content pages (components/ContentPage.tsx: /dream-mapping, size/type
+       pages, the buying guide, service-area pages, /faq), the booking page's "What happens at your Dream Mapping visit"
+       section (components/BookingPage.tsx) and the blog article body (components/blog/BlogLayout.tsx);
+     · builder pages: the rows scripts/typography.mjs lists (financing "Why Finance", "Traditional Mattress Financing",
+       "How to Apply" and "FAQs" headings; About "How to Apply" and "FAQs" headings).
+   Nothing here reaches a dark or image section, the marquees, reviews, location cards, nav or footer. The rules set size,
+   weight, line-height and spacing only: text colour inherits from the section and headings keep their colour and
+   alignment; the orange key phrase is the heading's own span (.snz-accent on React pages, the builder's <u>). ========= */
+:root {
+  --snz-orange: #f58433;
+  --snz-h2-size: clamp(30px, 3.4vw, 44px);   /* 30px at 375px, 44px from 1295px; long headings wrap, never below 28px */
+  --snz-lead-size: 20px;
+  --snz-body-size: 20px;
+  --snz-li-size: 18px;
+  --snz-section-pad: 72px;
+}
+@media (max-width: 767px) {
+  :root { --snz-lead-size: 18px; --snz-body-size: 18px; --snz-li-size: 17px; --snz-section-pad: 48px; }
+}
+
+/* ---- React pages (components/ui.tsx) ---- */
+.content-light .snz-h2 { margin: 0 0 16px; font-family: var(--font-poppins-stack); font-weight: 800; font-size: var(--snz-h2-size); line-height: 1.15; letter-spacing: -0.01em; max-width: 22ch; text-wrap: balance; }
+.content-light .snz-h2--center { margin-left: auto; margin-right: auto; text-align: center; }
+.content-light .snz-accent { color: var(--snz-orange); }
+.content-light .snz-lead { margin: 0 0 12px; font-family: var(--font-poppins-stack); font-weight: 400; font-size: var(--snz-lead-size); line-height: 1.4; }
+.content-light .snz-body { margin: 24px 0 12px; font-family: var(--font-poppins-stack); font-weight: 400; font-size: var(--snz-body-size); line-height: 1.5; }
+.content-light .snz-body:first-child { margin-top: 0; }
+/* check lists: never inside the navy facts panel (.snz-facts, a dark card in the ContentPage article), which keeps its own
+   list styles; :where() keeps the guard at zero specificity */
+.content-light .snz-check-list:where(:not(.snz-facts *)) { margin: 0 0 24px; gap: 14px; }
+.content-light .snz-check-list:where(:not(.snz-facts *)) > li { gap: 12px; font-family: var(--font-poppins-stack); font-weight: 400; font-size: var(--snz-li-size); line-height: 1.5; }
+.content-light .snz-check-list:where(:not(.snz-facts *)) > li strong, .content-light .snz-check-list:where(:not(.snz-facts *)) > li b { font-weight: 700; font-size: inherit; color: inherit; }
+/* the icon: a 20px orange outline circle with an orange check, top-aligned to the first line */
+.content-light .snz-check-list:where(:not(.snz-facts *)) .snz-li-ico, .hl_page-preview--content .content-light .snz-list-wrap .snz-li-ico { width: 20px !important; height: 20px !important; flex: 0 0 20px; margin-top: calc((1.5em - 20px) / 2); color: var(--snz-orange); }
+.content-light .snz-check-list:where(:not(.snz-facts *)) .snz-ico--check circle, .hl_page-preview--content .content-light .snz-list-wrap .snz-ico--check circle { fill: none; stroke: currentColor; stroke-width: 2; }
+.content-light .snz-check-list:where(:not(.snz-facts *)) .snz-ico--check path, .hl_page-preview--content .content-light .snz-list-wrap .snz-ico--check path { stroke: currentColor; stroke-width: 2.4; }
+.content-light .snz-two-col:not(.c-row) { display: grid; grid-template-columns: 45fr 55fr; gap: 48px; align-items: center; }
+.content-light .snz-two-col__media img { display: block; width: 100%; height: auto; border-radius: 16px; }
+@media (max-width: 767px) { .content-light .snz-two-col:not(.c-row) { grid-template-columns: 1fr; gap: 24px; } .content-light .snz-two-col__media { order: -1; } }
+/* the two-line call-to-action button (the button's own colours: orange gradient, white label) */
+.content-light .snz-cta-btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-sizing: border-box; width: 100%; max-width: 520px; margin: 32px 0 0; padding: 18px 28px; border: 0; border-radius: 10px; background: linear-gradient(135deg, #f58433 0%, #e8702a 100%); color: #fff; text-decoration: none; text-align: center; box-shadow: 0 10px 26px rgba(245, 132, 51, 0.28); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.content-light .snz-cta-btn:hover, .content-light .snz-cta-btn:focus-visible { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(245, 132, 51, 0.34); color: #fff; }
+.content-light .snz-cta-btn:focus-visible { outline: 2px solid #001489; outline-offset: 3px; }
+.content-light .snz-cta-btn__main { font-family: var(--font-poppins-stack); font-weight: 800; font-size: 18px; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.02em; }
+.content-light .snz-cta-btn__sub { font-family: var(--font-poppins-stack); font-weight: 400; font-size: 14px; line-height: 1.3; }
+@media (max-width: 767px) { .content-light .snz-cta-btn { max-width: none; } }
+
+/* ---- builder pages (scripts/typography.mjs). The page's own <style> comes later in the document, so these carry
+   !important and an extra class where the builder's rule has the same weight. ---- */
+.hl_page-preview--content .content-light { --snz-list-item-gap: 14px; --snz-list-block-gap: 24px; --snz-list-lead-gap: 24px; --snz-list-icon-gap: 12px; --snz-list-line-height: 1.5; }
+.hl_page-preview--content .content-light :is(.snz-h2-wrap, .snz-lead-wrap, .snz-body-wrap) { padding-top: 0 !important; padding-bottom: 0 !important; }
+.hl_page-preview--content .content-light :is(.snz-h2-wrap, .snz-lead-wrap, .snz-body-wrap) > * { padding-top: 0 !important; padding-bottom: 0 !important; }
+.hl_page-preview--content .content-light .snz-h2-wrap { margin-bottom: 16px !important; }
+.hl_page-preview--content .content-light .snz-h2-wrap :is(h1, h2, h3, h4, p:not(.snz-area-line)) { margin: 0 !important; font-family: var(--font-poppins-stack) !important; font-weight: 800 !important; font-size: var(--snz-h2-size) !important; line-height: 1.15 !important; letter-spacing: -0.01em !important; max-width: 22ch; }
+.hl_page-preview--content .content-light .snz-h2-wrap.snz-h2-wrap--center :is(h1, h2, h3, h4, p:not(.snz-area-line)) { margin-left: auto !important; margin-right: auto !important; }
+.hl_page-preview--content .content-light .snz-h2-wrap :is(h1, h2, h3, h4, p:not(.snz-area-line)) :is(span, strong, b, em, u) { font-family: inherit !important; font-size: inherit !important; font-weight: inherit !important; line-height: inherit !important; letter-spacing: inherit !important; }
+.hl_page-preview--content .content-light .snz-lead-wrap { margin-bottom: 12px !important; }
+.hl_page-preview--content .content-light .snz-lead-wrap :is(p, h1, h2, h3, h4, li) { margin: 0 !important; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-lead-size) !important; line-height: 1.4 !important; }
+.hl_page-preview--content .content-light .snz-body-wrap { margin-top: 24px !important; margin-bottom: 12px !important; }
+.hl_page-preview--content .content-light .snz-body-wrap :is(p, h1, h2, h3, h4, li) { margin: 0 !important; font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-body-size) !important; line-height: 1.5 !important; }
+.hl_page-preview--content .content-light :is(.snz-lead-wrap, .snz-body-wrap) :is(p, h1, h2, h3, h4, li) :is(span, em, u, a) { font-family: inherit !important; font-size: inherit !important; line-height: inherit !important; }
+.hl_page-preview--content .content-light :is(.snz-lead-wrap, .snz-body-wrap) :is(p, h1, h2, h3, h4, li) :is(strong, b) { font-weight: 700 !important; font-size: inherit !important; }
+.hl_page-preview--content .content-light :is(.snz-lead-wrap, .snz-body-wrap) :is(p, h1, h2, h3, h4) + :is(p, h1, h2, h3, h4) { margin-top: 12px !important; }
+/* list rhythm under a lead-in or a body line (beats the older list-block rule at the top of this file) */
+.hl_page-preview--content .content-light .c-wrapper.snz-lead-wrap + .c-bullet-list.c-wrapper, .hl_page-preview--content .content-light .c-wrapper.snz-body-wrap + .c-bullet-list.c-wrapper { margin-top: 0 !important; }
+.hl_page-preview--content .content-light .snz-lead-wrap + .c-row, .hl_page-preview--content .content-light .snz-lead-wrap + .c-row > .inner, .hl_page-preview--content .content-light .snz-lead-wrap + .c-row > .inner > .c-column, .hl_page-preview--content .content-light .snz-lead-wrap + .c-row > .inner > .c-column > .inner { margin-top: 0 !important; padding-top: 0 !important; }
+.hl_page-preview--content .content-light .c-column > .inner > .snz-lead-wrap:last-child { margin-bottom: 24px !important; }
+.hl_page-preview--content .content-light .snz-list-wrap .text-output li { font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: var(--snz-li-size) !important; line-height: 1.5 !important; gap: 12px !important; }
+.hl_page-preview--content .content-light .snz-list-wrap .text-output li :is(span, p) { font-size: inherit !important; line-height: inherit !important; }
+.hl_page-preview--content .content-light .snz-list-wrap .text-output li :is(strong, b) { font-weight: 700 !important; font-size: inherit !important; }
+.hl_page-preview--content .content-light .snz-list-wrap.c-wrapper + .snz-list-wrap.c-wrapper { margin-top: 14px !important; }
+.hl_page-preview--content .content-light .snz-list-wrap.c-wrapper + .c-wrapper:not(.snz-list-wrap) { margin-top: 24px !important; }
+.hl_page-preview--content .content-light .c-button.snz-cta-wrap { margin-top: 32px !important; padding: 0 !important; }
+.hl_page-preview--content .content-light .c-button.snz-cta-wrap a { display: inline-flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 2px !important; box-sizing: border-box !important; width: 100% !important; max-width: 520px !important; min-width: 0 !important; margin: 0 !important; padding: 18px 28px !important; border: 0 !important; border-radius: 10px !important; background: linear-gradient(135deg, #f58433 0%, #e8702a 100%) !important; color: #fff !important; box-shadow: 0 10px 26px rgba(245, 132, 51, 0.28) !important; text-align: center !important; }
+.hl_page-preview--content .content-light .c-button.snz-cta-wrap a .main-heading-group { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; }
+.hl_page-preview--content .content-light .c-button.snz-cta-wrap a .main-heading-button { font-family: var(--font-poppins-stack) !important; font-weight: 800 !important; font-size: 18px !important; line-height: 1.2 !important; text-transform: uppercase !important; letter-spacing: 0.02em !important; color: #fff !important; }
+.hl_page-preview--content .content-light .c-button.snz-cta-wrap a :is(.sub-heading-group, .sub-heading-button) { font-family: var(--font-poppins-stack) !important; font-weight: 400 !important; font-size: 14px !important; line-height: 1.3 !important; text-transform: none !important; letter-spacing: 0 !important; color: #fff !important; }
+.hl_page-preview--content .content-light .c-button.snz-cta-wrap a :is(.button-icon-start, .button-icon-end) { color: #fff !important; margin: 0 !important; }
+@media (max-width: 767px) { .hl_page-preview--content .content-light .c-button.snz-cta-wrap a { max-width: none !important; } }
+.hl_page-preview--content .snz-two-col.content-light > .inner { width: 100% !important; box-sizing: border-box !important; display: grid !important; grid-template-columns: var(--snz-two-col-columns, 45fr 55fr) !important; gap: 48px !important; align-items: center !important; }
+.hl_page-preview--content .snz-two-col.content-light > .inner > .c-column { width: auto !important; max-width: none !important; min-width: 0 !important; flex: none !important; margin: 0 !important; }
+.hl_page-preview--content .snz-two-col.content-light .c-image img { border-radius: 16px !important; width: 100% !important; height: auto !important; }
+.hl_page-preview--content .snz-two-col--image-right.content-light { --snz-two-col-columns: 55fr 45fr; }
+@media (max-width: 767px) {
+  .hl_page-preview--content .snz-two-col.content-light > .inner { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .hl_page-preview--content .snz-two-col--image-right.content-light > .inner > .c-column:last-child { order: -1; }
+}

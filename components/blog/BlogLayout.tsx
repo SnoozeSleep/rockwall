@@ -166,7 +166,8 @@ export function BlogArticle({ post, related, locale = 'en' }: { post: BlogPost; 
         <Image src={post.featured.src} alt={post.featured.alt} width={post.featured.width} height={post.featured.height} sizes="(max-width: 1100px) 100vw, 1040px" priority />
       </figure>
 
-      <main className={styles.article} id="article">
+      {/* the light content block: the shared typography applies inside it (overrides/global.css, scoped) */}
+      <main className={`${styles.article} content-light`} id="article">
         {post.sections.map((s, i) => (
           <section key={i} className={styles.section}>
             {s.heading && <h2 className={styles.h2}>{s.heading}</h2>}

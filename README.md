@@ -59,6 +59,16 @@ Where the Rockwall values live:
   (−5 … −12px), which assume the heading's exact rendered height. `scripts/svg-flourish.mjs` (`npm run svg:flourish`)
   writes overrides into `overrides/global.css` that anchor each one to the bottom edge of the heading box and tuck it up by
   a share of its own height, so the offset never depends on the text's metrics (the one stroke under a picture is left as is).
+- **Typography system (scoped)** (client brief, November 2026; re-applied after the revert of `7130686`) — one scale for
+  section headings, lead-ins, check-icon lists, body copy, two-column blocks and the two-line CTA, styled ONLY inside light
+  content blocks that carry the wrapper class `content-light` (the "Typography system, SCOPED" block of
+  [`overrides/global.css`](overrides/global.css)). React: the ContentPage article, the booking page's visit section and the
+  blog article use [`components/ui.tsx`](components/ui.tsx). Builder pages: `scripts/typography.mjs` (`npm run typography`)
+  wraps the listed rows only (financing "Why Finance", "Traditional Mattress Financing", the "How to Apply" and "FAQs"
+  headings; About "How to Apply" and "FAQs" headings). Sizes, weights, line-heights and spacing only: text colour and
+  heading colour/alignment stay the section's own. Never in a dark or image section, the marquees, reviews, location cards,
+  nav or footer; the navy facts panel inside the ContentPage article (`.snz-facts`) is excluded too. The ContentPage
+  sections space their children with a 16px grid gap, so the shared margins are zeroed there (ContentPage.module.css).
 - **Blog** — five client articles (the "Rockwall Blogs" document, published November 3, 2026) in
   [`lib/blog-posts.ts`](lib/blog-posts.ts) (English) and [`lib/blog-posts-es.ts`](lib/blog-posts-es.ts) (Spanish, different
   slugs paired by `altSlug` and `lib/blog-nav.ts`). Copy verbatim; sections as `blocks` (paragraphs, h3, check-icon /

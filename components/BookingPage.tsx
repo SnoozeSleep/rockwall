@@ -5,6 +5,7 @@ import { INTEGRATIONS } from '@/lib/integrations';
 import { SITE_URL } from '@/lib/site-url';
 import { PageSchema } from './PageSchema';
 import { Icon, type IconName } from './icons';
+import { CtaButton, SectionHeading } from './ui';
 import type { Locale } from '@/lib/i18n';
 import styles from './BookingPage.module.css';
 
@@ -181,10 +182,11 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
         </div>
       )}
 
-      <section className={styles.visit} aria-labelledby="visit-title">
+      {/* a light content block: the shared typography applies inside it (overrides/global.css, scoped) */}
+      <section className={`${styles.visit} content-light`} aria-labelledby="visit-title">
         <div className={styles.visitInner}>
           <p className={styles.visitEyebrow}>{t.visitEyebrow}</p>
-          <h2 id="visit-title" className={styles.visitTitle}>{t.visitTitle}</h2>
+          <SectionHeading id="visit-title" center className={styles.visitTitle}>{t.visitTitle}</SectionHeading>
           <span className={styles.flourish} aria-hidden="true" />
           <ol className={styles.steps}>
             {t.visitSteps.map((step, i) => (
@@ -196,7 +198,7 @@ export function BookingPage({ locale = 'en' }: { locale?: Locale }) {
             ))}
           </ol>
           <div className={styles.visitCtas}>
-            {BOOKING_CALENDAR_ID ? <a className={styles.visitBtn} href={`#${BOOKING_EMBED_ID}`}>{t.pickTime}</a> : null}
+            {BOOKING_CALENDAR_ID ? <CtaButton href={`#${BOOKING_EMBED_ID}`} main={t.pickTime} className={styles.visitCta} /> : null}
             <a className={styles.visitCall} href={SITE.phoneHref}><Icon name="phone" /> {t.questions(SITE.phone)}</a>
           </div>
         </div>
