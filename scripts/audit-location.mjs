@@ -202,7 +202,7 @@ if (!SOURCE_ONLY) {
   console.log(`  pairs: ${pairs}, mismatches: ${mism}`);
 
   console.log('\n=== embeds in built routes ===');
-  const w = { calendar: /widget\/booking\/([A-Za-z0-9]*)/g, form: /widget\/form\/([A-Za-z0-9]*)/g, reviews: /review_widget\/([A-Za-z0-9]+)\?widgetId=([a-f0-9]+)/g, chat: /data-widget-id["']?[:=]\s*["']([a-f0-9]*)/g, gtm: /googletagmanager\.com\/(?:gtm|ns)[^"']*id=([A-Z0-9-]+)/g, ga4: /gtag\/js\?id=([A-Z0-9-]+)/g };
+  const w = { calendar: /widget\/booking\/([A-Za-z0-9]*)/g, form: /widget\/form\/([A-Za-z0-9]*)/g, reviews: /review_widget\/([A-Za-z0-9]+)\?widgetId=([a-f0-9]+)/g, chat: /data-widget-id\\?["']?[:=]\s*\\?["']([a-f0-9]*)/g, gtm: /googletagmanager\.com\/(?:gtm|ns)[^"']*id=([A-Z0-9-]+)/g, ga4: /gtag\/js\?id=([A-Z0-9-]+)/g };
   for (const [k, re] of Object.entries(w)) { const ids = new Map(); for (const f of html) { const s = fs.readFileSync(f, 'utf8'); for (const m of s.matchAll(re)) { const id = m.slice(1).join('/') || '(empty)'; (ids.get(id) || ids.set(id, new Set()).get(id)).add(1); } } for (const [id, pages] of ids) console.log(`  ${k}: ${id} on ${pages.size ? 'some' : 'no'} route(s)`); if (!ids.size) console.log(`  ${k}: none`); }
 }
 

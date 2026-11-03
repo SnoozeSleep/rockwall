@@ -11,7 +11,7 @@ export type Integrations = {
   ga4Ids: string[];
   /** Simpli.fi tag id (tag.simpli.fi/sifitag/<id>) */
   simplifiId: string;
-  /** [ROCKWALL_CHAT_EN] / [ROCKWALL_CHAT_ES] LeadConnector chat widget id per language */
+  /** LeadConnector chat widget id per language (components/ChatWidget.tsx) */
   chatWidgetId: { en: string; es: string };
   /** [ROCKWALL_QUIZ_WEBHOOK] inbound webhook URL for the Sleep Fit Quiz lead */
   quizWebhookUrl: string;

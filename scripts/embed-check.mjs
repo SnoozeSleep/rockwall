@@ -1,7 +1,8 @@
 /*
  * Runtime check of the third-party embeds and tags on the static export (out/), in a real browser (Edge/Chrome through
  * puppeteer-core): per page, how many <script> tags load form_embed.js, review-widget.js, gtm.js, gtag.js and the
- * Simpli.fi tag (each must be at most one), how many reviews-widget / form / calendar iframes are in the DOM and
+ * Simpli.fi tag (each must be at most one), the site's own chat widget loader (exactly one, with the page language's
+ * widget id from lib/integrations.json), how many reviews-widget / form / calendar iframes are in the DOM and
  * visible, whether the Recent Reviews card shows, the dataLayer events, console errors, and whether a GA4 / GTM
  * collect request went out without any interaction (client brief, November 2026, B + C5).
  *   npm run build && node scripts/embed-check.mjs
@@ -27,6 +28,7 @@ await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const BASE = `http://127.0.0.1:${server.address().port}`;
 const browser = await puppeteer.launch({ executablePath: BROWSER, headless: true, args: ['--no-first-run', '--disable-gpu', '--hide-scrollbars'] });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const CHAT = JSON.parse(fs.readFileSync(path.join(ROOT, 'lib', 'integrations.json'), 'utf8')).chatWidgetId;
 const PAGES = process.argv.slice(2).filter((a) => a.startsWith('/'));
 const routes = PAGES.length ? PAGES : ['/', '/es', '/about-us', '/es/about-us', '/contact-us', '/es/contact-us', '/booking', '/es/booking', '/mattresses', '/pillows'];
 let problems = 0;
@@ -52,10 +54,11 @@ for (const route of routes) {
       // tags the GTM container injects at runtime (other properties' gtag.js, a chat loader) are reported, not counted against the page
       const own = (re) => [...document.querySelectorAll('script[src]')].filter((s) => re.test(s.src) && !s.hasAttribute('data-gtm-yt-inspected') && s.closest('#snz-app, head, body') && !s.src.includes('gtm.js') || false);
       const injectedGtag = [...document.querySelectorAll('script[src*="gtag/js?id="]')].map((s) => new URL(s.src).searchParams.get('id')).filter((v, i, a) => a.indexOf(v) === i);
-      const chatTags = [...document.querySelectorAll('script[src*="widgets.leadconnectorhq.com"]')].map((s) => `${s.src.split('/').pop()}${s.getAttribute('data-widget-id') ? ' id=' + s.getAttribute('data-widget-id') : ' (no id)'}`);
+      const ownChat = [...document.querySelectorAll('script#snz-chat-widget')].map((s) => s.getAttribute('data-widget-id'));
+      const chatTags = [...document.querySelectorAll('script[src*="widgets.leadconnectorhq.com"]:not(#snz-chat-widget)')].map((s) => `${s.src.split('/').pop()}${s.getAttribute('data-widget-id') ? ' id=' + s.getAttribute('data-widget-id') : ' (no id)'}`);
       return {
         scripts: { formEmbed: tags(/js\/form_embed\.js/), reviewWidget: tags(/assets\/review-widget\.js/), gtm: tags(/googletagmanager\.com\/gtm\.js/), simplifi: tags(/sifitag\//) },
-        gtagIds: injectedGtag, chatTags,
+        gtagIds: injectedGtag, chatTags, ownChat,
         frames: { reviews: frames('iframe.lc_reviews_widget'), form: frames('iframe[src*="widget/form/"]'), calendar: frames('iframe[src*="widget/booking/"]') },
         reviewCard: [...document.querySelectorAll('.snz-reviews')].filter(vis).length, readMoreHidden: [...document.querySelectorAll('.snz-reviews__more')].every((a) => a.hidden),
         h1: document.querySelectorAll('h1').length,
@@ -67,9 +70,11 @@ for (const route of routes) {
     if (hits.formEmbed > 1 || hits.reviewWidget > 1 || hits.gtm > 1 || hits.simplifi > 1) bad.push(`duplicate requests ${JSON.stringify(hits)}`);
     if (!hits.ownGa4) bad.push('no GA4 collect hit for G-87QBE3D9Z9');
     if (dom.gtagIds.filter((id) => id === 'G-87QBE3D9Z9').length > 1) bad.push('G-87QBE3D9Z9 loaded twice');
+    const wantChat = route === '/es' || route.startsWith('/es/') ? CHAT.es : CHAT.en;
+    if (wantChat && (dom.ownChat.length !== 1 || dom.ownChat[0] !== wantChat)) bad.push(`chat widget ${JSON.stringify(dom.ownChat)} (want one ${wantChat})`);
     if (errors.length) bad.push(`${errors.length} console error(s)`);
     if (bad.length) problems++;
-    console.log(`${bad.length ? '✗' : '✓'} ${route} @${kind}: own scripts ${JSON.stringify(dom.scripts)} | iframes visible/total ${JSON.stringify(dom.frames)} | review card ${dom.reviewCard}${dom.readMoreHidden ? ' (read-more hidden)' : ''} | h1 ${dom.h1} | requests ${JSON.stringify(hits)} | dataLayer [${dom.dataLayer}]\n     gtag.js ids on the page (ours + the GTM container's): ${dom.gtagIds.join(', ')} | chat loaders (GTM container): ${dom.chatTags.join(' · ') || 'none'}${bad.length ? `\n     ${bad.join('; ')}` : ''}`);
+    console.log(`${bad.length ? '✗' : '✓'} ${route} @${kind}: own scripts ${JSON.stringify(dom.scripts)} | iframes visible/total ${JSON.stringify(dom.frames)} | review card ${dom.reviewCard}${dom.readMoreHidden ? ' (read-more hidden)' : ''} | h1 ${dom.h1} | requests ${JSON.stringify(hits)} | dataLayer [${dom.dataLayer}]\n     gtag.js ids on the page (ours + the GTM container's): ${dom.gtagIds.join(', ')} | chat widget ${dom.ownChat.join(', ') || 'none'} | other widget scripts (the widget's own chunks, the GTM container's id-less loader.js): ${dom.chatTags.join(' · ') || 'none'}${bad.length ? `\n     ${bad.join('; ')}` : ''}`);
     for (const e of errors.slice(0, 3)) console.log(`     console: ${e}`);
     if (thirdParty.length) console.log(`     third-party console errors (not the page's own): ${thirdParty.length} — e.g. ${thirdParty[0]}`);
     await page.close();
