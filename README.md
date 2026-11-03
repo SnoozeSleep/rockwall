@@ -69,6 +69,11 @@ Where the Rockwall values live:
   heading colour/alignment stay the section's own. Never in a dark or image section, the marquees, reviews, location cards,
   nav or footer; the navy facts panel inside the ContentPage article (`.snz-facts`) is excluded too. The ContentPage
   sections space their children with a 16px grid gap, so the shared margins are zeroed there (ContentPage.module.css).
+- **Financing "Why Finance" lists** (client brief, November 2026) — the two check-icon lists ("They want better sleep
+  immediately…", "Back and joint support…") on /mattress-financing and /es/mattress-financing read in regular weight,
+  normal style: the builder's <em>/<strong> inside the items are unwrapped (spans, colour, icon kept), desktop + phone copy,
+  markup and hydration payload, by `scripts/financing-lists.mjs` (`npm run financing:lists`, `--check`). Run it after
+  `npm run convert`.
 - **Blog** — five client articles (the "Rockwall Blogs" document, published November 3, 2026) in
   [`lib/blog-posts.ts`](lib/blog-posts.ts) (English) and [`lib/blog-posts-es.ts`](lib/blog-posts-es.ts) (Spanish, different
   slugs paired by `altSlug` and `lib/blog-nav.ts`). Copy verbatim; sections as `blocks` (paragraphs, h3, check-icon /
