@@ -270,24 +270,3 @@
 .olist li { position: relative; padding-left: 44px; counter-increment: step; }
 .olist li::before { content: counter(step); position: absolute; left: 0; top: 0.15em; width: 30px; height: 30px; border-radius: 999px; background: var(--orange); color: #fff; font: 800 0.9rem/30px var(--ui); text-align: center; }
 .tagline { margin: clamp(28px, 4vw, 40px) 0 0; padding: 18px 0 0; border-top: 2px solid rgba(0, 20, 137, 0.1); font: italic 700 clamp(1.15rem, 1.8vw, 1.4rem)/1.35 var(--head); color: var(--navy); }
-
-/* ── the showroom band on its own (ShowroomCtaBand, used outside the blog: /about-us) — the blog's tokens without its page background ── */
-.ctaBand {
-  --navy: #001489;
-  --navy-2: #0022cc;
-  --orange: #f58433;
-  --orange-2: #ff9d5c;
-  --ink: #1e223c;
-  --ink-soft: #3a4166;
-  --muted: #5b6690;
-  --line: rgba(0, 20, 137, 0.1);
-  --head: var(--font-poppins-stack);
-  --body: var(--font-poppins-stack);
-  --ui: var(--font-poppins-stack);
-  --ease: cubic-bezier(0.19, 1, 0.22, 1);
-  font-family: var(--body);
-  line-height: 1.7;
-  padding: 0 0 72px;
-}
-.ctaBand .cta { margin-top: 0; }
-@media (max-width: 767px) { .ctaBand { padding-bottom: 48px; } }

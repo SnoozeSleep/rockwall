@@ -121,18 +121,6 @@ export function BlogCta({ locale = 'en' }: { locale?: Locale }) {
   );
 }
 
-/* The showroom band ("Visit Our Showroom" · Get Dream Mapped → /booking · call · NAP) on a page outside the blog
-   (/about-us, November 2026): the same BlogCta inside the site container, with the blog's colour tokens. */
-export function ShowroomCtaBand({ locale = 'en' }: { locale?: Locale }) {
-  return (
-    <div className={styles.ctaBand}>
-      <div className={styles.container}>
-        <BlogCta locale={locale} />
-      </div>
-    </div>
-  );
-}
-
 /* Sleep Fit Quiz call to action: after the article body, before the showroom CTA and the related posts. */
 export function QuizCta({ locale = 'en' }: { locale?: Locale }) {
   const t = ui(locale).quizCta;

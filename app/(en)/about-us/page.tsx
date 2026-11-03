@@ -2,7 +2,6 @@
 import type { Metadata } from 'next';
 import PageClient from './client';
 import { ReviewWidgetScript } from '@/components/GhlScripts';
-import { ShowroomCtaBand } from '@/components/blog/BlogLayout';
 import { PageSchema } from '@/components/PageSchema';
 import { PAGE_SCHEMA } from './schema';
 
@@ -49,8 +48,6 @@ export default function Page() {
       <PageClient />
       {/* review-widget.js once per page, after the widget iframes (components/GhlScripts.tsx) */}
       <ReviewWidgetScript />
-      {/* the showroom band closes the page: Get Dream Mapped → /booking (components/blog/BlogLayout.tsx) */}
-      <ShowroomCtaBand locale="en" />
     </>
   );
 }
