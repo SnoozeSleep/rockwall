@@ -32,7 +32,7 @@ const CONFIG = {
     address: "919 E Interstate 30, Suite 101, Rockwall, TX 75032",
     bookingUrl: SITE_URL + PREFIX + "/booking",      // Dream Mapping booking page
     shopUrl: SITE_URL + PREFIX + "/mattresses",      // mattresses page
-    // [ROCKWALL_QUIZ_WEBHOOK] the Rockwall sub-account's inbound webhook URL (Automation -> Workflows -> trigger): set in
+    // the Rockwall sub-account's inbound webhook URL (Automation -> Workflows -> trigger): set in
     // lib/integrations.json and injected by components/SleepQuiz.tsx as window.__snzQuizWebhook; empty = the lead is not sent
     // (the payload is logged to the console instead)
     webhookUrl: (typeof window !== "undefined" && window.__snzQuizWebhook) || ""

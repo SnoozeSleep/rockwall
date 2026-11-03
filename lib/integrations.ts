@@ -13,7 +13,7 @@ export type Integrations = {
   simplifiId: string;
   /** LeadConnector chat widget id per language (components/ChatWidget.tsx) */
   chatWidgetId: { en: string; es: string };
-  /** [ROCKWALL_QUIZ_WEBHOOK] inbound webhook URL for the Sleep Fit Quiz lead */
+  /** GoHighLevel inbound webhook URL for the Sleep Fit Quiz lead (public/sleep-fit-quiz.js) */
   quizWebhookUrl: string;
   /** [ROCKWALL_CALENDAR_URL] the Dream Mapping booking calendar id */
   calendarId: string;

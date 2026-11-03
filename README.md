@@ -15,7 +15,7 @@ Where the Rockwall values live:
 - **Third-party ids** — [`lib/integrations.json`](lib/integrations.json): GTM `GTM-TVPN94M` (shared container), GA4
   `G-87QBE3D9Z9` (once), Simpli.fi, the reviews widget, the "Optin" form `1LdL8SpYNbiPVKijjrvr`, the booking calendar
   `DVpZQx1bX7VqidkrE6YN`, the chat widgets `6ae940c0e1c22f053e61210b` (EN) / `6ae941e5629a77bacf134c78` (ES).
-  `[ROCKWALL_QUIZ_WEBHOOK]` is empty = off (**NEEDS CLIENT INPUT**). After editing: `node scripts/integrations.mjs` (form), `node scripts/reviews-cta.mjs` (widget), build.
+  The Sleep Fit Quiz webhook `…/hooks/qR8peonBlnjGI3ZuLHQP/webhook-trigger/gVktp08tOj3l4vVVm3Lu`. After editing: `node scripts/integrations.mjs` (form), `node scripts/reviews-cta.mjs` (widget), build.
 - **Photos** — the store's GoHighLevel media library (`qR8peonBlnjGI3ZuLHQP`), served locally with WebP twins and responsive
   variants by [`scripts/rockwall-photos.mjs`](scripts/rockwall-photos.mjs): storefront `6a8d8085…` (location cards,
   LocalBusiness image, About page frame), team `6a8df824…` (home About section; `TEAM_PHOTO_URL` stays in `lib/location.ts`, unused on /about-us since the "Meet Your
@@ -192,7 +192,7 @@ One footer for the whole site: `components/SiteFooter.tsx` (+ module CSS), rende
 
 ## Sleep Fit Quiz (hand-written route)
 
-`/sleep-quiz` and `/es/sleep-quiz` are the client's Sleep Fit Quiz inside the site header and footer: `components/SleepQuiz.tsx` renders the quiz shell and metadata (self-canonical, hreflang pair, `?r=` results links canonical to the bare page), `components/sleep-quiz/sleep-fit-quiz.css` is the quiz stylesheet scoped under `.snz-quiz`, and `public/sleep-fit-quiz.js` is the quiz logic (scoring, screens, lead form, kiosk mode `?kiosk=1`, shareable results) with every human-readable string in an EN/ES table and the McAllen store CONFIG + GoHighLevel inbound webhook. The converter keeps `app/(en)/sleep-quiz` and `app/es/sleep-quiz`. Calls to action link to it from the header (desktop item + mobile drawer item and button), the footer Company column, the Dream Mapping steps, the brand marquee, the guarantee cards, every FAQ accordion (`overrides/*.html`, styled by `overrides/site.css` → `.snz-quiz-cta`, Spanish copy in `overrides/i18n/es.extra.json`) and the blog posts (`components/blog/BlogLayout.tsx` → `QuizCta`).
+`/sleep-quiz` and `/es/sleep-quiz` are the client's Sleep Fit Quiz inside the site header and footer: `components/SleepQuiz.tsx` renders the quiz shell and metadata (self-canonical, hreflang pair, `?r=` results links canonical to the bare page), `components/sleep-quiz/sleep-fit-quiz.css` is the quiz stylesheet scoped under `.snz-quiz`, and `public/sleep-fit-quiz.js` is the quiz logic (scoring, screens, lead form, kiosk mode `?kiosk=1`, shareable results) with every human-readable string in an EN/ES table and the Rockwall store CONFIG; the lead goes to the GoHighLevel inbound webhook in `lib/integrations.json` (`quizWebhookUrl`). The converter keeps `app/(en)/sleep-quiz` and `app/es/sleep-quiz`. Calls to action link to it from the header (desktop item + mobile drawer item and button), the footer Company column, the Dream Mapping steps, the brand marquee, the guarantee cards, every FAQ accordion (`overrides/*.html`, styled by `overrides/site.css` → `.snz-quiz-cta`, Spanish copy in `overrides/i18n/es.extra.json`) and the blog posts (`components/blog/BlogLayout.tsx` → `QuizCta`).
 
 ## Page fixes (`overrides/site.css`, `overrides/global.css`)
 
